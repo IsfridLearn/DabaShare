@@ -1,0 +1,75 @@
+import { z } from "zod";
+
+// Only same-site relative paths are allowed after login or email links,
+// so a crafted link cannot send users to another website.
+export function safeNextPath(next: unknown, fallback = "/profile"): string {
+  if (typeof next !== "string") return fallback;
+  if (!next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return fallback;
+  if (/[\u0000-\u001f]/.test(next)) return fallback;
+  return next;
+}
+
+// Trim and lowercase before validating; zod checks run in declaration order.
+const email = z
+  .string({ error: "Enter a valid email address." })
+  .trim()
+  .toLowerCase()
+  .max(254, { error: "Enter a valid email address." })
+  .pipe(z.email({ error: "Enter a valid email address." }));
+
+export const passwordSchema = z
+  .string()
+  .min(8, { error: "Use at least 8 characters." })
+  .max(72, { error: "Use at most 72 characters." })
+  .regex(/[A-Za-z]/, { error: "Include at least one letter." })
+  .regex(/[0-9]/, { error: "Include at least one number." });
+
+const displayName = z
+  .string()
+  .trim()
+  .min(1, { error: "Enter your name." })
+  .max(60, { error: "Use at most 60 characters." });
+
+const universityId = z.coerce
+  .number({ error: "Choose your university." })
+  .int({ error: "Choose your university." })
+  .positive({ error: "Choose your university." });
+
+export const signUpSchema = z.object({
+  displayName,
+  email,
+  universityId,
+  password: passwordSchema,
+  confirmAge: z.literal("on", { error: "You must be 18 or older to join." }),
+  acceptTerms: z.literal("on", { error: "Please accept the privacy notice to continue." }),
+});
+
+export const signInSchema = z.object({
+  email,
+  password: z.string().min(1, { error: "Enter your password." }),
+});
+
+export const emailOnlySchema = z.object({ email });
+
+export const newPasswordSchema = z
+  .object({ password: passwordSchema, confirmPassword: z.string() })
+  .refine((v) => v.password === v.confirmPassword, {
+    error: "Passwords don't match.",
+    path: ["confirmPassword"],
+  });
+
+export const usernameSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .regex(/^[a-z0-9_]{3,20}$/, {
+    error: "3–20 characters: lowercase letters, numbers and underscores.",
+  });
+
+export const profileSchema = z.object({
+  username: usernameSchema,
+  displayName,
+  universityId,
+  program: z.string().trim().max(100, { error: "Use at most 100 characters." }),
+  bio: z.string().trim().max(500, { error: "Use at most 500 characters." }),
+});
