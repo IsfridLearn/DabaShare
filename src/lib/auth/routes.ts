@@ -14,4 +14,4 @@ export function routeAccess(pathname: string): RouteAccess {
   return "protected";
 }
 
-export const SIGNED_IN_HOME = "/profile";
+export const SIGNED_IN_HOME = "/courses";

@@ -55,6 +55,8 @@ docs/                  project documentation
 | A12 | Members must confirm they are 18 or older | Keeps minors off a platform with open messaging, and avoids parental-consent handling under the Data Privacy Act. Revisit if senior-high or 17-year-old freshmen need access. |
 | A13 | Auth emails use Supabase's default templates (PKCE `?code=` links) for now | The free tier rejects custom templates without custom SMTP. `/auth/confirm` supports both `?code=` and `?token_hash=`, and the branded templates in `supabase/templates/` are ready for when SMTP is set up. |
 | A14 | The server Supabase client calls `connection()`, and signed-in pages set `instant = false` | Session data must never be prerendered. supabase-js reads the clock (token expiry), which Cache Components forbids during prerendering. Per-user pages block on the server and show `loading.tsx` instead of an instant static shell. |
+| A16 | Course browsing uses one SQL function, `search_courses()` (security invoker), with GET-form filters | Combined filters, tutor and skill search and the total count in one round trip, with RLS still applied. GET URLs are shareable and work without JavaScript. |
+| A17 | Courses (`/courses`) is the signed-in home. No star ratings are shown. | Browsing is the main activity. The prototype's ratings were made up, and showing them would mislead students. |
 | A15 | Avatars are resized in the browser to a 512px WebP before upload | It keeps uploads under 2 MB on mobile data, and image transformations aren't available on the free tier. |
 
 ## Dependencies

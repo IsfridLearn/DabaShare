@@ -11,6 +11,9 @@ The source of truth is `supabase/migrations/`. This document explains the model;
 | `20261122090400_reference_data.sql` | Universities, categories, starter skills (no users or demo content) |
 | `20261122100000_security_hardening.sql` | Fixes from the security review: `private.accounts`, column-level insert grants, secure default privileges, block enforcement on every path, abuse caps, notification de-duplication, session edit fixes, FK indexes |
 
+| `20261123090000_account_deletion.sql` | `delete_my_account()` |
+| `20261124090000_course_marketplace.sql` | `search_courses()`, `set_course_skills()`, `course_removed` notifications when an owner deletes a course |
+
 Tests: `supabase/tests/rls_smoke.sql` (`npm run db:test:rls`) runs 55 rule checks as real impersonated users and always rolls back. Run it after every migration, **against dev only**.
 
 ## Entities
@@ -74,6 +77,10 @@ profiles >── universities
 |---|---|
 | `start_direct_conversation(other_id uuid) → uuid` | Returns the existing one-to-one conversation or creates one. Refuses self-chats, unonboarded users and blocked pairs. |
 | `add_student_skill(skill_name text, skill_kind skill_kind) → bigint` | Normalises the name, creates the canonical skill if needed, and adds it to the caller's list. |
+
+| `search_courses(filter_text, filter_university, filter_price, filter_category, filter_level, page_size, page_offset)` | Published courses visible to the caller. Searches the title and description (full text and partial words), skill names and tutor name. Filters by the tutor's university, free or paid, category and level. Returns `total_count` for pagination (max 48 per page). LIKE wildcards in the search text are escaped. |
+| `set_course_skills(target_course, skill_names)` | Owner only. Replaces a course's skill tags (max 10) with canonical skills, creating new ones under the 50-per-user cap. |
+| `delete_my_account()` | Deletes the caller's account. Everything cascades; filed reports keep the evidence anonymised. |
 
 Planned for later phases: `suggest_matches()` (Phase 5) and a conversation-list function with unread counts (Phase 6).
 

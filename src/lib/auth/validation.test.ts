@@ -6,13 +6,13 @@ describe("safeNextPath", () => {
   it.each([
     ["/onboarding", "/onboarding"],
     ["/u/juan?tab=skills", "/u/juan?tab=skills"],
-    ["https://evil.example", "/profile"],
-    ["//evil.example", "/profile"],
-    ["/\\evil.example", "/profile"],
-    ["javascript:alert(1)", "/profile"],
-    ["/ok\nSet-Cookie:x", "/profile"],
-    [undefined, "/profile"],
-    [42, "/profile"],
+    ["https://evil.example", "/courses"],
+    ["//evil.example", "/courses"],
+    ["/\\evil.example", "/courses"],
+    ["javascript:alert(1)", "/courses"],
+    ["/ok\nSet-Cookie:x", "/courses"],
+    [undefined, "/courses"],
+    [42, "/courses"],
   ])("%s -> %s", (input, expected) => {
     expect(safeNextPath(input)).toBe(expected);
   });

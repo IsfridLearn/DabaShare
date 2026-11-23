@@ -349,6 +349,53 @@ begin
     r := r || ('PASS cancelled session is closed (' || sqlerrm || ')');
   end;
 
+  -- ── Phase 4: marketplace search, course skills, course deletion ───────
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  perform public.set_course_skills(course_free, array['Python', ' react ', 'python']);
+  select count(*) into n from public.course_skills where course_id = course_free;
+  r := r || (case when n = 2 then 'PASS' else 'FAIL' end || ' set_course_skills dedupes canonical skills (' || n || ')');
+  begin
+    perform public.set_course_skills(course_paid, array['Hijack']);
+    r := r || 'FAIL A can tag B''s course'::text;
+  exception when others then
+    r := r || ('PASS only owners tag courses (' || sqlerrm || ')');
+  end;
+  begin
+    perform public.set_course_skills(course_free, array['Python','Java','SQL','React','Calculus','Algebra','Physics','Chemistry','Biology','Economics','Guitar']);
+    r := r || 'FAIL more than 10 course skills allowed'::text;
+  exception when others then
+    r := r || ('PASS course skills capped at 10 (' || sqlerrm || ')');
+  end;
+  insert into public.courses (owner_id, title, description, category_id, level, status)
+  values (a, 'Hidden Draft', 'Not ready to publish yet.', 1, 'beginner', 'draft');
+  select count(*) into n from public.search_courses() where id = course_paid;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' search hides courses of someone who blocked you');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.search_courses() where id = course_free or id = course_paid;
+  r := r || (case when n = 2 then 'PASS' else 'FAIL' end || ' search lists published courses (' || n || ')');
+  select count(*) into n from public.search_courses() where title = 'Hidden Draft';
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' search hides drafts');
+  select count(*) into n from public.search_courses(filter_text => 'react') where id = course_free;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' search matches skill names');
+  select count(*) into n from public.search_courses(filter_text => 'alic') where id = course_free;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' search matches partial tutor name');
+  select count(*) into n from public.search_courses(filter_text => '100%_off') where true;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' LIKE wildcards in search are escaped');
+  select count(*) into n from public.search_courses(filter_price => 'paid') where id in (course_free, course_paid);
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' price filter (paid)');
+  select count(*) into n from public.search_courses(filter_level => 'expert') where id = course_paid;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' level filter');
+  select count(*) into n from public.search_courses(filter_university => 2::smallint) where id in (course_free, course_paid);
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' university filter uses the tutor''s university');
+
+  insert into public.course_enrollments (course_id, student_id) values (course_free, d);
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  delete from public.courses where id = course_free;
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.notifications where recipient_id = d and type = 'course_removed';
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' enrolled student notified when a course is deleted (' || n || ')');
+
   -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
   perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
   begin

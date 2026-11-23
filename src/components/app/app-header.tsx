@@ -5,9 +5,11 @@ import { Logo } from "@/components/ui/logo";
 import { signOut } from "@/lib/auth/actions";
 import { getMyProfile } from "@/lib/auth/session";
 
-// Only links to features that exist; later phases add Courses, Matches,
-// Sessions and Messages here.
+// Only links to features that exist; later phases add Matches, Sessions and
+// Messages here.
 const NAV = [
+  { href: "/courses", label: "Courses" },
+  { href: "/courses/mine", label: "My courses" },
   { href: "/profile", label: "My profile" },
   { href: "/settings", label: "Settings" },
 ];
@@ -16,7 +18,7 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-20 border-b border-gray-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
-        <Link href="/profile" className="text-brand" aria-label="DabaShare">
+        <Link href="/courses" className="text-brand" aria-label="DabaShare">
           <Logo size={28} />
         </Link>
         <nav aria-label="Main" className="ml-2 hidden gap-1 sm:flex">

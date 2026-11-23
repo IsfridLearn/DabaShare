@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { SIGNED_IN_HOME } from "./routes";
 
 // Only same-site relative paths are allowed after login or email links,
 // so a crafted link cannot send users to another website.
-export function safeNextPath(next: unknown, fallback = "/profile"): string {
+export function safeNextPath(next: unknown, fallback = SIGNED_IN_HOME): string {
   if (typeof next !== "string") return fallback;
   if (!next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return fallback;
   if (/[\u0000-\u001f]/.test(next)) return fallback;

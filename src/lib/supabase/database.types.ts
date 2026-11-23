@@ -737,6 +737,38 @@ export type Database = {
         Returns: number
       }
       delete_my_account: { Args: never; Returns: undefined }
+      search_courses: {
+        Args: {
+          filter_category?: number
+          filter_level?: Database["public"]["Enums"]["course_level"]
+          filter_price?: string
+          filter_text?: string
+          filter_university?: number
+          page_offset?: number
+          page_size?: number
+        }
+        Returns: {
+          category_id: number
+          category_name: string
+          created_at: string
+          description: string
+          id: string
+          level: Database["public"]["Enums"]["course_level"]
+          owner_avatar: string
+          owner_id: string
+          owner_name: string
+          owner_username: string
+          price_php: number
+          skill_names: string[]
+          title: string
+          total_count: number
+          university_short: string
+        }[]
+      }
+      set_course_skills: {
+        Args: { skill_names: string[]; target_course: string }
+        Returns: undefined
+      }
       start_direct_conversation: { Args: { other_id: string }; Returns: string }
     }
     Enums: {
@@ -752,6 +784,7 @@ export type Database = {
         | "participation_updated"
         | "session_updated"
         | "session_cancelled"
+        | "course_removed"
       participant_status:
         | "invited"
         | "requested"
@@ -904,6 +937,7 @@ export const Constants = {
         "participation_updated",
         "session_updated",
         "session_cancelled",
+        "course_removed",
       ],
       participant_status: [
         "invited",

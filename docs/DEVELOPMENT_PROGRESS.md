@@ -1,17 +1,17 @@
 # DabaShare Development Progress
 
-Last updated: 2026-11-23
+Last updated: 2026-11-24
 
-**Current Phase:** Phase 3 — Authentication and Student Profiles. The code is complete and tested; it's waiting on one manual check, a real signup email.
+**Current Phase:** Phase 5 — Student Matching (next). Phase 4 is complete. Phase 3 is still waiting on your manual signup-email check.
 
-**Overall Progress:** 2/10 phases completed.
+**Overall Progress:** 3/10 phases completed (1, 2 and 4; Phase 3 waits on one manual check).
 
 ## Phase Status
 
 - [x] Phase 1 — Repository Audit
 - [x] Phase 2 — Architecture and Foundation
 - [ ] Phase 3 — Authentication and Profiles (one manual check left, see below)
-- [ ] Phase 4 — Course Marketplace
+- [x] Phase 4 — Course Marketplace
 - [ ] Phase 5 — Student Matching
 - [ ] Phase 6 — Messaging
 - [ ] Phase 7 — Study Sessions and Notifications
@@ -25,6 +25,18 @@ Last updated: 2026-11-23
 2. **Known external blocker for real students:** Supabase's built-in email only delivers to org members, so custom SMTP is needed before anyone else can sign up. It's tracked in DEPLOYMENT.md, and you need to choose a provider.
 
 ## Log
+
+### 2026-11-24 — Phase 4 complete
+
+Completion criterion met: students can publish, discover, manage and enroll in courses. It was verified end to end on a production build with two real accounts.
+
+- **Migration** `20261124090000_course_marketplace.sql`: `search_courses()` (RLS-aware search, filters and count), `set_course_skills()` (owner only, max 10), and `course_removed` notifications.
+- **Pages:**
+  - `/courses` (now the signed-in home): hero, GET-form filters, price pills, results grid, empty states, pagination.
+  - `/courses/new`, `/courses/[id]`, `/courses/[id]/edit` and `/courses/mine`.
+- **Enrollment:** free courses are instant; paid courses send a request with an optional note, and the owner accepts or declines. Students can leave or cancel and re-enroll. Paid courses explain that payment is arranged with the tutor and that DabaShare handles no money.
+- **Prototype defects fixed:** the "$ ₱" badge is now pesos only, no fabricated ratings are shown, and the university filter and form use the full university list.
+
 
 ### 2026-11-23 — Phase 3
 
@@ -54,7 +66,10 @@ Last updated: 2026-11-23
 
 | Date | Check | Result |
 |---|---|---|
-| 2026-11-23 | `npm run check` | Passed: 0 type errors, 0 lint problems, 35/35 unit tests |
+| 2026-11-24 | `npm run check` | Passed: 0 type errors, 0 lint problems, 52/52 unit tests |
+| 2026-11-24 | `npm run build` | Passed |
+| 2026-11-24 | `npm run db:test:rls` | **78 passed, 0 failed** (rolled back) |
+| 2026-11-24 | Production-build E2E (auth, profiles and marketplace) | **71 passed, 0 failed.** Dev data was removed afterwards: 0 users, courses or notifications, and 55 seed skills. |
 | 2026-11-23 | `npm run build` | Passed |
 | 2026-11-23 | `npm run db:test:rls` (extended for Phase 3) | **65 passed, 0 failed** (rolled back) |
 | 2026-11-23 | No-JS E2E of the real forms on a **production build** | **43 passed, 0 failed** (details in SECURITY.md). The test users were deleted, and dev is back to 0 users. |
@@ -68,8 +83,8 @@ Last updated: 2026-11-23
 
 ## Next steps
 
-1. Your manual signup check, which closes Phase 3.
-2. Phase 4, the course marketplace: create, edit and delete courses; browse, search and filter by university, price, category and level; course details; free enrollment and paid enrollment requests, with owner approval.
+1. Your manual signup-email check, which closes Phase 3.
+2. Phase 5, student matching: `suggest_matches()`, which scores teach/learn overlap in both directions plus shared interests, university and categories, and explains each match; a matches page; and a "Message" button that starts a conversation in Phase 6.
 
 ## Blockers
 

@@ -12,8 +12,11 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | Profiles | Avatar upload (browser-resized WebP), remove photo | Built. Storage rules tested with a real user; **the browser upload UI is UNTESTED**. | 3 |
 | Settings | Discoverable toggle, change password, delete account | Done (E2E) | 3 |
 | Legal | Privacy notice page (draft, needs review) | Built | 3 |
-| Courses | Create, edit and delete; browse, search and filter (university, price, category, level); details | DB only | 4 |
-| Courses | Enroll (free) or request enrollment (paid), owner accepts or declines | DB only | 4 |
+| Courses | Create, edit and delete (with confirmation); draft, published and archived visibility; up to 10 skill tags | Done (E2E) | 4 |
+| Courses | Browse with search (title, description, skills, tutor name), filters (university, price, category, level) and pagination, using shareable GET URLs | Done (E2E) | 4 |
+| Courses | Detail page with tutor card. Free courses enroll instantly; paid courses send a request with an optional note. Students can leave or cancel and re-enroll. | Done (E2E) | 4 |
+| Courses | Owner request queue (accept, decline, remove), and My courses (teaching with pending counts, learning with statuses) | Done (E2E) | 4 |
+| Courses | Ratings and reviews | Not built. The prototype's ratings were fabricated, so none are shown until a real review feature exists. | — |
 | Matching | Skill and interest based suggestions with reasons, public profiles, "Message" button | Planned | 5 |
 | Messaging | One-to-one conversations, realtime messages, unread indicators | DB only | 6 |
 | Safety | Block and report | DB only | 6 |
