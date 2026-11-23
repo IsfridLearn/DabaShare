@@ -396,6 +396,45 @@ begin
   select count(*) into n from public.notifications where recipient_id = d and type = 'course_removed';
   r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' enrolled student notified when a course is deleted (' || n || ')');
 
+  -- ── Phase 5: matching ──────────────────────────────────────────────────
+  -- A teaches Python / learns C++ (added earlier). D is A's mirror image, E
+  -- teaches Python only, B (who blocked A) also teaches C++.
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  perform public.add_student_skill('C++', 'teach');
+  perform public.add_student_skill('Python', 'learn');
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  perform public.add_student_skill('Python', 'teach');
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  perform public.add_student_skill('C++', 'teach');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.suggest_matches() where profile_id = d;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' matches exclude yourself');
+  select teaches_you::text || '|' || learns_from_you::text into v_text from public.suggest_matches() where profile_id = a;
+  r := r || (case when v_text = '{Python}|{C++}' then 'PASS' else 'FAIL' end || ' mutual match explains both directions (' || coalesce(v_text, 'none') || ')');
+  select profile_id into v_uuid from public.suggest_matches() limit 1;
+  r := r || (case when v_uuid = a then 'PASS' else 'FAIL' end || ' skill swap ranks above one-way match');
+  select count(*) into n from public.suggest_matches() where profile_id = e and cardinality(teaches_you) = 1;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' one-way match (E teaches what D learns)');
+  select count(*) into n from public.suggest_matches(filter_mode => 'learns_from_me');
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' filter: wants to learn from me (' || n || ')');
+  select count(*) into n from public.suggest_matches() where profile_id = c;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' un-onboarded students are never suggested');
+  select bool_and(same_university) into v_text from public.suggest_matches(same_university_only => true);
+  r := r || (case when coalesce(v_text, 'true') = 'true' then 'PASS' else 'FAIL' end || ' same-university filter');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  update public.profiles set discoverable = false where id = e;
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.suggest_matches() where profile_id = e;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' non-discoverable students are hidden');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.suggest_matches() where profile_id = b;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' a student who blocked you is never suggested');
+  select count(*) into n from public.suggest_matches() where profile_id = d;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' matching is symmetric (A sees D)');
+
   -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
   perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
   begin

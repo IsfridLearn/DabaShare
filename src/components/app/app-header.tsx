@@ -5,10 +5,10 @@ import { Logo } from "@/components/ui/logo";
 import { signOut } from "@/lib/auth/actions";
 import { getMyProfile } from "@/lib/auth/session";
 
-// Only links to features that exist; later phases add Matches, Sessions and
-// Messages here.
+// Only links to features that exist; later phases add Sessions and Messages here.
 const NAV = [
   { href: "/courses", label: "Courses" },
+  { href: "/matches", label: "Matches" },
   { href: "/courses/mine", label: "My courses" },
   { href: "/profile", label: "My profile" },
   { href: "/settings", label: "Settings" },

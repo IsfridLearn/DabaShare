@@ -1,10 +1,10 @@
 # DabaShare Development Progress
 
-Last updated: 2026-11-24
+Last updated: 2026-11-25
 
-**Current Phase:** Phase 5 — Student Matching (next). Phase 4 is complete. Phase 3 is still waiting on your manual signup-email check.
+**Current Phase:** Phase 6 — Messaging (next). Phase 5 is complete. Phase 3 is still waiting on your manual signup-email check.
 
-**Overall Progress:** 3/10 phases completed (1, 2 and 4; Phase 3 waits on one manual check).
+**Overall Progress:** 4/10 phases completed (1, 2, 4 and 5; Phase 3 waits on one manual check).
 
 ## Phase Status
 
@@ -12,7 +12,7 @@ Last updated: 2026-11-24
 - [x] Phase 2 — Architecture and Foundation
 - [ ] Phase 3 — Authentication and Profiles (one manual check left, see below)
 - [x] Phase 4 — Course Marketplace
-- [ ] Phase 5 — Student Matching
+- [x] Phase 5 — Student Matching
 - [ ] Phase 6 — Messaging
 - [ ] Phase 7 — Study Sessions and Notifications
 - [ ] Phase 8 — UI/UX Refinement
@@ -25,6 +25,15 @@ Last updated: 2026-11-24
 2. **Known external blocker for real students:** Supabase's built-in email only delivers to org members, so custom SMTP is needed before anyone else can sign up. It's tracked in DEPLOYMENT.md, and you need to choose a provider.
 
 ## Log
+
+### 2026-11-25 — Phase 5 complete
+
+Completion criterion met: students discover relevant learning partners from real profile data, and every suggestion explains why it was made.
+
+- **Migration** `20261125090000_student_matching.sql`: `suggest_matches()`, a security-invoker function with an explainable score (see DATABASE.md).
+- **Page:** `/matches` with match cards showing the reasons, a skill-swap badge, the number of courses offered and a profile link; filter pills; a prompt when skills are missing; empty states; pagination.
+- **Navigation:** Matches added to the nav. The courses hero has "Find learning partners", and the profile skills card links to matches.
+- **Deferred to Phase 6:** the "Message" button. It needs real conversations, and a button that leads nowhere isn't allowed.
 
 ### 2026-11-24 — Phase 4 complete
 
@@ -66,6 +75,10 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 | Date | Check | Result |
 |---|---|---|
+| 2026-11-25 | `npm run check` | Passed: 0 type errors, 0 lint problems, 58/58 unit tests |
+| 2026-11-25 | `npm run build` | Passed |
+| 2026-11-25 | `npm run db:test:rls` | **88 passed, 0 failed** (rolled back) |
+| 2026-11-25 | Production-build E2E (auth, profiles, marketplace, matching) | **79 passed, 0 failed.** Dev data was removed afterwards. |
 | 2026-11-24 | `npm run check` | Passed: 0 type errors, 0 lint problems, 52/52 unit tests |
 | 2026-11-24 | `npm run build` | Passed |
 | 2026-11-24 | `npm run db:test:rls` | **78 passed, 0 failed** (rolled back) |
@@ -84,7 +97,7 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 ## Next steps
 
 1. Your manual signup-email check, which closes Phase 3.
-2. Phase 5, student matching: `suggest_matches()`, which scores teach/learn overlap in both directions plus shared interests, university and categories, and explains each match; a matches page; and a "Message" button that starts a conversation in Phase 6.
+2. Phase 6, messaging: a conversation list with unread counts, a chat view with realtime delivery, persistent history, "Message" buttons on matches, profiles and courses, and block and report with a UI.
 
 ## Blockers
 

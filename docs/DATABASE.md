@@ -12,6 +12,7 @@ The source of truth is `supabase/migrations/`. This document explains the model;
 | `20261122100000_security_hardening.sql` | Fixes from the security review: `private.accounts`, column-level insert grants, secure default privileges, block enforcement on every path, abuse caps, notification de-duplication, session edit fixes, FK indexes |
 
 | `20261123090000_account_deletion.sql` | `delete_my_account()` |
+| `20261125090000_student_matching.sql` | `suggest_matches()` |
 | `20261124090000_course_marketplace.sql` | `search_courses()`, `set_course_skills()`, `course_removed` notifications when an owner deletes a course |
 
 Tests: `supabase/tests/rls_smoke.sql` (`npm run db:test:rls`) runs 55 rule checks as real impersonated users and always rolls back. Run it after every migration, **against dev only**.
@@ -82,7 +83,9 @@ profiles >── universities
 | `set_course_skills(target_course, skill_names)` | Owner only. Replaces a course's skill tags (max 10) with canonical skills, creating new ones under the 50-per-user cap. |
 | `delete_my_account()` | Deletes the caller's account. Everything cascades; filed reports keep the evidence anonymised. |
 
-Planned for later phases: `suggest_matches()` (Phase 5) and a conversation-list function with unread counts (Phase 6).
+| `suggest_matches(filter_mode, same_university_only, page_size, page_offset)` | Ranks other discoverable, onboarded students (RLS removes blocked ones). Score: 3 per skill they teach that you learn, 3 per skill they learn that you teach, +2 for a two-way swap, +1 per shared interest, +1 per matching course category, +1 for the same university. It needs a skill, interest or course overlap; the same university alone isn't a match. Returns the reason arrays and `total_count`. |
+
+Planned for later phases: a conversation-list function with unread counts (Phase 6).
 
 ## Changing the schema
 

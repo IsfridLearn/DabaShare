@@ -770,6 +770,30 @@ export type Database = {
         Returns: undefined
       }
       start_direct_conversation: { Args: { other_id: string }; Returns: string }
+      suggest_matches: {
+        Args: {
+          filter_mode?: string
+          page_offset?: number
+          page_size?: number
+          same_university_only?: boolean
+        }
+        Returns: {
+          avatar_path: string
+          course_categories: string[]
+          display_name: string
+          learns_from_you: string[]
+          profile_id: string
+          program: string
+          published_courses: number
+          same_university: boolean
+          score: number
+          shared_interests: string[]
+          teaches_you: string[]
+          total_count: number
+          university_short: string
+          username: string
+        }[]
+      }
     }
     Enums: {
       course_level: "beginner" | "intermediate" | "advanced" | "expert"

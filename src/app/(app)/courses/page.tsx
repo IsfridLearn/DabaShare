@@ -34,10 +34,10 @@ export default async function CoursesPage({ searchParams }: PageProps<"/courses"
             + Post a course
           </Link>
           <Link
-            href="/courses/mine"
+            href="/matches"
             className="inline-flex items-center rounded-control border-[1.5px] border-white/60 px-5 py-2.5 font-display text-[0.95rem] font-semibold text-white hover:bg-white/10"
           >
-            My courses
+            Find learning partners →
           </Link>
         </div>
       </section>

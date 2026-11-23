@@ -17,7 +17,9 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | Courses | Detail page with tutor card. Free courses enroll instantly; paid courses send a request with an optional note. Students can leave or cancel and re-enroll. | Done (E2E) | 4 |
 | Courses | Owner request queue (accept, decline, remove), and My courses (teaching with pending counts, learning with statuses) | Done (E2E) | 4 |
 | Courses | Ratings and reviews | Not built. The prototype's ratings were fabricated, so none are shown until a real review feature exists. | — |
-| Matching | Skill and interest based suggestions with reasons, public profiles, "Message" button | Planned | 5 |
+| Matching | Ranked suggestions from teach/learn overlap in both directions, skill-swap bonus, shared interests, course categories and university, with the reasons shown on every card | Done (E2E) | 5 |
+| Matching | Filters (can teach me, wants to learn from me, my university only), prompt when skills are missing, respects the discoverable setting and blocks | Done (E2E) | 5 |
+| Matching | "Message" button on matches and profiles | Planned with conversations | 6 |
 | Messaging | One-to-one conversations, realtime messages, unread indicators | DB only | 6 |
 | Safety | Block and report | DB only | 6 |
 | Sessions | Create, edit and cancel; join or request; invitations; capacity; meeting link for participants | DB only | 7 |

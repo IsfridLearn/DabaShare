@@ -66,6 +66,8 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | 2026-11-23 | Production-build E2E after the fixes (2 temporary users, deleted afterwards) | **43 passed, 0 failed.** Adds: password change needs the current password, the old password stops working, a reset without a recovery link is refused, and a deleted account's other-device session is cleared via `/auth/signout`. |
 | 2026-11-24 | `npm run db:test:rls` extended for the marketplace | **78 passed, 0 failed.** Search hides drafts and tutors who blocked you. Filters work, including the tutor's university. Skill, partial-name and wildcard-escaping search checks pass. Only owners can tag courses, with a cap of 10. Deleting a course notifies its students. |
 | 2026-11-24 | Production-build E2E with the marketplace scenario (2 temporary users, deleted afterwards) | **71 passed, 0 failed.** Adds: create (with paid-amount validation), drafts hidden from others, search and filters, invalid and junk URLs, a non-owner blocked from the edit page, free and paid enrollment, the request note, owner accept, leave and re-enroll, edit, and delete with confirmation. |
+| 2026-11-25 | `npm run db:test:rls` extended for matching | **88 passed, 0 failed.** Matches exclude you, unfinished profiles, non-discoverable students and anyone in a block. Reasons cover both directions, swaps rank first, and the filters work. |
+| 2026-11-25 | Production-build E2E with the matching scenario | **79 passed, 0 failed.** Adds: the no-skills prompt, a swap with its reasons, profile links, filters, symmetry, and a hidden student disappearing from matches. |
 | — | Realtime delivery under RLS, real email delivery, the in-browser avatar upload UI | UNTESTED |
 
 ### Phase 3 auth hardening (from review)

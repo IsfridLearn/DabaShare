@@ -18,7 +18,8 @@ export const instant = false;
 export const metadata = { title: "My profile" };
 
 const NOTICES: Record<string, string> = {
-  welcome: "Welcome to DabaShare! Add what you can teach and what you want to learn so we can match you.",
+  welcome:
+    "Welcome to DabaShare! Add what you can teach and what you want to learn, then check Matches for learning partners.",
   "password-updated": "Your password has been updated.",
 };
 
@@ -78,6 +79,9 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
             <SkillSuggestions id="skill-suggestions" names={skillNames} />
             <SkillsEditor kind="teach" skills={details.teaches} suggestionsId="skill-suggestions" />
             <SkillsEditor kind="learn" skills={details.learns} suggestionsId="skill-suggestions" />
+            <Link href="/matches" className="text-sm font-medium text-brand hover:underline">
+              See students who match these skills →
+            </Link>
           </Card>
 
           <Card className="flex flex-col gap-4">
