@@ -2,9 +2,9 @@
 
 Last updated: 2026-11-28
 
-**Current Phase:** Phase 9 — Security, Testing and QA (next). Phases 1–8 are complete.
+**Current Phase:** Phase 10 — Deployment and Production Preparation (next). Phases 1–9 are complete.
 
-**Overall Progress:** 8/10 phases completed.
+**Overall Progress:** 9/10 phases completed.
 
 ## Phase Status
 
@@ -16,7 +16,7 @@ Last updated: 2026-11-28
 - [x] Phase 6 — Messaging
 - [x] Phase 7 — Study Sessions and Notifications
 - [x] Phase 8 — UI/UX Refinement
-- [ ] Phase 9 — Security and Testing
+- [x] Phase 9 — Security and Testing
 - [ ] Phase 10 — Deployment
 
 ## Phase 3 sign-off
@@ -24,6 +24,18 @@ Last updated: 2026-11-28
 Your real account (created 2026-11-23) proves the end-to-end email flow: signup through the real form, a delivered confirmation email, a confirmed address, onboarding done, and 7 skills (including 2 new canonical skills). The in-browser photo upload is still UNTESTED; the storage rules behind it were tested on 2026-11-23.
 
 ## Log
+
+### 2026-11-28 — Phase 9 complete
+
+Completion criterion met: critical workflows work, access controls are tested, and no known critical (or high) issues are open.
+
+- **Independent security review** of everything since Phase 3: 0 critical and 0 high findings, and no RLS bypass, IDOR or escalation. 2 medium and 9 low findings are fixed; 2 low findings are documented as known limitations in SECURITY.md.
+- **Migrations:** `20261128090000_phase9_hardening.sql` and `20261128100000_open_hidden_conversation.sql`. These add the abuse caps (conversations, courses, sessions), hide-a-conversation, de-duplicated session updates, no replies to deleted accounts, a bounded inbox, and input bounds.
+- **App:**
+  - Security headers, notification links no longer prefetched, and a "Hide" button in chat.
+  - Strict cursor and filter validation, an inline retry for older messages, and limited owner lists.
+- **Repeatable tests in the repo:** `npm run test:e2e` (138 checks, self-cleaning, guarded to the dev project) and `npm run db:test:rls` (119 checks).
+- **Dependency audit:** 0 vulnerabilities.
 
 ### 2026-11-28 — Phase 8 complete
 
@@ -129,6 +141,10 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 | Date | Check | Result |
 |---|---|---|
+| 2026-11-28 | Phase 9: `npm run check` | Passed: 87/87 unit tests |
+| 2026-11-28 | Phase 9: `npm run db:test:rls` | **119 passed, 0 failed** |
+| 2026-11-28 | Phase 9: `npm run test:e2e` | **138 passed, 0 failed** (exit 0, self-cleaned) |
+| 2026-11-28 | Phase 9: `npm audit`, headers, advisors | 0 vulnerabilities; headers present; only expected advisor items |
 | 2026-11-28 | `npm run check` | Passed: 0 type errors, 0 lint problems, 86/86 unit tests |
 | 2026-11-28 | `npm run build` | Passed |
 | 2026-11-28 | Screenshots (headless Chrome, 390px and 1280px) of profile, public profile, chat, inbox, courses and session pages with seeded content | Checked visually before and after: the phone header overflow and the clipped nav are gone, the chat fills the screen, the profile order is right, and the overlap section renders |
@@ -163,12 +179,13 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 ## Next steps
 
-Phase 9, security, testing and QA:
+Phase 10, deployment and production preparation. It needs your decisions and accounts:
 
-1. A full independent security review of the whole app.
-2. Automate the RLS smoke test and the E2E suite as repeatable scripts in the repo.
-3. Rate limits for signup and login, and a review of Supabase Auth settings.
-4. Resolve findings and document known limitations.
+1. **Email (SMTP) provider** for real students (for example Resend or Brevo; free tiers exist, and some need a domain).
+2. **Production Supabase project:** create it and apply the migrations. It needs the same org and free tier, or Pro if you want leaked-password protection, daily backups and no pausing.
+3. **Vercel project** linked to the GitHub repo, with production environment variables and optionally a domain.
+4. Merge `phase-2-foundation` into `main`.
+5. Error monitoring, a backup plan, and a release checklist.
 
 ## Blockers
 

@@ -7,6 +7,7 @@ import { StudentMenu } from "@/components/safety/student-menu";
 import { Avatar } from "@/components/ui/avatar";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { isUuid } from "@/lib/courses/queries";
+import { hideConversation } from "@/lib/messages/actions";
 import { getInbox, getMessages } from "@/lib/messages/queries";
 
 // Per-user content: navigation waits for the server (loading.tsx shows meanwhile).
@@ -19,7 +20,7 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
   const { id } = await params;
   if (!isUuid(id)) notFound();
 
-  const inbox = await getInbox();
+  const inbox = await getInbox(id);
   // Only conversations you belong to are in your inbox (RLS), so this doubles
   // as the membership check.
   const conversation = inbox.find((c) => c.conversation_id === id);
@@ -58,6 +59,15 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
               )}
               {conversation.other_username && <span className="block truncate text-xs text-gray-600">@{conversation.other_username}</span>}
             </div>
+            <form action={hideConversation.bind(null, id)}>
+              <button
+                type="submit"
+                className="rounded-control px-2.5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                title="Hide this conversation until a new message arrives"
+              >
+                Hide
+              </button>
+            </form>
             {conversation.other_id && conversation.other_username && (
               <StudentMenu studentId={conversation.other_id} username={conversation.other_username} />
             )}
@@ -70,6 +80,11 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
             initialMessages={messages}
             initialHasMore={hasMore}
             canSend={conversation.can_send}
+            unavailableReason={
+              conversation.other_id
+                ? "Messaging isn't available in this conversation because one of you blocked the other."
+                : "This student deleted their account, so you can't reply."
+            }
           />
         </section>
       </div>

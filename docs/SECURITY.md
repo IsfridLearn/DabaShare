@@ -32,13 +32,24 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 
 **Blocking** hides profiles, courses and sessions in both directions. It stops new messages, enrollments, joins and re-requests, and it cancels the pair's existing enrollments and participations silently. A blocked user gets the same "not found" or "not open" message as for a missing item, so the block isn't revealed. Report snapshots respect blocks too.
 
-**Abuse limits:**
+**Abuse limits (all enforced in the database):**
+- New conversations: 30 a day per student. Messages: 20 a minute. Reports: 20 a day.
+- Active courses: 20 per student. Upcoming sessions: 20 per host. Session invitations: 50 a day per host.
+- Recipients can **hide** a conversation (it comes back only if a new message arrives) or block the sender.
+
+Earlier limits:
 - Skills: up to 20 per list, and up to 50 new canonical skills per user.
 - Courses: up to 10 skill tags per course.
 - Invitations: up to 50 per host per day.
 - Notifications: at most one unread notification per enrollment, per session participant, and per conversation.
 
 ## Known limitations and open items
+
+- **No full script CSP.** Next.js injects inline scripts, so only the nonce-free directives are set (no framing, no plugins, `form-action` and `base-uri` limited to self). React escaping and the absence of `dangerouslySetInnerHTML` are the XSS defences.
+- **Leaked-password protection is off.** The HaveIBeenPwned check is a Supabase Pro feature. Decide at launch.
+- **Search and matching scale linearly** with the number of courses and students (`ilike` and per-profile subqueries). That's fine at campus scale. Add `pg_trgm` indexes or cached match scores if it gets slow.
+- **Account deletion doesn't require a recent sign-in.** The typed "DELETE" confirmation is in the app, and `delete_my_account()` trusts any valid session. Acceptable today with no XSS vector; revisit if third-party scripts are ever added.
+- **Auth rate limits are per IP**, at Supabase's default of 30 sign-ins or sign-ups per 5 minutes. A class on shared campus Wi-Fi could hit that, so raise it for production (see DEPLOYMENT.md).
 
 - **Avatars are public by URL.** File names are unguessable, but anyone who has a URL can view it.
 - **Rate limits:** messages are capped at 20 a minute and reports at 20 a day per student, in the database. Signup and login throttling relies on Supabase Auth's built-in limits, to be reviewed in Phase 9.
@@ -74,6 +85,12 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | 2026-11-27 | `npm run db:test:rls` extended for sessions and notifications | **110 passed, 0 failed.** Cancelled sessions leave Upcoming, My sessions shows your place, blocked hosts' sessions are hidden, approval turns a join into a request, notifications carry the actor, title and host flag, and students only see their own notifications. |
 | 2026-11-27 | Production-build E2E with the sessions and notifications scenario | **134 passed, 0 failed.** Adds: link validation, the database refusing past starts, PH-time display and editing, the link hidden until you join, seats and leave/rejoin, invites (unknown and duplicate), non-host edit gives 404, approval flow, notifications (open goes to the target, mark all as read), the My sessions and Live tabs, and cancellation notices. One E2E failure led to a fix: the meeting URL is no longer sent to the browser after a session is cancelled or ended. |
 | 2026-11-23 | Real signup by the project owner (org member email) | The confirmation email was delivered, the address confirmed, and onboarding completed. |
+| 2026-11-28 | Independent security review of Phases 4–7 (`qa-security-reviewer`, Sonnet) | **0 critical, 0 high, 2 medium, 11 low; no RLS bypass, IDOR or privilege escalation.** Both mediums were fixed (notification links no longer prefetched; conversation caps, hide and a bounded inbox), along with 9 of the lows. L7 (trigram indexes for search) and L11 (recent sign-in before account deletion) are documented below. |
+| 2026-11-28 | `npm audit` | 0 vulnerabilities (production and dev dependencies) |
+| 2026-11-28 | Security headers on every response (`curl -I`) | CSP `frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'`, X-Frame-Options DENY, nosniff, a strict Referrer-Policy, a Permissions-Policy, HSTS, and no X-Powered-By |
+| 2026-11-28 | `npm run db:test:rls` | **119 passed, 0 failed** |
+| 2026-11-28 | `npm run test:e2e` (repo script, production build) | **138 passed, 0 failed**, exit code 0, and its own users removed |
+| 2026-11-28 | Supabase security advisor | Only expected items remain: 5 intended `security definer` RPCs, each checking `auth.uid()`, and leaked-password protection (a Pro-plan feature; see the limitations) |
 | — | Password-reset email to a real inbox, the in-browser avatar upload UI and realtime in a real browser tab | UNTESTED |
 
 ### Phase 3 auth hardening (from review)

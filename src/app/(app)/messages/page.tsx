@@ -12,6 +12,7 @@ export const metadata = { title: "Messages" };
 const NOTICES: Record<string, { tone: "info" | "success" | "error"; text: string }> = {
   blocked: { tone: "success", text: "Student blocked. You can unblock them in Settings." },
   unavailable: { tone: "error", text: "That conversation isn't available." },
+  hidden: { tone: "info", text: "Conversation hidden. It comes back if a new message arrives." },
 };
 
 export default async function MessagesPage({ searchParams }: PageProps<"/messages">) {

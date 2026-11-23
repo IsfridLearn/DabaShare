@@ -517,6 +517,67 @@ begin
   select count(*) into n from public.my_notifications() where type = 'session_request';
   r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' students only see their own notifications');
 
+  -- ── Phase 9: abuse limits and hide-a-conversation ──────────────────────
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  begin
+    perform public.set_course_skills(course_paid, (select array_agg('s' || g) from generate_series(1, 21) g));
+    r := r || 'FAIL oversized skill list accepted'::text;
+  exception when others then
+    r := r || ('PASS oversized skill list rejected up front (' || sqlerrm || ')');
+  end;
+  -- B edits the session time twice: D (requested) keeps one unread update.
+  update public.study_sessions set starts_at = starts_at + interval '1 hour', ends_at = ends_at + interval '1 hour' where id = v_uuid;
+  update public.study_sessions set starts_at = starts_at + interval '1 hour', ends_at = ends_at + interval '1 hour' where id = v_uuid;
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.notifications where recipient_id = d and type = 'session_updated' and read_at is null;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' repeated time edits leave one unread update (' || n || ')');
+
+  -- D hides conv2 (D<->A); it disappears until a newer message arrives.
+  update public.conversation_members set hidden_at = now() where conversation_id = conv2 and profile_id = d;
+  select count(*) into n from public.my_conversations() where conversation_id = conv2;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' hidden conversation leaves the inbox');
+  -- (One transaction = one now(): backdate the hide so the message is "newer".)
+  update public.conversation_members set hidden_at = now() - interval '1 hour' where conversation_id = conv2 and profile_id = d;
+  select count(*) into n from public.my_conversations() where conversation_id = conv2;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' hidden conversation without new messages stays hidden');
+  insert into public.messages (conversation_id, sender_id, body) values (conv2, d, 'Back again');
+  select count(*) into n from public.my_conversations() where conversation_id = conv2;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' a newer message brings it back');
+  begin
+    update public.conversation_members set last_read_at = now(), hidden_at = null where conversation_id = conv2 and profile_id = a;
+    get diagnostics n = row_count;
+    r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' cannot hide or mark read for someone else');
+  exception when others then
+    r := r || ('PASS cannot hide for someone else (' || sqlerrm || ')');
+  end;
+
+  -- New-conversation cap: 30 per day per creator.
+  perform set_config('role', admin_role, true);
+  insert into public.conversations (direct_key, created_by)
+  select 'cap-test-' || g, e from generate_series(1, 30) g;
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  begin
+    perform public.start_direct_conversation(b);
+    r := r || 'FAIL new-conversation cap not enforced'::text;
+  exception when others then
+    r := r || ('PASS new-conversation cap (' || sqlerrm || ')');
+  end;
+  perform set_config('role', admin_role, true);
+  delete from public.conversations where direct_key like 'cap-test-%';
+  perform set_config('role', 'authenticated', true);
+
+  -- Course cap: 20 active courses per student.
+  begin
+    for n in 1..21 loop
+      insert into public.courses (owner_id, title, description, category_id, level)
+      values (e, 'Cap course ' || n, 'Testing the course limit.', 1, 'beginner');
+    end loop;
+    r := r || 'FAIL course cap not enforced'::text;
+  exception when others then
+    r := r || ('PASS course cap (' || sqlerrm || ')');
+  end;
+
   -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
   perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
   begin
@@ -570,6 +631,11 @@ begin
   delete from auth.users where id = d;
   select count(*) into n from public.conversations where id = conv2;
   r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' conversation kept while the other student still has it');
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select can_send::text into v_text from public.my_conversations() where conversation_id = conv2;
+  r := r || (case when v_text = 'false' then 'PASS' else 'FAIL' end || ' no replying once the other student deleted their account (' || coalesce(v_text, 'none') || ')');
+  perform set_config('role', admin_role, true);
   delete from auth.users where id = a;
   select count(*) into n from public.conversations where id = conv2;
   r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' conversation deleted once both students are gone');

@@ -8,9 +8,10 @@ export type ChatMessage = { id: string; sender_id: string; body: string; created
 
 export const PAGE = 50;
 
-export async function getInbox(): Promise<InboxItem[]> {
+// `include` keeps one conversation visible even if the user hid it (chat page).
+export async function getInbox(include?: string): Promise<InboxItem[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("my_conversations");
+  const { data, error } = await supabase.rpc("my_conversations", include ? { include_conversation: include } : {});
   if (error) throw new Error(`Could not load conversations: ${error.message}`);
   return data;
 }

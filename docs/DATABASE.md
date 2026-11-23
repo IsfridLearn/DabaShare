@@ -12,6 +12,8 @@ The source of truth is `supabase/migrations/`. This document explains the model;
 | `20261122100000_security_hardening.sql` | Fixes from the security review: `private.accounts`, column-level insert grants, secure default privileges, block enforcement on every path, abuse caps, notification de-duplication, session edit fixes, FK indexes |
 
 | `20261123090000_account_deletion.sql` | `delete_my_account()` |
+| `20261128100000_open_hidden_conversation.sql` | `my_conversations(include_conversation)` so a hidden chat still opens by link |
+| `20261128090000_phase9_hardening.sql` | Security review fixes: `conversations.created_by` with a cap of 30 new conversations a day, `conversation_members.hidden_at` (hide until a new message), `can_send` false when the other student deleted their account, an input cap on `set_course_skills`, de-duplicated `session_updated`, 20 active courses and 20 upcoming sessions per student, `my_blocks` limited to finished profiles |
 | `20261127100000_participant_status_default.sql` | Default for `session_participants.status` (the trigger still sets it) |
 | `20261127090000_sessions_notifications.sql` | `list_sessions()`, `my_notifications()`, `unread_notification_count()`, `mark_all_notifications_read()` |
 | `20261126100000_conversation_cleanup.sql` | Deletes a conversation once its last member is gone |

@@ -26,6 +26,7 @@ The prototype in `prototype/` is the archived original UI. It's a visual referen
 | `npm run build` | Production build. It must pass before a phase is marked done. |
 | `npm run db:push` | Apply `supabase/migrations` to the **linked** project. Check which project is linked first. |
 | `npm run db:types` | Regenerate `src/lib/supabase/database.types.ts` after a schema change. |
+| `E2E_PROJECT_REF=<dev ref> npm run test:e2e` | Full end-to-end suite against a running server (`npm run build && npm run start`). It creates and always deletes its own test users, and refuses to run unless the ref matches the linked project. Expect "N passed, 0 failed". |
 | `npm run db:test:rls` | Run the RLS and business-rule smoke test on the linked **dev** database (always rolled back). Expect "N passed, 0 failed". |
 
 The linked project is **DabaShare** (`zxjerdapfbufuimqhcgp`, Singapore). It's the dev database. Don't touch the other project in this account (IsfridVerse).

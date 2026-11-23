@@ -12,7 +12,8 @@
     "check": "npm run typecheck && npm run lint && npm test",
     "db:push": "supabase db push --remote",
     "db:types": "supabase gen types typescript --linked --schema public > src/lib/supabase/database.types.ts",
-    "db:test:rls": "supabase db query --remote --yes -f supabase/tests/rls_smoke.sql"
+    "db:test:rls": "supabase db query --remote --yes -f supabase/tests/rls_smoke.sql",
+    "test:e2e": "node scripts/e2e/run.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -40,7 +40,9 @@ export type CourseFilters = {
   page: number;
 };
 
-const positiveInt = z.coerce.number().int().positive();
+// smallint ids in the database: anything larger would make the query fail.
+const positiveInt = z.coerce.number().int().positive().max(32767);
+const pageNumber = z.coerce.number().int().positive();
 
 // Invalid or unknown values are dropped rather than erroring, so a hand-edited
 // URL still shows results.
@@ -52,7 +54,7 @@ export function parseCourseFilters(params: Record<string, string | string[] | un
   const q = one("q")?.trim().slice(0, 100);
   const uni = positiveInt.safeParse(one("uni"));
   const cat = positiveInt.safeParse(one("cat"));
-  const page = positiveInt.safeParse(one("page"));
+  const page = pageNumber.safeParse(one("page"));
   const price = one("price");
   const level = one("level");
   return {

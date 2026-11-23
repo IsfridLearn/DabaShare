@@ -26,6 +26,7 @@ export function ChatWindow({
   initialMessages,
   initialHasMore,
   canSend,
+  unavailableReason,
 }: {
   conversationId: string;
   meId: string;
@@ -33,10 +34,12 @@ export function ChatWindow({
   initialMessages: ChatMessage[];
   initialHasMore: boolean;
   canSend: boolean;
+  unavailableReason?: string;
 }) {
   const [messages, setMessages] = useState(initialMessages);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [unseen, setUnseen] = useState(0);
+  const [olderError, setOlderError] = useState(false);
   const [loadingOlder, startLoadingOlder] = useTransition();
   const [state, action, pending] = useActionState(sendMessage.bind(null, conversationId), initialSend);
   const formRef = useRef<HTMLFormElement>(null);
@@ -115,11 +118,17 @@ export function ChatWindow({
   function loadOlder() {
     const oldest = messages[0];
     if (!oldest) return;
+    setOlderError(false);
     startLoadingOlder(async () => {
-      const older = await loadOlderMessages(conversationId, oldest.created_at);
-      prependFrom.current = scrollerRef.current?.scrollHeight ?? null;
-      setMessages((current) => mergeSorted(current, older.messages));
-      setHasMore(older.hasMore);
+      try {
+        const older = await loadOlderMessages(conversationId, oldest.created_at);
+        prependFrom.current = scrollerRef.current?.scrollHeight ?? null;
+        setMessages((current) => mergeSorted(current, older.messages));
+        setHasMore(older.hasMore);
+      } catch {
+        // Keep the chat (and any draft) on screen; offer a retry instead.
+        setOlderError(true);
+      }
     });
   }
 
@@ -138,7 +147,7 @@ export function ChatWindow({
         {hasMore && (
           <div className="mb-4 text-center">
             <Button variant="ghost" size="sm" onClick={loadOlder} disabled={loadingOlder}>
-              {loadingOlder ? "Loading…" : "Load earlier messages"}
+              {loadingOlder ? "Loading…" : olderError ? "Couldn't load. Try again" : "Load earlier messages"}
             </Button>
           </div>
         )}
@@ -234,7 +243,7 @@ export function ChatWindow({
         </form>
       ) : (
         <p className="border-t border-gray-200 p-4 text-center text-sm text-gray-600">
-          Messaging isn&apos;t available in this conversation because one of you blocked the other.
+          {unavailableReason ?? "Messaging isn't available in this conversation."}
         </p>
       )}
     </div>

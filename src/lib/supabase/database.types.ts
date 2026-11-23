@@ -71,18 +71,21 @@ export type Database = {
       conversation_members: {
         Row: {
           conversation_id: string
+          hidden_at: string | null
           joined_at: string
           last_read_at: string
           profile_id: string
         }
         Insert: {
           conversation_id: string
+          hidden_at?: string | null
           joined_at?: string
           last_read_at?: string
           profile_id: string
         }
         Update: {
           conversation_id?: string
+          hidden_at?: string | null
           joined_at?: string
           last_read_at?: string
           profile_id?: string
@@ -107,23 +110,34 @@ export type Database = {
       conversations: {
         Row: {
           created_at: string
+          created_by: string | null
           direct_key: string | null
           id: string
           last_message_at: string | null
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           direct_key?: string | null
           id?: string
           last_message_at?: string | null
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           direct_key?: string | null
           id?: string
           last_message_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conversations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       course_enrollments: {
         Row: {
@@ -771,7 +785,7 @@ export type Database = {
         }[]
       }
       my_conversations: {
-        Args: never
+        Args: { include_conversation?: string }
         Returns: {
           can_send: boolean
           conversation_id: string

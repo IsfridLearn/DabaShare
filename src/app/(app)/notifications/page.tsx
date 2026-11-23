@@ -43,6 +43,8 @@ export default async function NotificationsPage({ searchParams }: PageProps<"/no
               <li key={n.id}>
                 <Link
                   href={`/notifications/open/${n.id}`}
+                  // This GET marks the notification read: never prefetch it.
+                  prefetch={false}
                   className={cn("flex items-start gap-3 px-5 py-4 hover:bg-gray-50", !n.read_at && "bg-brand-soft/60")}
                 >
                   <Avatar name={n.actor_name ?? "DabaShare"} path={n.actor_avatar} size={40} />

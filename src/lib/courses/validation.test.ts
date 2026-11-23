@@ -22,6 +22,10 @@ describe("parseCourseFilters", () => {
     ).toEqual({ page: 1 });
   });
 
+  it("drops ids too large for the database", () => {
+    expect(parseCourseFilters({ uni: "70000", cat: "32768" })).toEqual({ page: 1 });
+  });
+
   it("ignores repeated params and caps the page", () => {
     expect(parseCourseFilters({ q: ["a", "b"], page: "999999" })).toEqual({ page: 1000 });
   });

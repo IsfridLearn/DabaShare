@@ -102,6 +102,7 @@ export async function getCourseEnrollments(courseId: string): Promise<OwnerEnrol
     .select(`id, status, note, created_at, decided_at, student:profiles(${PERSON})`)
     .eq("course_id", courseId)
     .order("created_at", { ascending: false })
+    .limit(500)
     .returns<OwnerEnrollment[]>();
   if (error) throw new Error(`Could not load enrollments: ${error.message}`);
   return data;
