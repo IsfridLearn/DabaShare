@@ -56,7 +56,7 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
             {course.status !== "published" && <Tag className="bg-amber-100 text-amber-800">{statusLabel}</Tag>}
           </div>
           <h1 className="text-2xl font-bold break-words sm:text-3xl">{course.title}</h1>
-          <p className="leading-relaxed whitespace-pre-line text-gray-700">{course.description}</p>
+          <p className="leading-relaxed break-words whitespace-pre-line text-gray-700">{course.description}</p>
           {course.skills.length > 0 && (
             <div>
               <h2 className="mb-2 text-sm font-semibold text-gray-700">Skills you&apos;ll learn</h2>
@@ -93,7 +93,7 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
             </Card>
           )}
 
-          <Card className="flex flex-col gap-4">
+          <Card className="order-first flex flex-col gap-4 lg:order-none">
             {isOwner ? (
               <>
                 <h2 className="text-lg font-semibold">Your course</h2>

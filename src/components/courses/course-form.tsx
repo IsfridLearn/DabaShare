@@ -46,7 +46,6 @@ export function CourseForm({
 
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
-      <FormMessage state={state} />
       <Field label="Course title" htmlFor="title" error={fieldError(state, "title")}>
         <Input
           id="title"
@@ -172,6 +171,7 @@ export function CourseForm({
         </Select>
       </Field>
 
+      <FormMessage state={state} />
       <div>
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? "Saving…" : submitLabel}

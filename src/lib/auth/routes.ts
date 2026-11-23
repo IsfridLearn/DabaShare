@@ -2,9 +2,9 @@
 // still verify the user themselves (the proxy is only an optimistic check).
 export type RouteAccess = "public" | "guest" | "protected";
 
-// Guest pages: signed-in users are sent to their profile instead.
-const GUEST_ONLY = ["/login", "/signup", "/forgot-password"];
-const PUBLIC = ["/", "/check-email", "/privacy", "/status"];
+// Guest pages (incl. the landing page): signed-in users go to the app instead.
+const GUEST_ONLY = ["/", "/login", "/signup", "/forgot-password"];
+const PUBLIC = ["/check-email", "/privacy", "/status"];
 const PUBLIC_PREFIXES = ["/auth/"];
 
 export function routeAccess(pathname: string): RouteAccess {

@@ -19,7 +19,7 @@ export function SessionCard({ session, meId }: { session: SessionListItem; meId:
   return (
     <Link
       href={`/sessions/${session.id}`}
-      className="group flex h-full flex-col gap-3 rounded-card border border-gray-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-card-lg focus-visible:outline-2 focus-visible:outline-brand"
+      className="group flex h-full flex-col gap-3 rounded-card border border-gray-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 motion-reduce:transform-none hover:border-blue-200 hover:shadow-card-lg focus-visible:outline-2 focus-visible:outline-brand"
     >
       <div className="flex flex-wrap items-center gap-2">
         {phase === "live" ? (
@@ -33,7 +33,7 @@ export function SessionCard({ session, meId }: { session: SessionListItem; meId:
         {!mine && myStatus && <Tag tone="teach">{myStatus}</Tag>}
         {!mine && !myStatus && full && phase !== "cancelled" && <Tag>Full</Tag>}
       </div>
-      <h3 className="text-base leading-snug font-semibold group-hover:text-brand">{session.title}</h3>
+      <h2 className="text-base leading-snug font-semibold group-hover:text-brand">{session.title}</h2>
       <p className="text-sm text-gray-600">🗓 {formatSessionTime(session.starts_at, session.ends_at)}</p>
       {session.description && <p className="line-clamp-2 text-sm text-gray-600">{session.description}</p>}
       <div className="mt-auto flex items-center gap-2 border-t border-gray-100 pt-3 text-sm">

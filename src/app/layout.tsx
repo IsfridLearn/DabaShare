@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Sora } from "next/font/google";
 import "./globals.css";
 
@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   },
   description:
     "Connect with students across Davao City universities. Exchange skills, find tutors, and build a collaborative learning community.",
+};
+
+// "resizes-content" makes 100dvh shrink when the on-screen keyboard opens
+// (Chrome Android), so the chat composer stays visible while typing.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  interactiveWidget: "resizes-content",
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

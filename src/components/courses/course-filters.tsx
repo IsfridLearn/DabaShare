@@ -25,12 +25,12 @@ export function CourseFiltersBar({
 
   return (
     <div className="flex flex-col gap-3 rounded-card border border-gray-200 bg-white p-4 shadow-card">
-      <form action="/courses" method="get" className="grid gap-3 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]">
+      <form action="/courses" method="get" className="grid grid-cols-2 gap-3 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]">
         {filters.price && <input type="hidden" name="price" value={filters.price} />}
         <label className="sr-only" htmlFor="q">
           Search courses or tutors
         </label>
-        <Input id="q" name="q" type="search" placeholder="Search courses, skills or tutors…" defaultValue={filters.q} />
+        <Input id="q" name="q" type="search" className="col-span-2 md:col-span-1" placeholder="Search courses, skills or tutors…" defaultValue={filters.q} />
         <label className="sr-only" htmlFor="uni">
           University
         </label>
@@ -64,7 +64,7 @@ export function CourseFiltersBar({
             </option>
           ))}
         </Select>
-        <button type="submit" className={buttonClasses()}>
+        <button type="submit" className={`${buttonClasses()} md:col-span-1`}>
           Search
         </button>
       </form>

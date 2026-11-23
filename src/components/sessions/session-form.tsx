@@ -53,7 +53,6 @@ export function SessionForm({
 
   return (
     <form action={action} className="flex flex-col gap-5" noValidate>
-      <FormMessage state={state} />
       <Field label="Title" htmlFor="title" error={fieldError(state, "title")}>
         <Input id="title" name="title" maxLength={120} placeholder="e.g. Calculus finals prep" defaultValue={val("title")} required {...errorProps(state, "title")} />
       </Field>
@@ -129,6 +128,7 @@ export function SessionForm({
         <Textarea id="description" name="description" maxLength={2000} rows={5} defaultValue={val("description")} {...errorProps(state, "description")} />
       </Field>
 
+      <FormMessage state={state} />
       <div>
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? "Saving…" : submitLabel}

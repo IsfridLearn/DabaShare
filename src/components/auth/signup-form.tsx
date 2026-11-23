@@ -15,8 +15,7 @@ export function SignupForm({ universities }: { universities: University[] }) {
 
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
-      <FormMessage state={state} />
-      <Field label="Full name" htmlFor="displayName" error={fieldError(state, "displayName")}>
+      <Field label="Full name (shown on your profile)" htmlFor="displayName" error={fieldError(state, "displayName")}>
         <Input
           id="displayName"
           name="displayName"
@@ -82,11 +81,12 @@ export function SignupForm({ universities }: { universities: University[] }) {
       <Checkbox name="acceptTerms" state={state} defaultChecked={v?.acceptTerms === "on"}>
         I have read the{" "}
         <Link href="/privacy" target="_blank" className="font-medium text-brand hover:underline">
-          privacy notice
+          privacy notice<span className="sr-only"> (opens in a new tab)</span>
         </Link>{" "}
         and agree to DabaShare processing my information as described.
       </Checkbox>
 
+      <FormMessage state={state} />
       <Button type="submit" size="lg" fullWidth disabled={pending}>
         {pending ? "Creating account…" : "Create account"}
       </Button>

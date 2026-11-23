@@ -46,6 +46,7 @@ export function AvatarUploader({
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   function onFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -53,6 +54,7 @@ export function AvatarUploader({
     event.target.value = "";
     if (!file) return;
     setError(null);
+    setDone(null);
     if (!AVATAR_TYPES.includes(file.type)) return setError("Choose a JPG, PNG or WebP image.");
     if (file.size > 10 * 1024 * 1024) return setError("That image is too large. Choose one under 10 MB.");
 
@@ -71,6 +73,8 @@ export function AvatarUploader({
         if (result.error) {
           await bucket.remove([objectPath]); // don't leave an unused public file behind
           setError(result.error);
+        } else {
+          setDone("Photo updated.");
         }
       } catch {
         setError("We couldn't read that image. Try a different photo.");
@@ -88,6 +92,8 @@ export function AvatarUploader({
             type="file"
             accept={AVATAR_TYPES.join(",")}
             className="sr-only"
+            tabIndex={-1}
+            aria-hidden="true"
             onChange={onFile}
             aria-label="Choose a profile photo"
           />
@@ -99,7 +105,13 @@ export function AvatarUploader({
               variant="ghost"
               size="sm"
               disabled={pending}
-              onClick={() => startTransition(() => removeAvatar())}
+              onClick={() => {
+                setError(null);
+                startTransition(async () => {
+                  await removeAvatar();
+                  setDone("Photo removed.");
+                });
+              }}
             >
               Remove
             </Button>
@@ -107,6 +119,11 @@ export function AvatarUploader({
         </div>
       </div>
       {error && <Alert tone="error">{error}</Alert>}
+      {done && !error && (
+        <p role="status" className="text-sm font-medium text-success">
+          {done}
+        </p>
+      )}
     </div>
   );
 }

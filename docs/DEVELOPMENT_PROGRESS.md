@@ -1,10 +1,10 @@
 # DabaShare Development Progress
 
-Last updated: 2026-11-27
+Last updated: 2026-11-28
 
-**Current Phase:** Phase 8 — UI/UX Refinement and Responsiveness (next). Phases 1–7 are complete.
+**Current Phase:** Phase 9 — Security, Testing and QA (next). Phases 1–8 are complete.
 
-**Overall Progress:** 7/10 phases completed.
+**Overall Progress:** 8/10 phases completed.
 
 ## Phase Status
 
@@ -15,7 +15,7 @@ Last updated: 2026-11-27
 - [x] Phase 5 — Student Matching
 - [x] Phase 6 — Messaging
 - [x] Phase 7 — Study Sessions and Notifications
-- [ ] Phase 8 — UI/UX Refinement
+- [x] Phase 8 — UI/UX Refinement
 - [ ] Phase 9 — Security and Testing
 - [ ] Phase 10 — Deployment
 
@@ -24,6 +24,34 @@ Last updated: 2026-11-27
 Your real account (created 2026-11-23) proves the end-to-end email flow: signup through the real form, a delivered confirmation email, a confirmed address, onboarding done, and 7 skills (including 2 new canonical skills). The in-browser photo upload is still UNTESTED; the storage rules behind it were tested on 2026-11-23.
 
 ## Log
+
+### 2026-11-28 — Phase 8 complete
+
+Completion criterion met: the major screens are cohesive, accessible and usable at phone (390px) and desktop (1280px) widths. This was verified with real headless-Chrome screenshots of seeded content, plus the full production E2E suite.
+
+- **Independent review:** `qa-security-reviewer` (Sonnet) reviewed UI, UX and accessibility and found 7 high, 14 medium and 4 low issues. The high ones and nearly all the others are fixed; the rest are listed below.
+- **Shell:**
+  - A bottom tab bar on phones with always-visible badges, and current-page highlighting (`aria-current`).
+  - An account menu (closes on outside click, Escape and navigation), a skip link, and an `(app)/error.tsx` that keeps the navigation.
+  - The viewport tracks the keyboard (`interactive-widget`), and the landing page sends signed-in users to Courses.
+- **Forms:** 16px inputs on mobile (no iOS zoom), hints linked to inputs (`aria-describedby`), save and error messages next to the submit button, and placeholder and help-text contrast raised.
+- **Messages:**
+  - Full-screen chat on phones with a 44px back button.
+  - An auto-growing composer that keeps the keyboard open, and Enter-to-send only with a physical keyboard, never while sending.
+  - Scrolling that keeps your place, with a "New messages ↓" button.
+  - `role=log`, sender names for screen readers, bigger Report targets, and a clearer blocked-conversation message.
+  - An inbox empty state with a button and unread dots.
+- **Profile:**
+  - A completeness checklist with anchor links, and skills first on mobile.
+  - Bigger remove buttons on skills (long names wrap), and "Photo updated" / "Photo removed" feedback; the hidden file input is out of the tab order.
+  - Public profiles show "Why you two match" and the student's courses, with a full-width Message button on phones.
+  - Block requires a second confirmation, and the menu can't open off-screen.
+- **Elsewhere:**
+  - Join and Enroll cards come first on mobile, long links and descriptions wrap, and course filters use two columns on phones.
+  - Correct heading order (h1 then h2), reduced-motion support, card padding on phones, and darker avatar colours.
+- **Deferred:**
+  - A show-password toggle, an optimistic "sending" bubble with retry, a per-conversation tab title, and a dedicated inbox skeleton.
+  - Interests and other pages already use the generic skeleton.
 
 ### 2026-11-27 — Phase 7 complete
 
@@ -101,6 +129,10 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 | Date | Check | Result |
 |---|---|---|
+| 2026-11-28 | `npm run check` | Passed: 0 type errors, 0 lint problems, 86/86 unit tests |
+| 2026-11-28 | `npm run build` | Passed |
+| 2026-11-28 | Screenshots (headless Chrome, 390px and 1280px) of profile, public profile, chat, inbox, courses and session pages with seeded content | Checked visually before and after: the phone header overflow and the clipped nav are gone, the chat fills the screen, the profile order is right, and the overlap section renders |
+| 2026-11-28 | Production-build E2E (all phases) | **134 passed, 0 failed**, after updating the two checks that referred to old copy or old markup. Test data was removed; your account was untouched. |
 | 2026-11-27 | `npm run check` | Passed: 0 type errors, 0 lint problems, 82/82 unit tests |
 | 2026-11-27 | `npm run build` | Passed |
 | 2026-11-27 | `npm run db:test:rls` | **110 passed, 0 failed** (rolled back) |
@@ -131,12 +163,12 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 ## Next steps
 
-1. Optional: in a real browser, upload a profile photo and try live chat between two accounts.
-2. Phase 8, UI/UX refinement:
-   - A full review of every screen at phone and desktop widths, with the independent reviewer used for UI and accessibility.
-   - Consistent spacing and typography, and better mobile navigation.
-   - Loading, empty and error states everywhere, plus success feedback.
-   - Accessibility: contrast, focus, labels and keyboard use.
+Phase 9, security, testing and QA:
+
+1. A full independent security review of the whole app.
+2. Automate the RLS smoke test and the E2E suite as repeatable scripts in the repo.
+3. Rate limits for signup and login, and a review of Supabase Auth settings.
+4. Resolve findings and document known limitations.
 
 ## Blockers
 

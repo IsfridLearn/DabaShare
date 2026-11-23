@@ -15,11 +15,11 @@ export function MatchCard({ match }: { match: Match }) {
       <header className="flex items-start gap-3">
         <Avatar name={match.display_name} path={match.avatar_path} size={52} />
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-base font-semibold">
+          <h2 className="truncate text-base font-semibold">
             <Link href={`/u/${match.username}`} className="hover:text-brand">
               {match.display_name}
             </Link>
-          </h3>
+          </h2>
           <p className="truncate text-sm text-gray-500">
             {[match.program, match.university_short].filter(Boolean).join(" · ") || `@${match.username}`}
           </p>

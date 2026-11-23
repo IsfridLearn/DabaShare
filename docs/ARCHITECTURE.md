@@ -57,6 +57,8 @@ docs/                  project documentation
 | A14 | The server Supabase client calls `connection()`, and signed-in pages set `instant = false` | Session data must never be prerendered. supabase-js reads the clock (token expiry), which Cache Components forbids during prerendering. Per-user pages block on the server and show `loading.tsx` instead of an instant static shell. |
 | A16 | Course browsing uses one SQL function, `search_courses()` (security invoker), with GET-form filters | Combined filters, tutor and skill search and the total count in one round trip, with RLS still applied. GET URLs are shareable and work without JavaScript. |
 | A17 | Courses (`/courses`) is the signed-in home. No star ratings are shown. | Browsing is the main activity. The prototype's ratings were made up, and showing them would mislead students. |
+| A18 | Mobile navigation is a bottom tab bar (Courses, Matches, Sessions, Messages, Alerts) plus an account menu (Profile, My courses, Settings, Log out). Desktop keeps a top bar. | Thumb-reachable on phones, unread badges always visible, no horizontal scrolling. The account menu is `<details>` with a small client wrapper, so it works without JavaScript. |
+| A19 | The viewport uses `interactive-widget=resizes-content`, and inputs are 16px on mobile | Keeps the chat composer above the on-screen keyboard (Chrome Android) and stops iOS zooming when an input is focused. |
 | A15 | Avatars are resized in the browser to a 512px WebP before upload | It keeps uploads under 2 MB on mobile data, and image transformations aren't available on the free tier. |
 
 ## Dependencies

@@ -28,18 +28,25 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
   const name = conversation.other_name ?? "DabaShare member";
 
   return (
-    <div className="flex flex-col gap-4">
+    // Phones: the chat fills the screen between the top bar and the tab bar.
+    <div className="-mx-4 -mt-6 -mb-28 flex h-[calc(100dvh-7.5rem)] flex-col xl:m-0 xl:h-[calc(100dvh-10rem)]">
       <InboxLive />
       <h1 className="sr-only">Conversation with {name}</h1>
-      <Link href="/messages" className="text-sm font-medium text-brand hover:underline md:hidden">
-        ← All messages
-      </Link>
-      <div className="grid h-[calc(100dvh-13rem)] overflow-hidden rounded-card border border-gray-200 bg-white shadow-card md:h-[calc(100dvh-14rem)] md:grid-cols-[20rem_minmax(0,1fr)]">
+      <div className="grid min-h-0 flex-1 overflow-hidden bg-white md:rounded-card md:border md:border-gray-200 md:shadow-card md:grid-cols-[20rem_minmax(0,1fr)] xl:m-0">
         <div className="hidden overflow-y-auto border-r border-gray-200 md:block">
           <ConversationList items={inbox} activeId={id} meId={me.id} />
         </div>
         <section className="flex min-h-0 flex-col" aria-label={`Conversation with ${name}`}>
-          <header className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
+          <header className="flex items-center gap-2 border-b border-gray-200 px-2 py-2 sm:px-4">
+            <Link
+              href="/messages"
+              className="flex size-11 shrink-0 items-center justify-center rounded-control text-gray-600 hover:bg-gray-100 md:hidden"
+              aria-label="Back to all messages"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </Link>
             <Avatar name={name} path={conversation.other_avatar} size={40} />
             <div className="min-w-0 flex-1">
               {conversation.other_username ? (
@@ -49,7 +56,7 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
               ) : (
                 <span className="block truncate font-semibold">{name}</span>
               )}
-              {!conversation.can_send && <span className="text-xs text-gray-500">Messaging is turned off</span>}
+              {conversation.other_username && <span className="block truncate text-xs text-gray-600">@{conversation.other_username}</span>}
             </div>
             {conversation.other_id && conversation.other_username && (
               <StudentMenu studentId={conversation.other_id} username={conversation.other_username} />
@@ -59,6 +66,7 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
             key={id}
             conversationId={id}
             meId={me.id}
+            otherName={name}
             initialMessages={messages}
             initialHasMore={hasMore}
             canSend={conversation.can_send}

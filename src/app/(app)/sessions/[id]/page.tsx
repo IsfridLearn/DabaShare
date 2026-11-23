@@ -77,7 +77,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
               </dd>
             </div>
           </dl>
-          {session.description && <p className="leading-relaxed whitespace-pre-line text-gray-700">{session.description}</p>}
+          {session.description && <p className="leading-relaxed break-words whitespace-pre-line text-gray-700">{session.description}</p>}
         </Card>
 
         <div className="flex flex-col gap-6">
@@ -99,12 +99,12 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
             </Card>
           )}
 
-          <Card className="flex flex-col gap-4">
+          <Card className="order-first flex flex-col gap-4 lg:order-none">
             {isHost ? (
               <>
                 <h2 className="text-lg font-semibold">Your session</h2>
                 {meetingUrl ? (
-                  <a href={meetingUrl} target="_blank" rel="noopener noreferrer" className="truncate text-sm font-medium text-brand hover:underline">
+                  <a href={meetingUrl} target="_blank" rel="noopener noreferrer" className="block truncate text-sm font-medium text-brand hover:underline">
                     {meetingUrl} ↗
                   </a>
                 ) : (

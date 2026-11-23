@@ -7,7 +7,7 @@ type Size = "sm" | "md" | "lg";
 const base =
   "inline-flex items-center justify-center gap-2 rounded-control font-display font-semibold transition " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand " +
-  "disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98]";
+  "disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none";
 
 const variants: Record<Variant, string> = {
   primary: "bg-brand text-white hover:bg-brand-dark",

@@ -32,7 +32,6 @@ export function ProfileForm({
 
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
-      <FormMessage state={state} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Display name" htmlFor="displayName" error={fieldError(state, "displayName")}>
           <Input
@@ -48,7 +47,7 @@ export function ProfileForm({
           label="Username"
           htmlFor="username"
           error={fieldError(state, "username")}
-          hint="Your profile link: dabashare/u/username"
+          hint="Lowercase letters, numbers and _. Your profile address is /u/your-username."
         >
           <Input
             id="username"
@@ -102,6 +101,7 @@ export function ProfileForm({
           {...errorProps(state, "bio")}
         />
       </Field>
+      <FormMessage state={state} />
       <div>
         <Button type="submit" disabled={pending}>
           {pending ? "Saving…" : submitLabel}

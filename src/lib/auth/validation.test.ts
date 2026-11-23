@@ -81,7 +81,7 @@ describe("profileSchema", () => {
 
 describe("routeAccess", () => {
   it.each([
-    ["/", "public"],
+    ["/", "guest"],
     ["/privacy", "public"],
     ["/auth/confirm", "public"],
     ["/login", "guest"],

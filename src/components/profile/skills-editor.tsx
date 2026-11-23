@@ -49,12 +49,12 @@ export function SkillsEditor({
         <ul className="flex flex-wrap gap-2">
           {skills.map((skill) => (
             <li key={skill.id}>
-              <Tag tone={kind}>
+              <Tag tone={kind} className="py-0.5 pr-1 break-words whitespace-normal">
                 {skill.name}
                 <form action={removeSkill.bind(null, kind, skill.id)} className="inline-flex">
                   <button
                     type="submit"
-                    className="-mr-1 rounded-full px-1 leading-none opacity-70 hover:opacity-100"
+                    className="grid size-7 place-items-center rounded-full text-base leading-none opacity-70 hover:bg-black/10 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-current"
                     aria-label={`Remove ${skill.name}`}
                   >
                     ×

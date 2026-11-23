@@ -133,6 +133,20 @@ export async function getMyTeaching(userId: string): Promise<TeachingCourse[]> {
   }));
 }
 
+// A student's published courses (public profile). RLS hides blocked owners.
+export async function getPublishedCoursesBy(ownerId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("courses")
+    .select("id, title, price_php")
+    .eq("owner_id", ownerId)
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(10);
+  if (error) throw new Error(`Could not load courses: ${error.message}`);
+  return data;
+}
+
 export type LearningEnrollment = Enrollment & {
   course: { id: string; title: string; price_php: number; owner: { display_name: string } | null } | null;
 };

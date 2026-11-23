@@ -29,4 +29,7 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | Sessions | Meeting link shown only to the host and accepted participants, and only while the session is upcoming or live | Done (E2E) | 7 |
 | Notifications | Notification centre with readable sentences for every type, an unread badge in the nav, opening an item marks it read and goes to its page, mark all as read | Done (E2E) | 7 |
 | Notifications | Email or push notifications | Not built (needs SMTP and a push provider) | — |
+| UI | Mobile bottom tab bar with badges; current page highlighted (`aria-current`); account menu; skip link; in-app error screen that keeps the navigation | Done (screenshots + E2E) | 8 |
+| UI | Profile: completeness checklist, skills first on mobile, "Why you two match" and the student's courses on public profiles, photo upload feedback | Done (screenshots + E2E) | 8 |
+| UI | Messages: full-screen chat on mobile with a back button, auto-growing composer, Enter-to-send only with a physical keyboard, no double sends, scroll that keeps your place with a "new messages" button, screen-reader log | Done (screenshots + E2E) | 8 |
 | Payments | Collecting money for paid courses | Deferred (needs legal and age review) | — |

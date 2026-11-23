@@ -2,7 +2,7 @@ import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { avatarUrl } from "@/lib/profile/avatar";
 
-const COLORS = ["bg-blue-600", "bg-violet-600", "bg-emerald-600", "bg-amber-600", "bg-rose-600", "bg-cyan-700"];
+const COLORS = ["bg-blue-600", "bg-violet-600", "bg-emerald-700", "bg-amber-700", "bg-rose-600", "bg-cyan-700"];
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
