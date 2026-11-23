@@ -27,7 +27,9 @@ export function parsePublicEnv(
     ? []
     : result.error.issues.map((issue) => `  ${issue.path.join(".")}: ${issue.message}`);
   if (result.success && !result.data.NEXT_PUBLIC_SITE_URL && production) {
-    problems.push("  NEXT_PUBLIC_SITE_URL: required in production (the public https:// address)");
+    problems.push(
+      "  NEXT_PUBLIC_SITE_URL: required in production (the public https:// address; on Vercel it is filled in automatically from the project's domain)",
+    );
   }
   if (!result.success || problems.length) {
     throw new Error(
