@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MessageButton } from "@/components/messages/message-button";
 import { Avatar } from "@/components/ui/avatar";
 import { buttonClasses } from "@/components/ui/button";
 import { Tag } from "@/components/ui/tag";
@@ -51,9 +52,12 @@ export function MatchCard({ match }: { match: Match }) {
             ? `${match.published_courses} course${match.published_courses === 1 ? "" : "s"} offered`
             : "No courses yet"}
         </span>
-        <Link href={`/u/${match.username}`} className={buttonClasses({ variant: "outline", size: "sm" })}>
-          View profile
-        </Link>
+        <div className="flex gap-2">
+          <Link href={`/u/${match.username}`} className={buttonClasses({ variant: "outline", size: "sm" })}>
+            View profile
+          </Link>
+          <MessageButton otherId={match.profile_id} />
+        </div>
       </footer>
     </article>
   );

@@ -435,6 +435,53 @@ begin
   select count(*) into n from public.suggest_matches() where profile_id = d;
   r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' matching is symmetric (A sees D)');
 
+  -- ── Phase 6: inbox, unread, read marks, blocks list, rate limits ───────
+  -- conv (A<->B) has 2 messages from A; B blocked A earlier.
+  -- Everything here shares one transaction (one now()), so backdate B's read
+  -- marker to mimic B having last read before A wrote.
+  perform set_config('role', admin_role, true);
+  update public.conversation_members set last_read_at = now() - interval '1 hour'
+  where conversation_id = conv and profile_id = b;
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  select unread || '|' || can_send::text into v_text from public.my_conversations() where conversation_id = conv;
+  r := r || (case when v_text = '2|false' then 'PASS' else 'FAIL' end || ' inbox: unread count and no reply after block (' || coalesce(v_text, 'none') || ')');
+  n := public.unread_conversation_count();
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' unread conversation count (' || n || ')');
+  perform public.mark_conversation_read(conv);
+  select unread into n from public.my_conversations() where conversation_id = conv;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' mark_conversation_read clears unread');
+  select count(*) into n from public.notifications where recipient_id = b and type = 'new_message' and read_at is null;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' ... and its new_message notification');
+  select count(*) into n from public.my_blocks() where blocked_id = a;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' my_blocks lists the student you blocked');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.my_blocks();
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' my_blocks never reveals who blocked you');
+  select coalesce(other_name, '<hidden>') into v_text from public.my_conversations() where conversation_id = conv;
+  r := r || (case when v_text = '<hidden>' then 'PASS' else 'FAIL' end || ' inbox hides the profile of someone who blocked you');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.my_conversations() where conversation_id = conv;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' outsiders never see the conversation in their inbox');
+  perform public.mark_conversation_read(conv);
+  perform set_config('role', admin_role, true);
+  select count(*) into n from public.conversation_members where conversation_id = conv and profile_id = d;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' outsider mark-read does not join the conversation');
+  perform set_config('role', 'authenticated', true);
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  conv2 := public.start_direct_conversation(a);
+  begin
+    for n in 1..21 loop
+      insert into public.messages (conversation_id, sender_id, body) values (conv2, d, 'spam ' || n);
+    end loop;
+    r := r || 'FAIL message rate limit not enforced'::text;
+  exception when others then
+    r := r || ('PASS message rate limit (' || sqlerrm || ')');
+  end;
+
   -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
   perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
   begin
@@ -482,6 +529,15 @@ begin
   r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' deleted user''s profile cascades');
   select count(*) into n from private.accounts where profile_id = e;
   r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' deleted user''s private account row cascades');
+  select count(*) into n from public.conversations c
+  where not exists (select 1 from public.conversation_members m where m.conversation_id = c.id);
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' no empty conversations left behind after account deletion');
+  delete from auth.users where id = d;
+  select count(*) into n from public.conversations where id = conv2;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' conversation kept while the other student still has it');
+  delete from auth.users where id = a;
+  select count(*) into n from public.conversations where id = conv2;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' conversation deleted once both students are gone');
 
   -- ── Result (always roll back) ──────────────────────────────────────────
   perform set_config('role', admin_role, true);

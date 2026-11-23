@@ -19,9 +19,11 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | Courses | Ratings and reviews | Not built. The prototype's ratings were fabricated, so none are shown until a real review feature exists. | — |
 | Matching | Ranked suggestions from teach/learn overlap in both directions, skill-swap bonus, shared interests, course categories and university, with the reasons shown on every card | Done (E2E) | 5 |
 | Matching | Filters (can teach me, wants to learn from me, my university only), prompt when skills are missing, respects the discoverable setting and blocks | Done (E2E) | 5 |
-| Matching | "Message" button on matches and profiles | Planned with conversations | 6 |
-| Messaging | One-to-one conversations, realtime messages, unread indicators | DB only | 6 |
-| Safety | Block and report | DB only | 6 |
+| Matching | "Message" button on match cards, profiles and course tutor cards | Done (E2E) | 6 |
+| Messaging | Inbox with last message, unread counts and an unread badge in the nav; one-to-one chat with history (load earlier), day separators and Manila-time timestamps | Done (E2E) | 6 |
+| Messaging | Realtime delivery (chat and inbox); the send form also works without JavaScript | Done (realtime tested with 3 real users) | 6 |
+| Safety | Report messages, profiles and courses (reason and details, de-duplicated); block and unblock (Settings); rate limits on messages (20/min) and reports (20/day) | Done (E2E) | 6 |
+| Safety | Moderator review UI for reports | Not built. Admins use the Supabase dashboard. | 9 |
 | Sessions | Create, edit and cancel; join or request; invitations; capacity; meeting link for participants | DB only | 7 |
 | Notifications | Notification centre with read and unread states | DB only | 7 |
 | Payments | Collecting money for paid courses | Deferred (needs legal and age review) | — |

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MessageButton } from "@/components/messages/message-button";
+import { StudentMenu } from "@/components/safety/student-menu";
 import { Avatar } from "@/components/ui/avatar";
 import { buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -34,10 +36,15 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
             {[profile.program, profile.university?.name].filter(Boolean).join(" · ")}
           </p>
         </div>
-        {isMe && (
+        {isMe ? (
           <Link href="/profile" className={buttonClasses({ variant: "outline", size: "sm" })}>
             Edit profile
           </Link>
+        ) : (
+          <div className="flex items-center gap-2">
+            <MessageButton otherId={profile.id} size="md" />
+            <StudentMenu studentId={profile.id} />
+          </div>
         )}
       </Card>
 

@@ -12,6 +12,8 @@ The source of truth is `supabase/migrations/`. This document explains the model;
 | `20261122100000_security_hardening.sql` | Fixes from the security review: `private.accounts`, column-level insert grants, secure default privileges, block enforcement on every path, abuse caps, notification de-duplication, session edit fixes, FK indexes |
 
 | `20261123090000_account_deletion.sql` | `delete_my_account()` |
+| `20261126100000_conversation_cleanup.sql` | Deletes a conversation once its last member is gone |
+| `20261126090000_messaging.sql` | `my_conversations()`, `unread_conversation_count()`, `mark_conversation_read()`, `my_blocks()`, message and report rate limits |
 | `20261125090000_student_matching.sql` | `suggest_matches()` |
 | `20261124090000_course_marketplace.sql` | `search_courses()`, `set_course_skills()`, `course_removed` notifications when an owner deletes a course |
 
@@ -85,7 +87,10 @@ profiles >── universities
 
 | `suggest_matches(filter_mode, same_university_only, page_size, page_offset)` | Ranks other discoverable, onboarded students (RLS removes blocked ones). Score: 3 per skill they teach that you learn, 3 per skill they learn that you teach, +2 for a two-way swap, +1 per shared interest, +1 per matching course category, +1 for the same university. It needs a skill, interest or course overlap; the same university alone isn't a match. Returns the reason arrays and `total_count`. |
 
-Planned for later phases: a conversation-list function with unread counts (Phase 6).
+| `my_conversations()` | The caller's inbox: the other member (null if hidden by a block), the last message, the unread count (messages after `last_read_at`) and `can_send` (no block either way). |
+| `unread_conversation_count()` | The number of conversations with unread messages (nav badge). |
+| `mark_conversation_read(target)` | Sets your `last_read_at` and clears that conversation's `new_message` notification. |
+| `my_blocks()` | Security definer. Lists only the blocks the caller created, so they can unblock. It never reveals who blocked you. |
 
 ## Changing the schema
 

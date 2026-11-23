@@ -41,7 +41,7 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 ## Known limitations and open items
 
 - **Avatars are public by URL.** File names are unguessable, but anyone who has a URL can view it.
-- **No time-based rate limiting yet.** Message, report and signup throttling is planned before launch (Phases 6 and 9).
+- **Rate limits:** messages are capped at 20 a minute and reports at 20 a day per student, in the database. Signup and login throttling relies on Supabase Auth's built-in limits, to be reviewed in Phase 9.
 - **Read receipts:** conversation members can see each other's `last_read_at`. This is intentional, for a future "Seen" indicator.
 - **Bulk updates:** accepting several session requests in one statement can hit the capacity constraint (`23514`) instead of the friendly "This session is full" message. There's no overfill. The app should accept requests one at a time and map `23514` to "full".
 - **No moderation UI.** Admins review `reports` in the Supabase dashboard until one is built.
@@ -68,7 +68,10 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | 2026-11-24 | Production-build E2E with the marketplace scenario (2 temporary users, deleted afterwards) | **71 passed, 0 failed.** Adds: create (with paid-amount validation), drafts hidden from others, search and filters, invalid and junk URLs, a non-owner blocked from the edit page, free and paid enrollment, the request note, owner accept, leave and re-enroll, edit, and delete with confirmation. |
 | 2026-11-25 | `npm run db:test:rls` extended for matching | **88 passed, 0 failed.** Matches exclude you, unfinished profiles, non-discoverable students and anyone in a block. Reasons cover both directions, swaps rank first, and the filters work. |
 | 2026-11-25 | Production-build E2E with the matching scenario | **79 passed, 0 failed.** Adds: the no-skills prompt, a swap with its reasons, profile links, filters, symmetry, and a hidden student disappearing from matches. |
-| — | Realtime delivery under RLS, real email delivery, the in-browser avatar upload UI | UNTESTED |
+| 2026-11-26 | `npm run db:test:rls` extended for messaging | **101 passed, 0 failed.** Covers unread counts, mark-read (and its notification), `can_send` false after a block, the inbox hiding a blocker's profile, `my_blocks` never revealing who blocked you, outsiders seeing nothing and unable to join by marking read, the message rate limit, and empty-conversation cleanup. |
+| 2026-11-26 | Realtime under RLS with 3 real users (supabase-js) | The member received the new message live on both the conversation channel and the inbox channel (about 1.3 s). The outsider's channel received nothing, and their direct read returned 0 rows. |
+| 2026-11-26 | Production-build E2E with the messaging scenario | **103 passed, 0 failed.** Adds: the Message button opens or reuses a conversation, empty messages are rejected, messages are HTML-escaped, the unread badge and mark-read work, replies show up, report (needs a reason, de-duplicated, unknown targets give 404), block (neither side can reply, the profile is hidden, the blocker is anonymised), and unblock restores visibility. |
+| — | Real email delivery, the in-browser avatar upload UI and realtime in a real browser tab | UNTESTED |
 
 ### Phase 3 auth hardening (from review)
 

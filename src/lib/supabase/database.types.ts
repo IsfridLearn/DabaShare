@@ -737,6 +737,31 @@ export type Database = {
         Returns: number
       }
       delete_my_account: { Args: never; Returns: undefined }
+      mark_conversation_read: { Args: { target: string }; Returns: undefined }
+      my_blocks: {
+        Args: never
+        Returns: {
+          blocked_at: string
+          blocked_id: string
+          display_name: string
+          username: string
+        }[]
+      }
+      my_conversations: {
+        Args: never
+        Returns: {
+          can_send: boolean
+          conversation_id: string
+          last_at: string
+          last_body: string
+          last_sender: string
+          other_avatar: string
+          other_id: string
+          other_name: string
+          other_username: string
+          unread: number
+        }[]
+      }
       search_courses: {
         Args: {
           filter_category?: number
@@ -794,6 +819,7 @@ export type Database = {
           username: string
         }[]
       }
+      unread_conversation_count: { Args: never; Returns: number }
     }
     Enums: {
       course_level: "beginner" | "intermediate" | "advanced" | "expert"

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EnrollmentPanel } from "@/components/courses/enrollment-panel";
 import { EnrollmentRequests } from "@/components/courses/owner-tools";
+import { MessageButton } from "@/components/messages/message-button";
 import { Alert } from "@/components/ui/alert";
 import { Avatar } from "@/components/ui/avatar";
 import { buttonClasses } from "@/components/ui/button";
@@ -81,6 +82,14 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
                   {owner.university && <span className="block text-sm text-gray-500">{owner.university.name}</span>}
                 </span>
               </Link>
+              {!isOwner && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <MessageButton otherId={owner.id} variant="outline" />
+                  <Link href={`/report?type=course&id=${course.id}`} className="text-sm text-gray-500 hover:text-danger">
+                    Report course
+                  </Link>
+                </div>
+              )}
             </Card>
           )}
 

@@ -1,10 +1,10 @@
 # DabaShare Development Progress
 
-Last updated: 2026-11-25
+Last updated: 2026-11-26
 
-**Current Phase:** Phase 6 — Messaging (next). Phase 5 is complete. Phase 3 is still waiting on your manual signup-email check.
+**Current Phase:** Phase 7 — Study Sessions, Webinars and Notifications (next). Phase 6 is complete. Phase 3 is still waiting on your manual signup-email check.
 
-**Overall Progress:** 4/10 phases completed (1, 2, 4 and 5; Phase 3 waits on one manual check).
+**Overall Progress:** 5/10 phases completed (1, 2, 4, 5 and 6; Phase 3 waits on one manual check).
 
 ## Phase Status
 
@@ -13,7 +13,7 @@ Last updated: 2026-11-25
 - [ ] Phase 3 — Authentication and Profiles (one manual check left, see below)
 - [x] Phase 4 — Course Marketplace
 - [x] Phase 5 — Student Matching
-- [ ] Phase 6 — Messaging
+- [x] Phase 6 — Messaging
 - [ ] Phase 7 — Study Sessions and Notifications
 - [ ] Phase 8 — UI/UX Refinement
 - [ ] Phase 9 — Security and Testing
@@ -25,6 +25,20 @@ Last updated: 2026-11-25
 2. **Known external blocker for real students:** Supabase's built-in email only delivers to org members, so custom SMTP is needed before anyone else can sign up. It's tracked in DEPLOYMENT.md, and you need to choose a provider.
 
 ## Log
+
+### 2026-11-26 — Phase 6 complete
+
+Completion criterion met: two authenticated students communicate securely, with persistent messages and realtime delivery, and no dummy data.
+
+- **Migrations:** `20261126090000_messaging.sql` (inbox, unread, mark-read, my_blocks, rate limits) and `20261126100000_conversation_cleanup.sql`.
+- **Pages:**
+  - `/messages`: the inbox, which updates live.
+  - `/messages/[id]`: chat with realtime, load-earlier, day separators, Enter to send, a "Report" link on messages, and a profile menu with Report and Block.
+  - `/report`.
+  - Settings: a "Blocked students" list with Unblock.
+- **Message buttons** on match cards, public profiles and course tutor cards. The Messages nav item shows an unread badge.
+- **Fixed during cleanup:** empty conversations were left behind when both students deleted their accounts.
+- **Subagents:** none. RLS tests, a realtime isolation test and the E2E run covered the risks. The full independent review is planned for Phase 9.
 
 ### 2026-11-25 — Phase 5 complete
 
@@ -75,6 +89,11 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 | Date | Check | Result |
 |---|---|---|
+| 2026-11-26 | `npm run check` | Passed: 0 type errors, 0 lint problems, 64/64 unit tests |
+| 2026-11-26 | `npm run build` | Passed |
+| 2026-11-26 | `npm run db:test:rls` | **101 passed, 0 failed** (rolled back) |
+| 2026-11-26 | Realtime delivery and isolation (3 real users) | Member received live; the outsider got nothing |
+| 2026-11-26 | Production-build E2E (all phases so far) | **103 passed, 0 failed.** Dev data was removed afterwards. |
 | 2026-11-25 | `npm run check` | Passed: 0 type errors, 0 lint problems, 58/58 unit tests |
 | 2026-11-25 | `npm run build` | Passed |
 | 2026-11-25 | `npm run db:test:rls` | **88 passed, 0 failed** (rolled back) |
@@ -97,7 +116,12 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 ## Next steps
 
 1. Your manual signup-email check, which closes Phase 3.
-2. Phase 6, messaging: a conversation list with unread counts, a chat view with realtime delivery, persistent history, "Message" buttons on matches, profiles and courses, and block and report with a UI.
+2. Phase 7, sessions, webinars and notifications:
+   - Create, edit and cancel study sessions and webinars.
+   - Join or request a place, with capacity and invitations.
+   - Meeting links only for accepted participants.
+   - Upcoming, Live now and My sessions tabs.
+   - A notification centre with read and unread states, and a live badge.
 
 ## Blockers
 
