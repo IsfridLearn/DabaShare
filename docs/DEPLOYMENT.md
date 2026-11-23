@@ -1,6 +1,6 @@
 # Deployment
 
-Status: **free-tier launch setup**. The app is hosted on Vercel (free Hobby plan, `*.vercel.app` address, no custom domain), with auth email sent through Gmail SMTP (free, no domain). The one Supabase project serves both development and the live site for now.
+Status: **live at https://dabashare.vercel.app** (Vercel Hobby, free). Auth email still uses Supabase's built-in sender until Gmail SMTP is set up (§2), so only Supabase org members get confirmation emails for now.
 
 ## Environments
 
@@ -56,12 +56,16 @@ Supabase's built-in email only reaches members of your Supabase organization, so
 
 Once custom SMTP works, Supabase allows custom email templates on the free tier. The branded DabaShare templates are ready in `supabase/templates/`. Turning them on also requires the "Continue" step in `/auth/confirm` described in SECURITY.md, so do the two together.
 
-## 3. Point Supabase auth at the live address
+## 3. Point Supabase auth at the live address (done 2026-11-28)
 
 In Supabase → Authentication → **URL Configuration** (or with `supabase config push` from `supabase/config.toml`):
 
 - Site URL: `https://<your-project>.vercel.app`
 - Redirect URLs: `https://<your-project>.vercel.app/**` and `http://localhost:3000/**` (for local development)
+
+Current values: Site URL `https://dabashare.vercel.app`; redirect URLs `https://dabashare.vercel.app/**`, `https://dabashare-isfridlearn.vercel.app/**` (another address for the same project) and `http://localhost:3000/**`.
+
+**Don't add wildcards such as `https://dabashare-*-isfridlearn.vercel.app/**`.** Anyone can create a Vercel project with a matching name and receive password-reset or confirmation links meant for students. Preview deployments are behind Vercel login anyway.
 
 Without this, confirmation and password-reset links bounce to the wrong place.
 

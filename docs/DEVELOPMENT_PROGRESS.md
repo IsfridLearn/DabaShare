@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-28
 
-**Current Phase:** Phase 10 — Deployment (in progress: waiting on the Vercel import and Gmail SMTP setup, see DEPLOYMENT.md).
+**Current Phase:** Phase 10 — Deployment. **Live at https://dabashare.vercel.app.** Remaining: Gmail SMTP so every student receives emails (DEPLOYMENT.md §2).
 
 **Overall Progress:** 9/10 phases completed.
 
