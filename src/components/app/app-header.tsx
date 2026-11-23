@@ -34,14 +34,14 @@ const desktopLink =
 export function AppHeader() {
   return (
     <>
-      <header className="border-b border-gray-200 bg-white/95 backdrop-blur xl:sticky xl:top-0 xl:z-20">
+      <header className="border-b border-gray-200 bg-surface/95 backdrop-blur xl:sticky xl:top-0 xl:z-20">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 xl:h-16">
-          <Link href="/courses" className="text-brand" aria-label="DabaShare home">
+          <Link href="/courses" className="text-brand-ink" aria-label="DabaShare home">
             <Logo size={28} />
           </Link>
           <nav aria-label="Main" className="ml-2 hidden gap-0.5 xl:flex">
             {ITEMS.map((item) => (
-              <NavLink key={item.href} href={item.href} exclude={item.exclude} className={desktopLink} activeClassName="bg-brand-soft text-brand hover:bg-brand-soft hover:text-brand">
+              <NavLink key={item.href} href={item.href} exclude={item.exclude} className={desktopLink} activeClassName="bg-brand-soft text-brand-ink hover:bg-brand-soft hover:text-brand-ink">
                 {item.label}
                 {item.badge && (
                   <Suspense fallback={null}>
@@ -50,7 +50,7 @@ export function AppHeader() {
                 )}
               </NavLink>
             ))}
-            <NavLink href="/courses/mine" className={desktopLink} activeClassName="bg-brand-soft text-brand hover:bg-brand-soft hover:text-brand">
+            <NavLink href="/courses/mine" className={desktopLink} activeClassName="bg-brand-soft text-brand-ink hover:bg-brand-soft hover:text-brand-ink">
               My courses
             </NavLink>
           </nav>
@@ -64,7 +64,7 @@ export function AppHeader() {
 
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur xl:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur xl:hidden"
       >
         <ul className="mx-auto grid max-w-lg grid-cols-5">
           {ITEMS.map((item) => (
@@ -73,7 +73,7 @@ export function AppHeader() {
                 href={item.href}
                 exclude={item.exclude}
                 className="relative flex min-h-14 flex-col items-center justify-center gap-0.5 px-1 text-[0.7rem] font-medium text-gray-600"
-                activeClassName="text-brand"
+                activeClassName="text-brand-ink"
               >
                 {item.icon}
                 <span>{item.short ?? item.label}</span>
@@ -112,7 +112,7 @@ async function AccountMenu() {
   return (
     <Menu
       summaryClassName="flex items-center gap-2 rounded-full p-1 hover:bg-gray-100 md:pr-3"
-      panelClassName="absolute right-0 z-40 mt-2 w-56 rounded-control border border-gray-200 bg-white p-1 shadow-card-lg"
+      panelClassName="absolute right-0 z-40 mt-2 w-56 rounded-control border border-gray-200 bg-surface p-1 shadow-card-lg"
       summary={
         <>
           <Avatar name={profile.display_name} path={profile.avatar_path} size={32} />

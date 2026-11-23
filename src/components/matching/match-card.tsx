@@ -11,12 +11,12 @@ export function MatchCard({ match }: { match: Match }) {
   const swap = isSkillSwap(match);
 
   return (
-    <article className="flex h-full flex-col gap-4 rounded-card border border-gray-200 bg-white p-5 shadow-card">
+    <article className="flex h-full flex-col gap-4 rounded-card border border-gray-200 bg-surface p-5 shadow-card">
       <header className="flex items-start gap-3">
         <Avatar name={match.display_name} path={match.avatar_path} size={52} />
         <div className="min-w-0 flex-1">
           <h2 className="truncate text-base font-semibold">
-            <Link href={`/u/${match.username}`} className="hover:text-brand">
+            <Link href={`/u/${match.username}`} className="hover:text-brand-ink">
               {match.display_name}
             </Link>
           </h2>

@@ -80,7 +80,7 @@ export function SignupForm({ universities }: { universities: University[] }) {
       </Checkbox>
       <Checkbox name="acceptTerms" state={state} defaultChecked={v?.acceptTerms === "on"}>
         I have read the{" "}
-        <Link href="/privacy" target="_blank" className="font-medium text-brand hover:underline">
+        <Link href="/privacy" target="_blank" className="font-medium text-brand-ink hover:underline">
           privacy notice<span className="sr-only"> (opens in a new tab)</span>
         </Link>{" "}
         and agree to DabaShare processing my information as described.
@@ -119,7 +119,7 @@ function Checkbox({
         <span>{children}</span>
       </label>
       {error && (
-        <p id={`${name}-message`} className="mt-1 pl-6.5 text-sm text-danger">
+        <p id={`${name}-message`} className="mt-1 pl-6.5 text-sm text-danger-ink">
           {error}
         </p>
       )}

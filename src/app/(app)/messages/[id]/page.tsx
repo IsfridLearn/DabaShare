@@ -33,7 +33,7 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
     <div className="-mx-4 -mt-6 -mb-28 flex h-[calc(100dvh-7.5rem)] flex-col xl:m-0 xl:h-[calc(100dvh-10rem)]">
       <InboxLive />
       <h1 className="sr-only">Conversation with {name}</h1>
-      <div className="grid min-h-0 flex-1 overflow-hidden bg-white md:rounded-card md:border md:border-gray-200 md:shadow-card md:grid-cols-[20rem_minmax(0,1fr)] xl:m-0">
+      <div className="grid min-h-0 flex-1 overflow-hidden bg-surface md:rounded-card md:border md:border-gray-200 md:shadow-card md:grid-cols-[20rem_minmax(0,1fr)] xl:m-0">
         <div className="hidden overflow-y-auto border-r border-gray-200 md:block">
           <ConversationList items={inbox} activeId={id} meId={me.id} />
         </div>
@@ -51,7 +51,7 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
             <Avatar name={name} path={conversation.other_avatar} size={40} />
             <div className="min-w-0 flex-1">
               {conversation.other_username ? (
-                <Link href={`/u/${conversation.other_username}`} className="block truncate font-semibold hover:text-brand">
+                <Link href={`/u/${conversation.other_username}`} className="block truncate font-semibold hover:text-brand-ink">
                   {name}
                 </Link>
               ) : (

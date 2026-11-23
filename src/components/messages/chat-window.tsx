@@ -180,7 +180,7 @@ export function ChatWindow({
                     {!mine && (
                       <Link
                         href={`/report?type=message&id=${m.id}`}
-                        className="rounded px-1.5 py-1 opacity-0 group-hover:opacity-100 hover:text-danger focus:opacity-100 [@media(hover:none)]:opacity-100"
+                        className="rounded px-1.5 py-1 opacity-0 group-hover:opacity-100 hover:text-danger-ink focus:opacity-100 [@media(hover:none)]:opacity-100"
                         aria-label={`Report message from ${otherName}`}
                       >
                         Report
@@ -205,7 +205,7 @@ export function ChatWindow({
       )}
 
       {canSend ? (
-        <form ref={formRef} action={action} className="flex flex-col gap-2 border-t border-gray-200 bg-white p-3" noValidate>
+        <form ref={formRef} action={action} className="flex flex-col gap-2 border-t border-gray-200 bg-surface p-3" noValidate>
           {state.status === "error" && <FormMessage state={state} />}
           <div className="flex items-end gap-2">
             <label htmlFor="body" className="sr-only">

@@ -40,7 +40,7 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <Link href="/courses" className="text-sm font-medium text-brand hover:underline">
+      <Link href="/courses" className="text-sm font-medium text-brand-ink hover:underline">
         ← All courses
       </Link>
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
@@ -75,7 +75,7 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
           {owner && (
             <Card className="flex flex-col gap-3">
               <h2 className="text-sm font-semibold text-gray-500">Tutor</h2>
-              <Link href={`/u/${owner.username}`} className="flex items-center gap-3 hover:text-brand">
+              <Link href={`/u/${owner.username}`} className="flex items-center gap-3 hover:text-brand-ink">
                 <Avatar name={owner.display_name} path={owner.avatar_path} size={48} />
                 <span>
                   <span className="block font-semibold">{owner.display_name}</span>
@@ -85,7 +85,7 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
               {!isOwner && (
                 <div className="flex flex-wrap items-center gap-2">
                   <MessageButton otherId={owner.id} variant="outline" />
-                  <Link href={`/report?type=course&id=${course.id}`} className="text-sm text-gray-500 hover:text-danger">
+                  <Link href={`/report?type=course&id=${course.id}`} className="text-sm text-gray-500 hover:text-danger-ink">
                     Report course
                   </Link>
                 </div>

@@ -1,20 +1,33 @@
 @import "tailwindcss";
 
+/* Dark mode follows a `dark` class on <html> (set from the user's choice in
+   Settings, or the system preference), not only the OS media query. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
   DabaShare design tokens, ported from prototype/style.css.
   The prototype colours match Tailwind's palette exactly, so the semantic
   names below point at Tailwind colours.
+
+  Colour roles:
+  - surface      card/panel background (white in light mode)
+  - brand        filled buttons, focus rings, active backgrounds
+  - *-ink        text in that colour; lighter in dark mode so it stays readable
 */
 @theme {
+  --color-surface: #ffffff;
   --color-brand: var(--color-blue-600);
   --color-brand-dark: var(--color-blue-700);
   --color-brand-soft: var(--color-blue-50);
+  --color-brand-ink: var(--color-blue-600);
   --color-accent: var(--color-violet-600);
   --color-accent-soft: var(--color-violet-100);
   --color-success: var(--color-emerald-600);
   --color-success-soft: var(--color-emerald-100);
+  --color-success-ink: var(--color-emerald-700);
   --color-danger: var(--color-red-600);
   --color-danger-soft: var(--color-red-50);
+  --color-danger-ink: var(--color-red-600);
   --color-warning: var(--color-amber-500);
 
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
@@ -25,6 +38,55 @@
 
   --shadow-card: 0 4px 24px rgb(0 0 0 / 0.08);
   --shadow-card-lg: 0 8px 40px rgb(0 0 0 / 0.12);
+}
+
+/*
+  Dark palette. Components keep their normal classes (bg-gray-50,
+  text-gray-700, bg-emerald-100 …); in dark mode those shades are remapped:
+  grays invert, pastel tag backgrounds become deep tints, and tag text
+  becomes light. Filled brand/danger buttons keep their light-mode colours so
+  white text on them stays at AA contrast.
+*/
+.dark {
+  color-scheme: dark;
+
+  --color-surface: #131c2e;
+  --color-gray-50: #0b1220;
+  --color-gray-100: #1e293b;
+  --color-gray-200: #2b3648;
+  --color-gray-300: #3b4659;
+  --color-gray-400: #64748b;
+  --color-gray-500: #94a3b8;
+  --color-gray-600: #a9b4c4;
+  --color-gray-700: #cbd5e1;
+  --color-gray-800: #e2e8f0;
+  --color-gray-900: #f1f5f9;
+
+  --color-blue-50: #172554;
+  --color-blue-100: #1e2f5c;
+  --color-blue-200: #1e3a8a;
+  --color-blue-800: #bfdbfe;
+  --color-violet-50: #1e1538;
+  --color-violet-100: #2e1f5e;
+  --color-violet-200: #4c1d95;
+  --color-violet-800: #ddd6fe;
+  --color-emerald-100: #063f30;
+  --color-emerald-200: #065f46;
+  --color-emerald-800: #a7f3d0;
+  --color-amber-100: #3d2a06;
+  --color-amber-800: #fde68a;
+  --color-red-50: #2a0f12;
+  --color-red-100: #4c1518;
+  --color-red-200: #7f1d1d;
+  --color-red-800: #fecaca;
+  --color-red-900: #fee2e2;
+
+  --color-brand-ink: #60a5fa;
+  --color-success-ink: #34d399;
+  --color-danger-ink: #f87171;
+
+  --shadow-card: 0 4px 24px rgb(0 0 0 / 0.35);
+  --shadow-card-lg: 0 8px 40px rgb(0 0 0 / 0.5);
 }
 
 @layer base {

@@ -44,12 +44,12 @@ export function ConversationList({
             >
               <span className="relative shrink-0">
                 <Avatar name={name} path={c.other_avatar} size={48} />
-                {unread && <span className="absolute -top-0.5 -right-0.5 size-3.5 rounded-full border-2 border-white bg-brand" aria-hidden="true" />}
+                {unread && <span className="absolute -top-0.5 -right-0.5 size-3.5 rounded-full border-2 border-surface bg-brand" aria-hidden="true" />}
               </span>
               <span className="min-w-0 flex-1">
                 <span className="flex items-baseline justify-between gap-2">
                   <span className={cn("truncate", unread ? "font-bold text-gray-900" : "font-medium text-gray-800")}>{name}</span>
-                  <span className={cn("shrink-0 text-xs", unread ? "font-semibold text-brand" : "text-gray-600")}>
+                  <span className={cn("shrink-0 text-xs", unread ? "font-semibold text-brand-ink" : "text-gray-600")}>
                     {formatInboxTime(c.last_at)}
                   </span>
                 </span>

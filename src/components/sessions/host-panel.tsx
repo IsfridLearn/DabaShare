@@ -15,7 +15,7 @@ function Person({ p }: { p: Participant }) {
   return (
     <span className="flex min-w-0 items-center gap-2.5">
       <Avatar name={p.person.display_name} path={p.person.avatar_path} size={32} />
-      <Link href={`/u/${p.person.username}`} className="truncate font-medium text-gray-900 hover:text-brand">
+      <Link href={`/u/${p.person.username}`} className="truncate font-medium text-gray-900 hover:text-brand-ink">
         {p.person.display_name}
       </Link>
       {p.person.university && <span className="shrink-0 text-sm text-gray-500">{p.person.university.short_name}</span>}
@@ -114,7 +114,7 @@ export function InviteForm({ sessionId }: { sessionId: string }) {
         </Button>
       </div>
       {fieldError(state, "username") && (
-        <p id="username-message" className="text-sm text-danger">
+        <p id="username-message" className="text-sm text-danger-ink">
           {fieldError(state, "username")}
         </p>
       )}

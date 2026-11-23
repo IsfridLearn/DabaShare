@@ -72,7 +72,7 @@ function Person({ enrollment }: { enrollment: OwnerEnrollment }) {
     <div className="flex min-w-0 items-start gap-3">
       <Avatar name={student.display_name} path={student.avatar_path} size={36} />
       <div className="min-w-0">
-        <Link href={`/u/${student.username}`} className="font-medium text-gray-900 hover:text-brand">
+        <Link href={`/u/${student.username}`} className="font-medium text-gray-900 hover:text-brand-ink">
           {student.display_name}
         </Link>
         {student.university && <span className="ml-2 text-sm text-gray-500">{student.university.short_name}</span>}

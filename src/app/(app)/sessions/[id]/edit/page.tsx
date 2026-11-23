@@ -28,7 +28,7 @@ export default async function EditSessionPage({ params }: PageProps<"/sessions/[
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <Link href={`/sessions/${session.id}`} className="text-sm font-medium text-brand hover:underline">
+      <Link href={`/sessions/${session.id}`} className="text-sm font-medium text-brand-ink hover:underline">
         ← Back to session
       </Link>
       <h1 className="text-2xl font-bold">Edit session</h1>

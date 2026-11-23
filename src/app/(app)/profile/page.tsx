@@ -75,7 +75,7 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
               <li key={item.key}>
                 <a
                   href={item.href}
-                  className="inline-flex min-h-9 items-center rounded-full border border-gray-200 px-3 text-sm text-gray-700 hover:border-brand hover:text-brand"
+                  className="inline-flex min-h-9 items-center rounded-full border border-gray-200 px-3 text-sm text-gray-700 hover:border-brand hover:text-brand-ink"
                 >
                   + {item.label}
                 </a>
@@ -116,7 +116,7 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
             <SkillSuggestions id="skill-suggestions" names={skillNames} />
             <SkillsEditor kind="teach" skills={details.teaches} suggestionsId="skill-suggestions" />
             <SkillsEditor kind="learn" skills={details.learns} suggestionsId="skill-suggestions" />
-            <Link href="/matches" className="text-sm font-medium text-brand hover:underline">
+            <Link href="/matches" className="text-sm font-medium text-brand-ink hover:underline">
               See students who match these skills →
             </Link>
           </Card>

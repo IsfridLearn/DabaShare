@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 
 // 16px text on phones: iOS Safari zooms the page when focusing smaller inputs.
 const control =
-  "w-full rounded-control border-[1.5px] border-gray-200 bg-white px-3.5 py-2.5 text-base text-gray-800 md:text-[0.95rem] " +
+  "w-full rounded-control border-[1.5px] border-gray-200 bg-surface px-3.5 py-2.5 text-base text-gray-800 md:text-[0.95rem] " +
   "placeholder:text-gray-500 transition focus:border-brand focus:outline-none focus:ring-3 focus:ring-brand/15 " +
   "aria-invalid:border-danger disabled:bg-gray-100";
 
@@ -32,7 +32,7 @@ export function Field({ label, htmlFor, error, hint, children }: FieldProps) {
       </label>
       {control}
       {message && (
-        <p id={messageId} className={cn("text-sm", error ? "text-danger" : "text-gray-600")}>
+        <p id={messageId} className={cn("text-sm", error ? "text-danger-ink" : "text-gray-600")}>
           {message}
         </p>
       )}

@@ -37,7 +37,7 @@ export function ReportForm({ targetType, targetId }: { targetType: ReportTarget;
             </label>
           ))}
         </div>
-        {fieldError(state, "reason") && <p className="mt-1 text-sm text-danger">{fieldError(state, "reason")}</p>}
+        {fieldError(state, "reason") && <p className="mt-1 text-sm text-danger-ink">{fieldError(state, "reason")}</p>}
       </fieldset>
       <Field label="Details (optional)" htmlFor="details" error={fieldError(state, "details")}>
         <Textarea id="details" name="details" maxLength={1000} rows={4} defaultValue={state.values?.details} {...errorProps(state, "details")} />

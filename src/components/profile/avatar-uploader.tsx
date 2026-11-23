@@ -120,7 +120,7 @@ export function AvatarUploader({
       </div>
       {error && <Alert tone="error">{error}</Alert>}
       {done && !error && (
-        <p role="status" className="text-sm font-medium text-success">
+        <p role="status" className="text-sm font-medium text-success-ink">
           {done}
         </p>
       )}

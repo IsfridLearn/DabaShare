@@ -23,7 +23,7 @@ export default function CheckEmailPage({ searchParams }: PageProps<"/check-email
         <ResendWithEmail searchParams={searchParams} />
       </Suspense>
       <p className="mt-6 text-center text-sm text-gray-600">
-        <Link href="/login" className="font-medium text-brand hover:underline">
+        <Link href="/login" className="font-medium text-brand-ink hover:underline">
           Back to sign in
         </Link>
       </p>

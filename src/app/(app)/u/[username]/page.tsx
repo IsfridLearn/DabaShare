@@ -104,7 +104,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
           <ul className="divide-y divide-gray-100">
             {courses.map((c) => (
               <li key={c.id}>
-                <Link href={`/courses/${c.id}`} className="flex items-center justify-between gap-3 py-3 hover:text-brand">
+                <Link href={`/courses/${c.id}`} className="flex items-center justify-between gap-3 py-3 hover:text-brand-ink">
                   <span className="min-w-0 truncate font-medium">{c.title}</span>
                   <Tag tone={c.price_php === 0 ? "free" : "paid"} className="shrink-0">
                     {formatPrice(c.price_php)}

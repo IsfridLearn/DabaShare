@@ -13,10 +13,10 @@ export function CourseCard({ course }: { course: CourseListItem }) {
   return (
     <Link
       href={`/courses/${course.id}`}
-      className="group flex flex-col gap-3 rounded-card border border-gray-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 motion-reduce:transform-none hover:border-blue-200 hover:shadow-card-lg focus-visible:outline-2 focus-visible:outline-brand"
+      className="group flex flex-col gap-3 rounded-card border border-gray-200 bg-surface p-5 shadow-card transition hover:-translate-y-0.5 motion-reduce:transform-none hover:border-blue-200 hover:shadow-card-lg focus-visible:outline-2 focus-visible:outline-brand"
     >
       <div className="flex items-start justify-between gap-3">
-        <h2 className="text-base leading-snug font-semibold group-hover:text-brand">{course.title}</h2>
+        <h2 className="text-base leading-snug font-semibold group-hover:text-brand-ink">{course.title}</h2>
         <Tag tone={free ? "free" : "paid"} className="shrink-0 font-semibold">
           {formatPrice(course.price_php)}
         </Tag>

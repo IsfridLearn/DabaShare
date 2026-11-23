@@ -28,7 +28,7 @@ export default async function CoursesPage({ searchParams }: PageProps<"/courses"
     <div className="flex flex-col gap-6">
       <section className="rounded-card bg-linear-120 from-brand to-accent px-6 py-8 text-white shadow-card-lg sm:px-10">
         <h1 className="text-2xl font-bold text-white sm:text-3xl">Browse available courses</h1>
-        <p className="mt-2 max-w-xl text-blue-50">Discover skills shared by students across Davao City universities.</p>
+        <p className="mt-2 max-w-xl text-white/90">Discover skills shared by students across Davao City universities.</p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link href="/courses/new" className={buttonClasses({ variant: "outline" }) + " border-white"}>
             + Post a course

@@ -38,7 +38,7 @@ export function LoginForm({ next }: { next?: string }) {
         />
       </Field>
       <div className="-mt-1 text-right text-sm">
-        <Link href="/forgot-password" className="font-medium text-brand hover:underline">
+        <Link href="/forgot-password" className="font-medium text-brand-ink hover:underline">
           Forgot password?
         </Link>
       </div>

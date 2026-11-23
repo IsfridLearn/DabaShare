@@ -87,7 +87,7 @@ export function SkillsEditor({
         </Button>
       </form>
       {error && (
-        <p id={`${inputId}-error`} className="text-sm text-danger">
+        <p id={`${inputId}-error`} className="text-sm text-danger-ink">
           {error}
         </p>
       )}

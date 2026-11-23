@@ -10,7 +10,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-gray-300 bg-white px-6 py-12 text-center">
+    <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-gray-300 bg-surface px-6 py-12 text-center">
       <h2 className="text-lg font-semibold">{title}</h2>
       {description && <p className="max-w-md text-gray-600">{description}</p>}
       {action}

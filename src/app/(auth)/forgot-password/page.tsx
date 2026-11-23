@@ -20,7 +20,7 @@ export default function ForgotPasswordPage({ searchParams }: PageProps<"/forgot-
       </Suspense>
       <EmailForm action={requestPasswordReset} submitLabel="Send reset link" pendingLabel="Sending…" />
       <p className="mt-6 text-center text-sm text-gray-600">
-        <Link href="/login" className="font-medium text-brand hover:underline">
+        <Link href="/login" className="font-medium text-brand-ink hover:underline">
           Back to sign in
         </Link>
       </p>

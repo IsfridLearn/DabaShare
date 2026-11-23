@@ -22,7 +22,7 @@ export default async function EditCoursePage({ params }: PageProps<"/courses/[id
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <Link href={`/courses/${course.id}`} className="text-sm font-medium text-brand hover:underline">
+      <Link href={`/courses/${course.id}`} className="text-sm font-medium text-brand-ink hover:underline">
         ← Back to course
       </Link>
       <h1 className="text-2xl font-bold">Edit course</h1>
@@ -44,7 +44,7 @@ export default async function EditCoursePage({ params }: PageProps<"/courses/[id
         />
       </Card>
       <Card className="flex flex-col gap-3 border-red-200">
-        <h2 className="text-lg font-semibold text-danger">Delete course</h2>
+        <h2 className="text-lg font-semibold text-danger-ink">Delete course</h2>
         <p className="text-sm text-gray-600">
           To stop new enrollments but keep the course for current students, set its visibility to Archived instead.
         </p>

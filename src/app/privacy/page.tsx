@@ -11,7 +11,7 @@ export const metadata = { title: "Privacy notice" };
 export default function PrivacyPage() {
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
-      <Link href="/" className="text-brand" aria-label="DabaShare home">
+      <Link href="/" className="text-brand-ink" aria-label="DabaShare home">
         <Logo />
       </Link>
       <h1 className="mt-8 text-3xl font-bold">Privacy notice</h1>

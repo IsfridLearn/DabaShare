@@ -46,7 +46,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <Link href="/sessions" className="text-sm font-medium text-brand hover:underline">
+      <Link href="/sessions" className="text-sm font-medium text-brand-ink hover:underline">
         ← All sessions
       </Link>
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
@@ -54,7 +54,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
         <Card className="flex flex-col gap-5">
           <div className="flex flex-wrap items-center gap-2">
-            {phase === "live" && <Tag className="bg-red-100 font-semibold text-red-700">● Live now</Tag>}
+            {phase === "live" && <Tag className="bg-red-100 font-semibold text-red-800">● Live now</Tag>}
             {phase === "cancelled" && <Tag className="bg-gray-200 text-gray-700">Cancelled</Tag>}
             {phase === "ended" && <Tag>Ended</Tag>}
             <Tag tone={session.type === "webinar" ? "paid" : "learn"}>{typeLabel(session.type)}</Tag>
@@ -84,14 +84,14 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
           {session.host && (
             <Card className="flex flex-col gap-3">
               <h2 className="text-sm font-semibold text-gray-500">Host</h2>
-              <Link href={`/u/${session.host.username}`} className="flex items-center gap-3 hover:text-brand">
+              <Link href={`/u/${session.host.username}`} className="flex items-center gap-3 hover:text-brand-ink">
                 <Avatar name={session.host.display_name} path={session.host.avatar_path} size={44} />
                 <span className="font-semibold">{session.host.display_name}</span>
               </Link>
               {!isHost && (
                 <div className="flex flex-wrap items-center gap-2">
                   <MessageButton otherId={session.host.id} variant="outline" />
-                  <Link href={`/report?type=session&id=${session.id}`} className="text-sm text-gray-500 hover:text-danger">
+                  <Link href={`/report?type=session&id=${session.id}`} className="text-sm text-gray-500 hover:text-danger-ink">
                     Report session
                   </Link>
                 </div>
@@ -104,7 +104,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
               <>
                 <h2 className="text-lg font-semibold">Your session</h2>
                 {meetingUrl ? (
-                  <a href={meetingUrl} target="_blank" rel="noopener noreferrer" className="block truncate text-sm font-medium text-brand hover:underline">
+                  <a href={meetingUrl} target="_blank" rel="noopener noreferrer" className="block truncate text-sm font-medium text-brand-ink hover:underline">
                     {meetingUrl} ↗
                   </a>
                 ) : (
@@ -146,7 +146,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
                 <InviteForm sessionId={session.id} />
               </Card>
               <Card className="border-red-200">
-                <h2 className="mb-3 text-lg font-semibold text-danger">Cancel session</h2>
+                <h2 className="mb-3 text-lg font-semibold text-danger-ink">Cancel session</h2>
                 <CancelSessionForm sessionId={session.id} />
               </Card>
             </div>

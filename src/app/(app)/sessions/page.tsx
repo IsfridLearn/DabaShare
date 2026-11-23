@@ -54,7 +54,7 @@ export default async function SessionsPage({ searchParams }: PageProps<"/session
             aria-current={tab === t.value ? "page" : undefined}
             className={cn(
               "rounded-full border px-4 py-1.5 text-sm font-medium transition",
-              tab === t.value ? "border-brand bg-brand text-white" : "border-gray-200 bg-white text-gray-600 hover:border-brand hover:text-brand",
+              tab === t.value ? "border-brand bg-brand text-white" : "border-gray-200 bg-surface text-gray-600 hover:border-brand hover:text-brand-ink",
             )}
           >
             {t.label}

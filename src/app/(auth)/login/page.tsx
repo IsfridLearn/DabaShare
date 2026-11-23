@@ -17,7 +17,7 @@ export default function LoginPage({ searchParams }: PageProps<"/login">) {
       </Suspense>
       <p className="mt-6 text-center text-sm text-gray-600">
         Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-medium text-brand hover:underline">
+        <Link href="/signup" className="font-medium text-brand-ink hover:underline">
           Create one
         </Link>
       </p>

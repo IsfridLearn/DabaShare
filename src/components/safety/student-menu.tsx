@@ -17,7 +17,7 @@ export function StudentMenu({
   return (
     <Menu
       summaryClassName="flex size-11 items-center justify-center rounded-control text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-      panelClassName={`absolute z-30 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-control border border-gray-200 bg-white p-1 shadow-card-lg ${align === "right" ? "right-0" : "left-0"}`}
+      panelClassName={`absolute z-30 mt-1 w-64 max-w-[calc(100vw-2rem)] rounded-control border border-gray-200 bg-surface p-1 shadow-card-lg ${align === "right" ? "right-0" : "left-0"}`}
       summary={
         <>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -38,7 +38,7 @@ export function StudentMenu({
         Report this student
       </Link>
       <details className="group">
-        <summary className={`${item} cursor-pointer list-none text-danger [&::-webkit-details-marker]:hidden`}>
+        <summary className={`${item} cursor-pointer list-none text-danger-ink [&::-webkit-details-marker]:hidden`}>
           Block this student…
         </summary>
         <div className="m-1 rounded-md bg-danger-soft p-3 text-sm text-red-900">

@@ -16,7 +16,7 @@ export const metadata = { title: "Your matches" };
 const pill = (selected: boolean) =>
   cn(
     "rounded-full border px-3.5 py-1 text-sm font-medium transition",
-    selected ? "border-brand bg-brand text-white" : "border-gray-200 bg-white text-gray-600 hover:border-brand hover:text-brand",
+    selected ? "border-brand bg-brand text-white" : "border-gray-200 bg-surface text-gray-600 hover:border-brand hover:text-brand-ink",
   );
 
 export default async function MatchesPage({ searchParams }: PageProps<"/matches">) {

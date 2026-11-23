@@ -25,7 +25,7 @@ export default async function MessagesPage({ searchParams }: PageProps<"/message
       <InboxLive />
       <h1 className="text-2xl font-bold">Messages</h1>
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
-      <div className="grid overflow-hidden rounded-card border border-gray-200 bg-white shadow-card md:h-[calc(100dvh-14rem)] md:grid-cols-[20rem_minmax(0,1fr)]">
+      <div className="grid overflow-hidden rounded-card border border-gray-200 bg-surface shadow-card md:h-[calc(100dvh-14rem)] md:grid-cols-[20rem_minmax(0,1fr)]">
         <div className="overflow-y-auto md:border-r md:border-gray-200">
           <ConversationList items={items} meId={me.id} />
         </div>

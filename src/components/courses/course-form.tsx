@@ -142,7 +142,7 @@ export function CourseForm({
           </Field>
         </div>
         {fieldError(state, "pricePhp") && (
-          <p className="text-sm text-danger group-has-[#price-paid:checked]:hidden">{fieldError(state, "pricePhp")}</p>
+          <p className="text-sm text-danger-ink group-has-[#price-paid:checked]:hidden">{fieldError(state, "pricePhp")}</p>
         )}
       </fieldset>
 
