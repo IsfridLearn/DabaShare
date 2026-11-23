@@ -32,9 +32,12 @@ Status: local development only. The production steps are finalised in Phase 10.
 
 - [ ] Create the prod Supabase project in the nearest region (Singapore).
 - [ ] Run `supabase link` to prod, then `supabase db push`. Review the migration list first.
-- [ ] Set up custom SMTP for auth emails, since the built-in sender is rate-limited.
-- [ ] Set the auth Site URL and redirect URLs to the production domain.
-- [ ] Create the Vercel project from GitHub and set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `NEXT_PUBLIC_SITE_URL`.
+- [ ] **Set up custom SMTP for auth emails.** The built-in sender only delivers to Supabase org members, so students can't sign up without it. Once it works, enable the branded templates in `supabase/config.toml` (and the POST step in `/auth/confirm`).
+- [ ] Set the auth Site URL and redirect URLs to the production domain: `https://<domain>/**`, plus the Vercel preview pattern for previews.
+- [ ] Create the Vercel project from GitHub and set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `NEXT_PUBLIC_SITE_URL`. The app refuses to start in production without the site URL.
+- [ ] Raise Auth `sign_in_sign_ups` and `token_verifications` above the per-IP default of 30 per 5 minutes, because whole classes share campus Wi-Fi IPs.
+- [ ] Decide on leaked-password protection (HaveIBeenPwned), which is a Pro-plan feature.
+- [ ] Run `npm run test:e2e` against a staging deployment, never production.
 - [ ] Set up backups. The free tier has no point-in-time recovery, so this needs a decision.
 - [ ] Set up error monitoring.
 - [ ] Publish the privacy notice and terms, reviewed.

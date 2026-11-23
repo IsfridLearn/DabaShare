@@ -61,7 +61,7 @@ async function SupabaseStatus() {
       {results.map(({ table, ok, label }) => (
         <div key={table} className="flex items-center justify-between gap-4">
           <span className="font-medium">{table}</span>
-          <span className={ok ? "text-sm text-success" : "text-sm text-danger"}>
+          <span className={ok ? "text-sm text-success-ink" : "text-sm text-danger-ink"}>
             {ok ? "✓ " : "✗ "}
             {label}
           </span>

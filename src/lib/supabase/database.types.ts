@@ -71,18 +71,21 @@ export type Database = {
       conversation_members: {
         Row: {
           conversation_id: string
+          hidden_at: string | null
           joined_at: string
           last_read_at: string
           profile_id: string
         }
         Insert: {
           conversation_id: string
+          hidden_at?: string | null
           joined_at?: string
           last_read_at?: string
           profile_id: string
         }
         Update: {
           conversation_id?: string
+          hidden_at?: string | null
           joined_at?: string
           last_read_at?: string
           profile_id?: string
@@ -107,23 +110,34 @@ export type Database = {
       conversations: {
         Row: {
           created_at: string
+          created_by: string | null
           direct_key: string | null
           id: string
           last_message_at: string | null
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           direct_key?: string | null
           id?: string
           last_message_at?: string | null
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           direct_key?: string | null
           id?: string
           last_message_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "conversations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       course_enrollments: {
         Row: {
@@ -495,7 +509,7 @@ export type Database = {
           invited_by?: string | null
           profile_id: string
           session_id: string
-          status: Database["public"]["Enums"]["participant_status"]
+          status?: Database["public"]["Enums"]["participant_status"]
           updated_at?: string
         }
         Update: {
@@ -736,7 +750,132 @@ export type Database = {
         }
         Returns: number
       }
+      delete_my_account: { Args: never; Returns: undefined }
+      list_sessions: {
+        Args: { page_offset?: number; page_size?: number; tab?: string }
+        Returns: {
+          accepted_count: number
+          capacity: number
+          category_name: string
+          description: string
+          ends_at: string
+          host_avatar: string
+          host_id: string
+          host_name: string
+          host_username: string
+          id: string
+          my_status: Database["public"]["Enums"]["participant_status"]
+          requires_approval: boolean
+          starts_at: string
+          status: Database["public"]["Enums"]["session_status"]
+          title: string
+          total_count: number
+          type: Database["public"]["Enums"]["session_type"]
+        }[]
+      }
+      mark_all_notifications_read: { Args: never; Returns: undefined }
+      mark_conversation_read: { Args: { target: string }; Returns: undefined }
+      my_blocks: {
+        Args: never
+        Returns: {
+          blocked_at: string
+          blocked_id: string
+          display_name: string
+          username: string
+        }[]
+      }
+      my_conversations: {
+        Args: { include_conversation?: string }
+        Returns: {
+          can_send: boolean
+          conversation_id: string
+          last_at: string
+          last_body: string
+          last_sender: string
+          other_avatar: string
+          other_id: string
+          other_name: string
+          other_username: string
+          unread: number
+        }[]
+      }
+      my_notifications: {
+        Args: { page_offset?: number; page_size?: number }
+        Returns: {
+          actor_avatar: string
+          actor_name: string
+          actor_username: string
+          course_title: string
+          created_at: string
+          data: Json
+          i_host_session: boolean
+          i_own_course: boolean
+          id: string
+          read_at: string
+          session_title: string
+          total_count: number
+          type: Database["public"]["Enums"]["notification_type"]
+        }[]
+      }
+      search_courses: {
+        Args: {
+          filter_category?: number
+          filter_level?: Database["public"]["Enums"]["course_level"]
+          filter_price?: string
+          filter_text?: string
+          filter_university?: number
+          page_offset?: number
+          page_size?: number
+        }
+        Returns: {
+          category_id: number
+          category_name: string
+          created_at: string
+          description: string
+          id: string
+          level: Database["public"]["Enums"]["course_level"]
+          owner_avatar: string
+          owner_id: string
+          owner_name: string
+          owner_username: string
+          price_php: number
+          skill_names: string[]
+          title: string
+          total_count: number
+          university_short: string
+        }[]
+      }
+      set_course_skills: {
+        Args: { skill_names: string[]; target_course: string }
+        Returns: undefined
+      }
       start_direct_conversation: { Args: { other_id: string }; Returns: string }
+      suggest_matches: {
+        Args: {
+          filter_mode?: string
+          page_offset?: number
+          page_size?: number
+          same_university_only?: boolean
+        }
+        Returns: {
+          avatar_path: string
+          course_categories: string[]
+          display_name: string
+          learns_from_you: string[]
+          profile_id: string
+          program: string
+          published_courses: number
+          same_university: boolean
+          score: number
+          shared_interests: string[]
+          teaches_you: string[]
+          total_count: number
+          university_short: string
+          username: string
+        }[]
+      }
+      unread_conversation_count: { Args: never; Returns: number }
+      unread_notification_count: { Args: never; Returns: number }
     }
     Enums: {
       course_level: "beginner" | "intermediate" | "advanced" | "expert"
@@ -751,6 +890,7 @@ export type Database = {
         | "participation_updated"
         | "session_updated"
         | "session_cancelled"
+        | "course_removed"
       participant_status:
         | "invited"
         | "requested"
@@ -903,6 +1043,7 @@ export const Constants = {
         "participation_updated",
         "session_updated",
         "session_cancelled",
+        "course_removed",
       ],
       participant_status: [
         "invited",

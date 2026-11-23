@@ -1,8 +1,9 @@
 import { z } from "zod";
+import { SIGNED_IN_HOME } from "./routes";
 
 // Only same-site relative paths are allowed after login or email links,
 // so a crafted link cannot send users to another website.
-export function safeNextPath(next: unknown, fallback = "/profile"): string {
+export function safeNextPath(next: unknown, fallback = SIGNED_IN_HOME): string {
   if (typeof next !== "string") return fallback;
   if (!next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return fallback;
   if (/[\u0000-\u001f]/.test(next)) return fallback;
@@ -20,7 +21,8 @@ const email = z
 export const passwordSchema = z
   .string()
   .min(8, { error: "Use at least 8 characters." })
-  .max(72, { error: "Use at most 72 characters." })
+  // bcrypt's limit is 72 bytes, not characters (accented letters take 2+ bytes).
+  .refine((v) => new TextEncoder().encode(v).length <= 72, { error: "That password is too long." })
   .regex(/[A-Za-z]/, { error: "Include at least one letter." })
   .regex(/[0-9]/, { error: "Include at least one number." });
 
@@ -53,6 +55,17 @@ export const emailOnlySchema = z.object({ email });
 
 export const newPasswordSchema = z
   .object({ password: passwordSchema, confirmPassword: z.string() })
+  .refine((v) => v.password === v.confirmPassword, {
+    error: "Passwords don't match.",
+    path: ["confirmPassword"],
+  });
+
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, { error: "Enter your current password." }),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
   .refine((v) => v.password === v.confirmPassword, {
     error: "Passwords don't match.",
     path: ["confirmPassword"],

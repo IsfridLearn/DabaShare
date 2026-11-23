@@ -11,6 +11,16 @@ The source of truth is `supabase/migrations/`. This document explains the model;
 | `20261122090400_reference_data.sql` | Universities, categories, starter skills (no users or demo content) |
 | `20261122100000_security_hardening.sql` | Fixes from the security review: `private.accounts`, column-level insert grants, secure default privileges, block enforcement on every path, abuse caps, notification de-duplication, session edit fixes, FK indexes |
 
+| `20261123090000_account_deletion.sql` | `delete_my_account()` |
+| `20261128100000_open_hidden_conversation.sql` | `my_conversations(include_conversation)` so a hidden chat still opens by link |
+| `20261128090000_phase9_hardening.sql` | Security review fixes: `conversations.created_by` with a cap of 30 new conversations a day, `conversation_members.hidden_at` (hide until a new message), `can_send` false when the other student deleted their account, an input cap on `set_course_skills`, de-duplicated `session_updated`, 20 active courses and 20 upcoming sessions per student, `my_blocks` limited to finished profiles |
+| `20261127100000_participant_status_default.sql` | Default for `session_participants.status` (the trigger still sets it) |
+| `20261127090000_sessions_notifications.sql` | `list_sessions()`, `my_notifications()`, `unread_notification_count()`, `mark_all_notifications_read()` |
+| `20261126100000_conversation_cleanup.sql` | Deletes a conversation once its last member is gone |
+| `20261126090000_messaging.sql` | `my_conversations()`, `unread_conversation_count()`, `mark_conversation_read()`, `my_blocks()`, message and report rate limits |
+| `20261125090000_student_matching.sql` | `suggest_matches()` |
+| `20261124090000_course_marketplace.sql` | `search_courses()`, `set_course_skills()`, `course_removed` notifications when an owner deletes a course |
+
 Tests: `supabase/tests/rls_smoke.sql` (`npm run db:test:rls`) runs 55 rule checks as real impersonated users and always rolls back. Run it after every migration, **against dev only**.
 
 ## Entities
@@ -75,7 +85,19 @@ profiles >── universities
 | `start_direct_conversation(other_id uuid) → uuid` | Returns the existing one-to-one conversation or creates one. Refuses self-chats, unonboarded users and blocked pairs. |
 | `add_student_skill(skill_name text, skill_kind skill_kind) → bigint` | Normalises the name, creates the canonical skill if needed, and adds it to the caller's list. |
 
-Planned for later phases: `suggest_matches()` (Phase 5) and a conversation-list function with unread counts (Phase 6).
+| `search_courses(filter_text, filter_university, filter_price, filter_category, filter_level, page_size, page_offset)` | Published courses visible to the caller. Searches the title and description (full text and partial words), skill names and tutor name. Filters by the tutor's university, free or paid, category and level. Returns `total_count` for pagination (max 48 per page). LIKE wildcards in the search text are escaped. |
+| `set_course_skills(target_course, skill_names)` | Owner only. Replaces a course's skill tags (max 10) with canonical skills, creating new ones under the 50-per-user cap. |
+| `delete_my_account()` | Deletes the caller's account. Everything cascades; filed reports keep the evidence anonymised. |
+
+| `suggest_matches(filter_mode, same_university_only, page_size, page_offset)` | Ranks other discoverable, onboarded students (RLS removes blocked ones). Score: 3 per skill they teach that you learn, 3 per skill they learn that you teach, +2 for a two-way swap, +1 per shared interest, +1 per matching course category, +1 for the same university. It needs a skill, interest or course overlap; the same university alone isn't a match. Returns the reason arrays and `total_count`. |
+
+| `my_conversations()` | The caller's inbox: the other member (null if hidden by a block), the last message, the unread count (messages after `last_read_at`) and `can_send` (no block either way). |
+| `unread_conversation_count()` | The number of conversations with unread messages (nav badge). |
+| `mark_conversation_read(target)` | Sets your `last_read_at` and clears that conversation's `new_message` notification. |
+| `list_sessions(tab, page_size, page_offset)` | `upcoming` (scheduled, not started), `live` (now between start and end), or `mine` (hosting or invited, requested or accepted; ended less than a day ago). Includes the host and the caller's own status. Hosts who blocked you are hidden by RLS. |
+| `my_notifications(page_size, page_offset)` | The caller's notifications with the actor, the course or session title, and `i_own_course` / `i_host_session`, so the same event reads correctly for each side. |
+| `unread_notification_count()`, `mark_all_notifications_read()` | Nav badge and "Mark all as read". |
+| `my_blocks()` | Security definer. Lists only the blocks the caller created, so they can unblock. It never reveals who blocked you. |
 
 ## Changing the schema
 

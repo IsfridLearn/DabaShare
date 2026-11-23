@@ -1,18 +1,19 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
+import { buttonClasses } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 
 // Ported from the prototype's login page (prototype/Main.html, "login-left").
-// Sign-in and sign-up actions are added in Phase 3.
 export default function HomePage() {
   return (
-    <div className="relative flex-1 overflow-hidden bg-linear-135 from-[#f0f4ff] via-[#fafbff] to-[#f5f0ff]">
+    <div className="relative flex-1 overflow-hidden bg-linear-135 from-[#f0f4ff] via-[#fafbff] to-[#f5f0ff] dark:from-[#0b1220] dark:via-[#0f172a] dark:to-[#140f2a]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -left-24 size-[500px] rounded-full bg-blue-200 opacity-30 blur-[80px]" />
-        <div className="absolute right-24 -bottom-20 size-[400px] rounded-full bg-violet-200 opacity-30 blur-[80px]" />
+        <div className="absolute -top-24 -left-24 size-[500px] rounded-full bg-blue-200 opacity-30 blur-[80px] dark:opacity-60" />
+        <div className="absolute right-24 -bottom-20 size-[400px] rounded-full bg-violet-200 opacity-30 blur-[80px] dark:opacity-60" />
       </div>
 
       <header className="relative px-4 py-6 sm:px-12">
-        <Logo className="text-brand" />
+        <Logo className="text-brand-ink" />
       </header>
 
       <main className="relative mx-auto max-w-3xl px-4 pt-8 pb-16 sm:px-12 sm:pt-16">
@@ -25,11 +26,19 @@ export default function HomePage() {
           Connect with students across Davao City universities. Exchange skills, find tutors, and
           build a collaborative learning community.
         </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/signup" className={buttonClasses({ size: "lg" })}>
+            Create your account →
+          </Link>
+          <Link href="/login" className={buttonClasses({ variant: "outline", size: "lg" })}>
+            Sign in
+          </Link>
+        </div>
 
         <ul className="mt-10 flex flex-col gap-6">
           <Feature
             title="Smart Matching"
-            iconClass="bg-blue-100 text-brand"
+            iconClass="bg-blue-100 text-brand-ink"
             icon={
               <>
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -56,7 +65,7 @@ export default function HomePage() {
           </Feature>
           <Feature
             title="Cross-University Network"
-            iconClass="bg-emerald-100 text-success"
+            iconClass="bg-emerald-100 text-success-ink"
             icon={
               <>
                 <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
