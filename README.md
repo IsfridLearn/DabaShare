@@ -8,24 +8,6 @@ Status: in development. See [docs/DEVELOPMENT_PROGRESS.md](docs/DEVELOPMENT_PROG
 
 Next.js 16 · React 19 · TypeScript · Tailwind CSS v4 · Supabase (Postgres, Auth, Storage, Realtime) · Vercel
 
-## Getting started
-
-Requires Node 24 or newer and a Supabase project. Full steps are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md#local-setup).
-
-```bash
-npm install
-cp .env.example .env.local   # fill in Supabase URL and publishable key
-npm run dev
-```
-
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Development server |
-| `npm run check` | Typecheck, lint and tests |
-| `npm run build` | Production build |
-| `npm run db:push` | Apply database migrations to the linked Supabase project |
-| `npm run db:types` | Regenerate database TypeScript types |
-
 ## Documentation
 
 - [Architecture](docs/ARCHITECTURE.md)
