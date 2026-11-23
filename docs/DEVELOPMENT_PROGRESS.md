@@ -1,10 +1,10 @@
 # DabaShare Development Progress
 
-Last updated: 2026-11-26
+Last updated: 2026-11-27
 
-**Current Phase:** Phase 7 — Study Sessions, Webinars and Notifications (next). Phase 6 is complete. Phase 3 is still waiting on your manual signup-email check.
+**Current Phase:** Phase 8 — UI/UX Refinement and Responsiveness (next). Phase 7 is complete. Phase 3 is still waiting on your manual signup-email check.
 
-**Overall Progress:** 5/10 phases completed (1, 2, 4, 5 and 6; Phase 3 waits on one manual check).
+**Overall Progress:** 6/10 phases completed (1, 2, 4, 5, 6 and 7; Phase 3 waits on one manual check).
 
 ## Phase Status
 
@@ -14,7 +14,7 @@ Last updated: 2026-11-26
 - [x] Phase 4 — Course Marketplace
 - [x] Phase 5 — Student Matching
 - [x] Phase 6 — Messaging
-- [ ] Phase 7 — Study Sessions and Notifications
+- [x] Phase 7 — Study Sessions and Notifications
 - [ ] Phase 8 — UI/UX Refinement
 - [ ] Phase 9 — Security and Testing
 - [ ] Phase 10 — Deployment
@@ -25,6 +25,19 @@ Last updated: 2026-11-26
 2. **Known external blocker for real students:** Supabase's built-in email only delivers to org members, so custom SMTP is needed before anyone else can sign up. It's tracked in DEPLOYMENT.md, and you need to choose a provider.
 
 ## Log
+
+### 2026-11-27 — Phase 7 complete
+
+Completion criterion met: students organise sessions and webinars and get relevant notifications. It was verified end to end with two real accounts.
+
+- **Migrations:** `20261127090000_sessions_notifications.sql` and `20261127100000_participant_status_default.sql`.
+- **Sessions:**
+  - `/sessions` with Upcoming, Live now and My sessions tabs.
+  - `/sessions/new` and `/sessions/[id]/edit`, with times entered in PH time and impossible dates rejected.
+  - `/sessions/[id]`: join, request, invitation responses, leave, the meeting link for accepted participants, and host tools (participants, invite by username, cancel).
+- **Notifications:** `/notifications` with a sentence for each event, open-and-mark-read (`/notifications/open/[id]`) and mark all as read.
+- **Navigation:** reorganised to Courses, My courses, Matches, Sessions, Messages and Notifications, with unread badges. Your profile is reached from the avatar, and Settings sits next to Log out.
+- **Fix found by E2E:** the meeting link is no longer sent to the browser for cancelled or ended sessions.
 
 ### 2026-11-26 — Phase 6 complete
 
@@ -89,6 +102,10 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 | Date | Check | Result |
 |---|---|---|
+| 2026-11-27 | `npm run check` | Passed: 0 type errors, 0 lint problems, 82/82 unit tests |
+| 2026-11-27 | `npm run build` | Passed |
+| 2026-11-27 | `npm run db:test:rls` | **110 passed, 0 failed** (rolled back) |
+| 2026-11-27 | Production-build E2E (all phases so far) | **134 passed, 0 failed.** Dev data was removed afterwards. |
 | 2026-11-26 | `npm run check` | Passed: 0 type errors, 0 lint problems, 64/64 unit tests |
 | 2026-11-26 | `npm run build` | Passed |
 | 2026-11-26 | `npm run db:test:rls` | **101 passed, 0 failed** (rolled back) |
@@ -115,13 +132,12 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 ## Next steps
 
-1. Your manual signup-email check, which closes Phase 3.
-2. Phase 7, sessions, webinars and notifications:
-   - Create, edit and cancel study sessions and webinars.
-   - Join or request a place, with capacity and invitations.
-   - Meeting links only for accepted participants.
-   - Upcoming, Live now and My sessions tabs.
-   - A notification centre with read and unread states, and a live badge.
+1. Your manual signup-email check (closes Phase 3), ideally also trying live chat and a session in a real browser.
+2. Phase 8, UI/UX refinement:
+   - A full review of every screen at phone and desktop widths, with the independent reviewer used for UI and accessibility.
+   - Consistent spacing and typography, and better mobile navigation.
+   - Loading, empty and error states everywhere, plus success feedback.
+   - Accessibility: contrast, focus, labels and keyboard use.
 
 ## Blockers
 

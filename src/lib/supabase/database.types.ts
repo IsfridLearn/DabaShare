@@ -495,7 +495,7 @@ export type Database = {
           invited_by?: string | null
           profile_id: string
           session_id: string
-          status: Database["public"]["Enums"]["participant_status"]
+          status?: Database["public"]["Enums"]["participant_status"]
           updated_at?: string
         }
         Update: {
@@ -737,6 +737,29 @@ export type Database = {
         Returns: number
       }
       delete_my_account: { Args: never; Returns: undefined }
+      list_sessions: {
+        Args: { page_offset?: number; page_size?: number; tab?: string }
+        Returns: {
+          accepted_count: number
+          capacity: number
+          category_name: string
+          description: string
+          ends_at: string
+          host_avatar: string
+          host_id: string
+          host_name: string
+          host_username: string
+          id: string
+          my_status: Database["public"]["Enums"]["participant_status"]
+          requires_approval: boolean
+          starts_at: string
+          status: Database["public"]["Enums"]["session_status"]
+          title: string
+          total_count: number
+          type: Database["public"]["Enums"]["session_type"]
+        }[]
+      }
+      mark_all_notifications_read: { Args: never; Returns: undefined }
       mark_conversation_read: { Args: { target: string }; Returns: undefined }
       my_blocks: {
         Args: never
@@ -760,6 +783,24 @@ export type Database = {
           other_name: string
           other_username: string
           unread: number
+        }[]
+      }
+      my_notifications: {
+        Args: { page_offset?: number; page_size?: number }
+        Returns: {
+          actor_avatar: string
+          actor_name: string
+          actor_username: string
+          course_title: string
+          created_at: string
+          data: Json
+          i_host_session: boolean
+          i_own_course: boolean
+          id: string
+          read_at: string
+          session_title: string
+          total_count: number
+          type: Database["public"]["Enums"]["notification_type"]
         }[]
       }
       search_courses: {
@@ -820,6 +861,7 @@ export type Database = {
         }[]
       }
       unread_conversation_count: { Args: never; Returns: number }
+      unread_notification_count: { Args: never; Returns: number }
     }
     Enums: {
       course_level: "beginner" | "intermediate" | "advanced" | "expert"

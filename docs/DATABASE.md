@@ -12,6 +12,8 @@ The source of truth is `supabase/migrations/`. This document explains the model;
 | `20261122100000_security_hardening.sql` | Fixes from the security review: `private.accounts`, column-level insert grants, secure default privileges, block enforcement on every path, abuse caps, notification de-duplication, session edit fixes, FK indexes |
 
 | `20261123090000_account_deletion.sql` | `delete_my_account()` |
+| `20261127100000_participant_status_default.sql` | Default for `session_participants.status` (the trigger still sets it) |
+| `20261127090000_sessions_notifications.sql` | `list_sessions()`, `my_notifications()`, `unread_notification_count()`, `mark_all_notifications_read()` |
 | `20261126100000_conversation_cleanup.sql` | Deletes a conversation once its last member is gone |
 | `20261126090000_messaging.sql` | `my_conversations()`, `unread_conversation_count()`, `mark_conversation_read()`, `my_blocks()`, message and report rate limits |
 | `20261125090000_student_matching.sql` | `suggest_matches()` |
@@ -90,6 +92,9 @@ profiles >── universities
 | `my_conversations()` | The caller's inbox: the other member (null if hidden by a block), the last message, the unread count (messages after `last_read_at`) and `can_send` (no block either way). |
 | `unread_conversation_count()` | The number of conversations with unread messages (nav badge). |
 | `mark_conversation_read(target)` | Sets your `last_read_at` and clears that conversation's `new_message` notification. |
+| `list_sessions(tab, page_size, page_offset)` | `upcoming` (scheduled, not started), `live` (now between start and end), or `mine` (hosting or invited, requested or accepted; ended less than a day ago). Includes the host and the caller's own status. Hosts who blocked you are hidden by RLS. |
+| `my_notifications(page_size, page_offset)` | The caller's notifications with the actor, the course or session title, and `i_own_course` / `i_host_session`, so the same event reads correctly for each side. |
+| `unread_notification_count()`, `mark_all_notifications_read()` | Nav badge and "Mark all as read". |
 | `my_blocks()` | Security definer. Lists only the blocks the caller created, so they can unblock. It never reveals who blocked you. |
 
 ## Changing the schema

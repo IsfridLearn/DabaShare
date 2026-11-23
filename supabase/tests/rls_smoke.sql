@@ -482,6 +482,41 @@ begin
     r := r || ('PASS message rate limit (' || sqlerrm || ')');
   end;
 
+  -- ── Phase 7: session lists and notification centre ────────────────────
+  -- sess (host A, capacity 1, D accepted) was cancelled earlier.
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.list_sessions('upcoming') where id = sess;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' cancelled sessions leave the upcoming tab');
+  select my_status::text into v_text from public.list_sessions('mine') where id = sess;
+  r := r || (case when v_text = 'accepted' then 'PASS' else 'FAIL' end || ' my sessions shows my place (' || coalesce(v_text, 'none') || ')');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  insert into public.study_sessions (host_id, title, type, starts_at, ends_at, capacity, requires_approval)
+  values (b, 'Accounting review', 'webinar', now() + interval '2 days', now() + interval '2 days 1 hour', 10, true)
+  returning id into v_uuid;
+  select count(*) into n from public.list_sessions('upcoming') where id = v_uuid;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' new session listed as upcoming');
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.list_sessions('upcoming') where id = v_uuid;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' sessions of someone who blocked you are hidden');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  insert into public.session_participants (session_id, profile_id) values (v_uuid, d);
+  select status::text into v_text from public.session_participants where session_id = v_uuid and profile_id = d;
+  r := r || (case when v_text = 'requested' then 'PASS' else 'FAIL' end || ' approval-required session turns a join into a request');
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  select actor_name || '|' || session_title || '|' || i_host_session::text into v_text
+  from public.my_notifications() where type = 'session_request' limit 1;
+  r := r || (case when v_text = 'Dave|Accounting review|true' then 'PASS' else 'FAIL' end || ' notification carries actor, title and host flag (' || coalesce(v_text, 'none') || ')');
+  n := public.unread_notification_count();
+  r := r || (case when n >= 1 then 'PASS' else 'FAIL' end || ' unread notification count (' || n || ')');
+  perform public.mark_all_notifications_read();
+  n := public.unread_notification_count();
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' mark all notifications read');
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.my_notifications() where type = 'session_request';
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' students only see their own notifications');
+
   -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
   perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
   begin

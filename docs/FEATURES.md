@@ -24,6 +24,9 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | Messaging | Realtime delivery (chat and inbox); the send form also works without JavaScript | Done (realtime tested with 3 real users) | 6 |
 | Safety | Report messages, profiles and courses (reason and details, de-duplicated); block and unblock (Settings); rate limits on messages (20/min) and reports (20/day) | Done (E2E) | 6 |
 | Safety | Moderator review UI for reports | Not built. Admins use the Supabase dashboard. | 9 |
-| Sessions | Create, edit and cancel; join or request; invitations; capacity; meeting link for participants | DB only | 7 |
-| Notifications | Notification centre with read and unread states | DB only | 7 |
+| Sessions | Host webinars, study groups and Q&A sessions (PH-time date and time, duration, capacity, optional approval and subject); edit; cancel with confirmation, which notifies participants | Done (E2E) | 7 |
+| Sessions | Upcoming, Live now and My sessions tabs; join instantly or request; invitations by username; host accept, decline and remove; leave and rejoin; live seat count | Done (E2E) | 7 |
+| Sessions | Meeting link shown only to the host and accepted participants, and only while the session is upcoming or live | Done (E2E) | 7 |
+| Notifications | Notification centre with readable sentences for every type, an unread badge in the nav, opening an item marks it read and goes to its page, mark all as read | Done (E2E) | 7 |
+| Notifications | Email or push notifications | Not built (needs SMTP and a push provider) | — |
 | Payments | Collecting money for paid courses | Deferred (needs legal and age review) | — |
