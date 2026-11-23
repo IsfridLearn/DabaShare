@@ -2,7 +2,7 @@
 
 Last updated: 2026-11-28
 
-**Current Phase:** Phase 10 — Deployment and Production Preparation (next). Phases 1–9 are complete.
+**Current Phase:** Phase 10 — Deployment (in progress: waiting on the Vercel import and Gmail SMTP setup, see DEPLOYMENT.md).
 
 **Overall Progress:** 9/10 phases completed.
 
