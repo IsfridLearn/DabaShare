@@ -2,15 +2,15 @@
 
 Last updated: 2026-11-27
 
-**Current Phase:** Phase 8 — UI/UX Refinement and Responsiveness (next). Phase 7 is complete. Phase 3 is still waiting on your manual signup-email check.
+**Current Phase:** Phase 8 — UI/UX Refinement and Responsiveness (next). Phases 1–7 are complete.
 
-**Overall Progress:** 6/10 phases completed (1, 2, 4, 5, 6 and 7; Phase 3 waits on one manual check).
+**Overall Progress:** 7/10 phases completed.
 
 ## Phase Status
 
 - [x] Phase 1 — Repository Audit
 - [x] Phase 2 — Architecture and Foundation
-- [ ] Phase 3 — Authentication and Profiles (one manual check left, see below)
+- [x] Phase 3 — Authentication and Profiles
 - [x] Phase 4 — Course Marketplace
 - [x] Phase 5 — Student Matching
 - [x] Phase 6 — Messaging
@@ -19,10 +19,9 @@ Last updated: 2026-11-27
 - [ ] Phase 9 — Security and Testing
 - [ ] Phase 10 — Deployment
 
-## What's left for Phase 3
+## Phase 3 sign-off
 
-1. **Manual check (you):** run `npm run dev`, sign up at http://localhost:3000/signup with **your own email** (an org member, so the built-in sender delivers to it), click the link in the email, and finish onboarding. This is the only part I can't test: real email delivery, plus the in-browser avatar upload.
-2. **Known external blocker for real students:** Supabase's built-in email only delivers to org members, so custom SMTP is needed before anyone else can sign up. It's tracked in DEPLOYMENT.md, and you need to choose a provider.
+Your real account (created 2026-11-23) proves the end-to-end email flow: signup through the real form, a delivered confirmation email, a confirmed address, onboarding done, and 7 skills (including 2 new canonical skills). The in-browser photo upload is still UNTESTED; the storage rules behind it were tested on 2026-11-23.
 
 ## Log
 
@@ -132,7 +131,7 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 ## Next steps
 
-1. Your manual signup-email check (closes Phase 3), ideally also trying live chat and a session in a real browser.
+1. Optional: in a real browser, upload a profile photo and try live chat between two accounts.
 2. Phase 8, UI/UX refinement:
    - A full review of every screen at phone and desktop widths, with the independent reviewer used for UI and accessibility.
    - Consistent spacing and typography, and better mobile navigation.

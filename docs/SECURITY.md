@@ -73,7 +73,8 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | 2026-11-26 | Production-build E2E with the messaging scenario | **103 passed, 0 failed.** Adds: the Message button opens or reuses a conversation, empty messages are rejected, messages are HTML-escaped, the unread badge and mark-read work, replies show up, report (needs a reason, de-duplicated, unknown targets give 404), block (neither side can reply, the profile is hidden, the blocker is anonymised), and unblock restores visibility. |
 | 2026-11-27 | `npm run db:test:rls` extended for sessions and notifications | **110 passed, 0 failed.** Cancelled sessions leave Upcoming, My sessions shows your place, blocked hosts' sessions are hidden, approval turns a join into a request, notifications carry the actor, title and host flag, and students only see their own notifications. |
 | 2026-11-27 | Production-build E2E with the sessions and notifications scenario | **134 passed, 0 failed.** Adds: link validation, the database refusing past starts, PH-time display and editing, the link hidden until you join, seats and leave/rejoin, invites (unknown and duplicate), non-host edit gives 404, approval flow, notifications (open goes to the target, mark all as read), the My sessions and Live tabs, and cancellation notices. One E2E failure led to a fix: the meeting URL is no longer sent to the browser after a session is cancelled or ended. |
-| — | Real email delivery, the in-browser avatar upload UI and realtime in a real browser tab | UNTESTED |
+| 2026-11-23 | Real signup by the project owner (org member email) | The confirmation email was delivered, the address confirmed, and onboarding completed. |
+| — | Password-reset email to a real inbox, the in-browser avatar upload UI and realtime in a real browser tab | UNTESTED |
 
 ### Phase 3 auth hardening (from review)
 

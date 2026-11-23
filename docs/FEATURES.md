@@ -7,7 +7,7 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | Foundation | Landing page | Built | 2 |
 | Foundation | Dev status page (`/status`) | Built | 2 |
 | Auth | Register (age and consent), log in and out, session persistence, protected routes, guest-only pages | Done (E2E on a production build) | 3 |
-| Auth | Email confirmation and password-reset emails | Built. Link handling is tested; **real email delivery is UNTESTED**, because the built-in sender only delivers to org members (see SECURITY.md). | 3 |
+| Auth | Email confirmation and password-reset emails | Confirmation done: a real signup on 2026-11-23 received the email and confirmed. The reset email is UNTESTED with a real inbox. Only Supabase org members receive email until SMTP is set up. | 3 |
 | Profiles | Onboarding, profile edit, teach and learn skills (canonical autocomplete), interests, public profile `/u/<username>` | Done (E2E) | 3 |
 | Profiles | Avatar upload (browser-resized WebP), remove photo | Built. Storage rules tested with a real user; **the browser upload UI is UNTESTED**. | 3 |
 | Settings | Discoverable toggle, change password, delete account | Done (E2E) | 3 |
