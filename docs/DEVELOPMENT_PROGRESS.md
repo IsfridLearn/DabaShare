@@ -25,6 +25,13 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 
 ## Log
 
+### 2026-11-29 — Design refresh, Phase 3 (auth screens), on branch `design-refresh`
+
+- Sign in, create account, forgot password, new password and check email now share a split editorial layout with no cards or gradients (details in DESIGN_AUDIT.md "Phase 3 result").
+- New `PasswordInput` (show/hide, live requirement checklist) and `useInlineErrors` (check on leaving a field, clear while fixing). Form fields across the app use the new tokens.
+- The E2E suite now fails a stuck request after 30 seconds and names it, instead of hanging.
+
+
 ### 2026-11-29 — Design refresh, Phase 2 (design system + social layer), on branch `design-refresh`
 
 Following the owner's direction, students now land on a LinkedIn-style **Home feed** instead of the course list, can post about their work and events, follow each other and like posts.
@@ -155,6 +162,11 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 | Date | Check | Result |
 |---|---|---|
+| 2026-11-29 | Design 3: `npm run check` | Passed: 0 type errors, 0 lint problems, 98/98 unit tests |
+| 2026-11-29 | Design 3: `npm run build` | Passed |
+| 2026-11-29 | Design 3: `npm run test:e2e` | **158 passed, 0 failed**. One earlier run hung with no output after a stale server was killed mid-run; it didn't recur, and requests now time out after 30 s with the path named. |
+| 2026-11-29 | Design 3: headless-Chrome interaction check on `/signup` | Invalid email shows its error on blur and clears while fixing; the checklist ticks rules as you type; show/hide switches the input type |
+| 2026-11-29 | Design 3: screenshots of sign in, create account and check email | Checked at 390px and 1280px in light and dark mode |
 | 2026-11-29 | Design 2: `npm run check` | Passed: 0 type errors, 0 lint problems, 97/97 unit tests |
 | 2026-11-29 | Design 2: `npm run db:test:rls` | **139 passed, 0 failed** (22 new social checks: visibility, blocks, attachment ownership, likes, follows, feed scopes, counts, notifications, reports, edit stamp, deletes) |
 | 2026-11-29 | Design 2: `npm run build` | Passed |

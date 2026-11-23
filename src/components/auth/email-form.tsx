@@ -1,10 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
+import { emailSchema } from "@/lib/auth/validation";
 import { initialFormState, type FormState } from "@/lib/forms";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
-import { errorProps, fieldError, FormMessage } from "@/components/ui/form-message";
+import { FormMessage } from "@/components/ui/form-message";
+import { useInlineErrors } from "./use-inline-errors";
+
+const SCHEMAS = { email: emailSchema };
 
 // Single-email form used for "forgot password" and "resend confirmation".
 export function EmailForm({
@@ -18,25 +22,29 @@ export function EmailForm({
   submitLabel: string;
   pendingLabel: string;
   defaultEmail?: string;
-  variant?: "primary" | "outline";
+  variant?: "primary" | "secondary";
 }) {
   const [state, action, pending] = useActionState(serverAction, initialFormState);
+  const { error, bind } = useInlineErrors(state, SCHEMAS);
 
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
+    <form action={action} className="flex flex-col gap-5" noValidate>
       <FormMessage state={state} />
-      <Field label="Email address" htmlFor="email" error={fieldError(state, "email")}>
+      <Field label="Email address" htmlFor="email" error={error("email")}>
         <Input
           id="email"
           name="email"
           type="email"
+          inputMode="email"
           autoComplete="email"
+          autoCapitalize="none"
+          placeholder="you@example.com"
           defaultValue={state.values?.email ?? defaultEmail}
           required
-          {...errorProps(state, "email")}
+          {...bind("email")}
         />
       </Field>
-      <Button type="submit" variant={variant} size="lg" fullWidth disabled={pending}>
+      <Button type="submit" variant={variant} size="lg" fullWidth loading={pending}>
         {pending ? pendingLabel : submitLabel}
       </Button>
     </form>

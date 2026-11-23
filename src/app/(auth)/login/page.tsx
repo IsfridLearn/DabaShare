@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
-import { AuthHeading } from "@/components/auth/auth-shell";
+import { AuthFooter, AuthHeading, authLink } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 import { Alert } from "@/components/ui/alert";
 import { getNotice } from "@/lib/auth/notices";
@@ -11,16 +11,16 @@ export const metadata = { title: "Sign in" };
 export default function LoginPage({ searchParams }: PageProps<"/login">) {
   return (
     <>
-      <AuthHeading title="Welcome back" subtitle="Sign in to continue your learning journey." />
+      <AuthHeading title="Welcome back" subtitle="Sign in to see what your classmates are sharing." />
       <Suspense fallback={<LoginForm />}>
         <LoginWithParams searchParams={searchParams} />
       </Suspense>
-      <p className="mt-6 text-center text-sm text-gray-600">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-medium text-brand-ink hover:underline">
-          Create one
+      <AuthFooter>
+        New to DabaShare?{" "}
+        <Link href="/signup" className={authLink}>
+          Create an account
         </Link>
-      </p>
+      </AuthFooter>
     </>
   );
 }
@@ -30,7 +30,7 @@ async function LoginWithParams({ searchParams }: { searchParams: PageProps<"/log
   const notice = getNotice(params.notice);
   const next = typeof params.next === "string" ? safeNextPath(params.next) : undefined;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
       <LoginForm next={next} />
     </div>

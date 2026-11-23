@@ -1,21 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, type ReactNode } from "react";
+import { z } from "zod";
 import { signUp } from "@/lib/auth/actions";
+import { displayNameSchema, emailSchema, passwordSchema } from "@/lib/auth/validation";
 import { initialFormState } from "@/lib/forms";
 import type { University } from "@/lib/reference";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
-import { errorProps, fieldError, FormMessage } from "@/components/ui/form-message";
+import { FormMessage } from "@/components/ui/form-message";
+import { PasswordInput } from "@/components/ui/password-input";
+import { useInlineErrors } from "./use-inline-errors";
+
+const SCHEMAS = {
+  displayName: displayNameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+  universityId: z.string().min(1, { error: "Choose your university." }),
+};
 
 export function SignupForm({ universities }: { universities: University[] }) {
   const [state, action, pending] = useActionState(signUp, initialFormState);
+  const { error, bind } = useInlineErrors(state, SCHEMAS);
   const v = state.values;
 
   return (
-    <form action={action} className="flex flex-col gap-4" noValidate>
-      <Field label="Full name (shown on your profile)" htmlFor="displayName" error={fieldError(state, "displayName")}>
+    <form action={action} className="flex flex-col gap-5" noValidate>
+      <Field label="Full name" htmlFor="displayName" error={error("displayName")} hint="Shown on your profile.">
         <Input
           id="displayName"
           name="displayName"
@@ -24,29 +36,25 @@ export function SignupForm({ universities }: { universities: University[] }) {
           maxLength={60}
           defaultValue={v?.displayName}
           required
-          {...errorProps(state, "displayName")}
+          {...bind("displayName")}
         />
       </Field>
-      <Field label="Email address" htmlFor="email" error={fieldError(state, "email")}>
+      <Field label="Email address" htmlFor="email" error={error("email")}>
         <Input
           id="email"
           name="email"
           type="email"
+          inputMode="email"
           autoComplete="email"
+          autoCapitalize="none"
           placeholder="you@example.com"
           defaultValue={v?.email}
           required
-          {...errorProps(state, "email")}
+          {...bind("email")}
         />
       </Field>
-      <Field label="University" htmlFor="universityId" error={fieldError(state, "universityId")}>
-        <Select
-          id="universityId"
-          name="universityId"
-          defaultValue={v?.universityId ?? ""}
-          required
-          {...errorProps(state, "universityId")}
-        >
+      <Field label="University" htmlFor="universityId" error={error("universityId")}>
+        <Select id="universityId" name="universityId" defaultValue={v?.universityId ?? ""} required {...bind("universityId")}>
           <option value="" disabled>
             Select your university
           </option>
@@ -58,36 +66,25 @@ export function SignupForm({ universities }: { universities: University[] }) {
           ))}
         </Select>
       </Field>
-      <Field
-        label="Password"
-        htmlFor="password"
-        error={fieldError(state, "password")}
-        hint="At least 8 characters, with a letter and a number."
-      >
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          required
-          {...errorProps(state, "password")}
-        />
+      <Field label="Password" htmlFor="password" error={error("password")}>
+        <PasswordInput id="password" name="password" autoComplete="new-password" required rules {...bind("password")} />
       </Field>
 
-      <Checkbox name="confirmAge" state={state} defaultChecked={v?.confirmAge === "on"}>
-        I am 18 years old or older.
-      </Checkbox>
-      <Checkbox name="acceptTerms" state={state} defaultChecked={v?.acceptTerms === "on"}>
-        I have read the{" "}
-        <Link href="/privacy" target="_blank" className="font-medium text-brand-ink hover:underline">
-          privacy notice<span className="sr-only"> (opens in a new tab)</span>
-        </Link>{" "}
-        and agree to DabaShare processing my information as described.
-      </Checkbox>
+      <div className="flex flex-col gap-3 border-t border-line pt-5">
+        <Checkbox name="confirmAge" error={error("confirmAge")} defaultChecked={v?.confirmAge === "on"}>
+          I am 18 years old or older.
+        </Checkbox>
+        <Checkbox name="acceptTerms" error={error("acceptTerms")} defaultChecked={v?.acceptTerms === "on"}>
+          I have read the{" "}
+          <Link href="/privacy" target="_blank" className="font-medium text-brand-ink underline-offset-2 hover:underline">
+            privacy notice<span className="sr-only"> (opens in a new tab)</span>
+          </Link>{" "}
+          and agree to DabaShare processing my information as described.
+        </Checkbox>
+      </div>
 
       <FormMessage state={state} />
-      <Button type="submit" size="lg" fullWidth disabled={pending}>
+      <Button type="submit" size="lg" fullWidth loading={pending}>
         {pending ? "Creating account…" : "Create account"}
       </Button>
     </form>
@@ -96,30 +93,30 @@ export function SignupForm({ universities }: { universities: University[] }) {
 
 function Checkbox({
   name,
-  state,
+  error,
   defaultChecked,
   children,
 }: {
   name: string;
-  state: Parameters<typeof fieldError>[0];
+  error?: string;
   defaultChecked: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
-  const error = fieldError(state, name);
   return (
     <div>
-      <label className="flex items-start gap-2.5 text-sm text-gray-700">
+      <label className="flex items-start gap-2.5 text-small text-fg-muted">
         <input
           type="checkbox"
           name={name}
           defaultChecked={defaultChecked}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${name}-message` : undefined}
           className="mt-0.5 size-4 shrink-0 accent-brand"
-          {...errorProps(state, name)}
         />
         <span>{children}</span>
       </label>
       {error && (
-        <p id={`${name}-message`} className="mt-1 pl-6.5 text-sm text-danger-ink">
+        <p id={`${name}-message`} className="mt-1 pl-6.5 text-small text-danger-ink">
           {error}
         </p>
       )}

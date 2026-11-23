@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AuthHeading } from "@/components/auth/auth-shell";
+import { AuthFooter, AuthHeading, authLink } from "@/components/auth/auth-shell";
 import { SignupForm } from "@/components/auth/signup-form";
 import { getUniversities } from "@/lib/reference";
 
@@ -10,16 +10,16 @@ export default async function SignupPage() {
   return (
     <>
       <AuthHeading
-        title="Join the community"
-        subtitle="Exchange skills with students across Davao City."
+        title="Create your account"
+        subtitle="Share what you know and learn from students across Davao City. Free for students."
       />
       <SignupForm universities={universities} />
-      <p className="mt-6 text-center text-sm text-gray-600">
+      <AuthFooter>
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-brand-ink hover:underline">
+        <Link href="/login" className={authLink}>
           Sign in
         </Link>
-      </p>
+      </AuthFooter>
     </>
   );
 }

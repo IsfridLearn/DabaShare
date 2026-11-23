@@ -105,3 +105,12 @@ Date: 2026-11-28. Scope: the whole frontend (25 routes and 37 components), measu
 - **Shell:** a Linear-style left sidebar on desktop (main places, a "You" group, account menu at the bottom); on phones a slim top bar (alerts, account) and five bottom tabs (Home, Courses, Sessions, People, Messages).
 - **Social layer:** Home feed (Following / Everyone, composer with an optional session or course attachment, likes, delete, report, load more), post permalinks, follow buttons and follower counts on profiles, "People to follow" and "Upcoming sessions" on wide screens, and new-follower / post-liked notifications.
 - Still on the old look until Phase 4: Courses, course detail, Matches, Messages, Sessions, Notifications, Profile and Settings (they already use the new neutrals and fonts).
+
+## Phase 3 result (auth)
+
+- **Layout:** a split editorial layout. On wide screens, a flat identity panel shows the serif headline and three real features (no stats or testimonials). The form sits on the plain canvas with no card, gradient or blobs. Phones get the logo and the form only.
+- **Pages:** sign in, create account, forgot password, choose a new password, check your email (and the Settings change-password form) share one look: a serif title, quiet subtitle and a footer link row.
+- **Fields (all forms in the app):** 1px `line-strong` borders, a brand focus ring, red border plus message when invalid, a `labelAside` slot (used for "Forgot password?").
+- **Passwords:** a show/hide button (`aria-pressed`, `aria-controls`), and on new passwords a live checklist (8+ characters, a letter, a number) that ticks as you type, read as "Done" or "Needed" by screen readers. `PASSWORD_RULES` is unit-tested against the server schema.
+- **Inline validation:** fields are checked when you leave them (empty fields aren't nagged), and a shown error re-checks as you type, so it clears the moment the value is fixed. The server still validates everything.
+- **Loading:** buttons show a spinner and a "Signing in…" / "Creating account…" label and can't be double-submitted.

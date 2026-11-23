@@ -95,3 +95,13 @@ describe("routeAccess", () => {
     expect(routeAccess(path)).toBe(expected);
   });
 });
+
+describe("PASSWORD_RULES", () => {
+  it("matches what passwordSchema requires", async () => {
+    const { PASSWORD_RULES, passwordSchema } = await import("./validation");
+    for (const pw of ["short1", "longenough", "12345678", "goodpass1"]) {
+      const allRules = PASSWORD_RULES.every((r) => r.test(pw));
+      expect(allRules).toBe(passwordSchema.safeParse(pw).success);
+    }
+  });
+});

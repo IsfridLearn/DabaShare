@@ -86,3 +86,13 @@ export const profileSchema = z.object({
   program: z.string().trim().max(100, { error: "Use at most 100 characters." }),
   bio: z.string().trim().max(500, { error: "Use at most 500 characters." }),
 });
+
+// Single-field schemas, reused by the forms for inline (on blur) checks.
+// The server re-validates everything; these only give earlier feedback.
+export { displayName as displayNameSchema, email as emailSchema };
+
+export const PASSWORD_RULES: { label: string; test: (v: string) => boolean }[] = [
+  { label: "At least 8 characters", test: (v) => v.length >= 8 },
+  { label: "A letter", test: (v) => /[A-Za-z]/.test(v) },
+  { label: "A number", test: (v) => /[0-9]/.test(v) },
+];

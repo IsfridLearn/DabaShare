@@ -37,4 +37,5 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | Social | Follow and unfollow, follower and following counts, "Follows you", a student's posts on their profile; likes with counts; new-follower and post-liked notifications | Done (E2E + RLS) | Design 2 |
 | Social | Editing posts, comments, images in posts | Not built. Editing is supported by the database (marked "edited") but has no UI yet. | — |
 | UI | Design system v2 (Notion × Linear tokens, Inter + Newsreader, primitives) and the new sidebar app shell | Done (screenshots light and dark, phone and desktop) | Design 2 |
+| UI | Auth redesign: split editorial layout, show/hide password, live password checklist, inline validation, loading buttons | Done (screenshots light and dark, phone and desktop; browser interaction check; E2E) | Design 3 |
 | Payments | Collecting money for paid courses | Deferred (needs legal and age review) | — |

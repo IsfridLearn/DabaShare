@@ -26,7 +26,18 @@ function makeJar() {
 }
 
 async function req(jar, path, init = {}) {
-  const res = await fetch(BASE + path, { ...init, redirect: "manual", headers: { cookie: jar.header(), origin: BASE, ...(init.headers || {}) } });
+  // A stuck request fails the run with its path instead of hanging it.
+  let res;
+  try {
+    res = await fetch(BASE + path, {
+      ...init,
+      redirect: "manual",
+      signal: AbortSignal.timeout(30_000),
+      headers: { cookie: jar.header(), origin: BASE, ...(init.headers || {}) },
+    });
+  } catch (e) {
+    throw new Error(`${init.method ?? "GET"} ${path} failed: ${e.name === "TimeoutError" ? "no response in 30s" : e.message}`);
+  }
   jar.store(res);
   const html = res.status === 200 ? (await res.text()).replace(/<!-- -->/g, "") : "";
   return { status: res.status, location: res.headers.get("location"), html };
