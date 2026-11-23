@@ -34,6 +34,8 @@ auth.users 1─1 profiles ─┬─< student_skills >── skills >── categ
                          ├─< study_sessions ─┬── study_session_links (1─1)
                          │                   └─< session_participants (profile)
                          ├─< notifications (recipient)
+                         ├─< posts ─< post_likes (profile)
+                         ├─< follows (follower / followee)
                          ├─< blocks (blocker / blocked)
                          └─< reports (reporter)
 profiles >── universities
@@ -60,6 +62,9 @@ profiles >── universities
 | `study_session_links` | session, meeting_url (`https://` only) | Only the host and accepted participants can read it. |
 | `session_participants` | (session, profile), status `invited/requested/accepted/declined/cancelled` | |
 | `notifications` | recipient, actor, type, data (jsonb), read_at | Written only by triggers. |
+| `posts` | author_id, body (1–3000 chars), optional session_id **or** course_id, edited_at | The Home feed. At most one attachment; it must be the author's own session or published course. 30 posts a day. |
+| `post_likes` | (post, profile) | One like per student per post. |
+| `follows` | (follower, followee) | One-way, like LinkedIn. No self-follows; 200 new follows a day. A block removes follows both ways. |
 | `blocks` | (blocker, blocked) | Hides profiles, courses and sessions both ways, and stops messages, enrollments and joins. |
 | `reports` | reporter, target_type + target_id, reason, target_snapshot, status | The snapshot keeps the evidence for moderators. |
 
@@ -97,6 +102,8 @@ profiles >── universities
 | `list_sessions(tab, page_size, page_offset)` | `upcoming` (scheduled, not started), `live` (now between start and end), or `mine` (hosting or invited, requested or accepted; ended less than a day ago). Includes the host and the caller's own status. Hosts who blocked you are hidden by RLS. |
 | `my_notifications(page_size, page_offset)` | The caller's notifications with the actor, the course or session title, and `i_own_course` / `i_host_session`, so the same event reads correctly for each side. |
 | `unread_notification_count()`, `mark_all_notifications_read()` | Nav badge and "Mark all as read". |
+| `feed_posts(scope, before_ts, before_id, page_size, only_author)` | Security invoker. `following` = your posts plus people you follow; `everyone` = all posts you can see. Newest first with keyset paging on `(created_at, id)`, max 50 per page. Includes the author, `like_count`, `liked_by_me` and the attached session or course. `only_author` lists one student's posts (profile page). |
+| `profile_social(target)` | Security definer, but only for profiles you can see. Follower and following counts plus `i_follow` / `follows_me`. |
 | `my_blocks()` | Security definer. Lists only the blocks the caller created, so they can unblock. It never reveals who blocked you. |
 
 ## Changing the schema

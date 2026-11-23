@@ -22,6 +22,10 @@ async function preview(type: ReportTarget, id: string): Promise<string | null> {
     const { data } = await supabase.from("profiles").select("display_name").eq("id", id).maybeSingle();
     return data?.display_name ?? null;
   }
+  if (type === "post") {
+    const { data } = await supabase.from("posts").select("body").eq("id", id).maybeSingle();
+    return data?.body ?? null;
+  }
   if (type === "course") {
     const { data } = await supabase.from("courses").select("title").eq("id", id).maybeSingle();
     return data?.title ?? null;

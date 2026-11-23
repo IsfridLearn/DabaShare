@@ -15,8 +15,8 @@ export async function GET(request: NextRequest, { params }: RouteContext<"/notif
     .from("notifications")
     .update({ read_at: new Date().toISOString() })
     .eq("id", id)
-    .select("type, data")
+    .select("type, data, actor:profiles!notifications_actor_id_fkey(username)")
     .maybeSingle();
   if (!data) return NextResponse.redirect(fallback);
-  return NextResponse.redirect(new URL(notificationTarget(data), request.url));
+  return NextResponse.redirect(new URL(notificationTarget({ ...data, actor_username: data.actor?.username }), request.url));
 }

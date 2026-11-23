@@ -63,13 +63,21 @@ export function notificationText(n: NotificationRow): string {
       return `${session} has a new time`;
     case "session_cancelled":
       return `${session} was cancelled`;
+    case "new_follower":
+      return `${who} started following you`;
+    case "post_liked":
+      return `${who} liked your post`;
     default:
       return "You have a new notification";
   }
 }
 
 // Where clicking the notification goes.
-export function notificationTarget(n: Pick<NotificationRow, "type" | "data">): string {
+// new_follower goes to the follower's profile (the notification's actor).
+export function notificationTarget(n: Pick<NotificationRow, "type" | "data"> & { actor_username?: string | null }): string {
+  const post = field(n.data, "post_id");
+  if (n.type === "new_follower") return n.actor_username ? `/u/${n.actor_username}` : "/notifications";
+  if (n.type === "post_liked" && post) return `/posts/${post}`;
   const conversation = field(n.data, "conversation_id");
   const course = field(n.data, "course_id");
   const session = field(n.data, "session_id");

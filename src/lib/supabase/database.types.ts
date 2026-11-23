@@ -274,6 +274,39 @@ export type Database = {
           },
         ]
       }
+      follows: {
+        Row: {
+          created_at: string
+          followee_id: string
+          follower_id: string
+        }
+        Insert: {
+          created_at?: string
+          followee_id: string
+          follower_id: string
+        }
+        Update: {
+          created_at?: string
+          followee_id?: string
+          follower_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follows_followee_id_fkey"
+            columns: ["followee_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follows_follower_id_fkey"
+            columns: ["follower_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           body: string
@@ -354,6 +387,94 @@ export type Database = {
             columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          post_id: string
+          profile_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          profile_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_likes_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string
+          body: string
+          course_id: string | null
+          created_at: string
+          edited_at: string | null
+          id: string
+          session_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          course_id?: string | null
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          session_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          course_id?: string | null
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          session_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -751,6 +872,36 @@ export type Database = {
         Returns: number
       }
       delete_my_account: { Args: never; Returns: undefined }
+      feed_posts: {
+        Args: {
+          before_id?: string
+          before_ts?: string
+          only_author?: string
+          page_size?: number
+          scope?: string
+        }
+        Returns: {
+          author_avatar: string
+          author_id: string
+          author_name: string
+          author_program: string
+          author_university: string
+          author_username: string
+          body: string
+          course_id: string
+          course_price: number
+          course_title: string
+          created_at: string
+          edited_at: string
+          id: string
+          like_count: number
+          liked_by_me: boolean
+          session_id: string
+          session_starts_at: string
+          session_title: string
+          session_type: Database["public"]["Enums"]["session_type"]
+        }[]
+      }
       list_sessions: {
         Args: { page_offset?: number; page_size?: number; tab?: string }
         Returns: {
@@ -815,6 +966,15 @@ export type Database = {
           session_title: string
           total_count: number
           type: Database["public"]["Enums"]["notification_type"]
+        }[]
+      }
+      profile_social: {
+        Args: { target: string }
+        Returns: {
+          followers: number
+          following: number
+          follows_me: boolean
+          i_follow: boolean
         }[]
       }
       search_courses: {
@@ -891,6 +1051,8 @@ export type Database = {
         | "session_updated"
         | "session_cancelled"
         | "course_removed"
+        | "new_follower"
+        | "post_liked"
       participant_status:
         | "invited"
         | "requested"
@@ -899,7 +1061,7 @@ export type Database = {
         | "cancelled"
       report_reason: "spam" | "harassment" | "inappropriate" | "scam" | "other"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
-      report_target: "profile" | "course" | "message" | "session"
+      report_target: "profile" | "course" | "message" | "session" | "post"
       request_status: "requested" | "accepted" | "declined" | "cancelled"
       session_status: "scheduled" | "cancelled"
       session_type: "webinar" | "study_group" | "qa"
@@ -1044,6 +1206,8 @@ export const Constants = {
         "session_updated",
         "session_cancelled",
         "course_removed",
+        "new_follower",
+        "post_liked",
       ],
       participant_status: [
         "invited",
@@ -1054,7 +1218,7 @@ export const Constants = {
       ],
       report_reason: ["spam", "harassment", "inappropriate", "scam", "other"],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
-      report_target: ["profile", "course", "message", "session"],
+      report_target: ["profile", "course", "message", "session", "post"],
       request_status: ["requested", "accepted", "declined", "cancelled"],
       session_status: ["scheduled", "cancelled"],
       session_type: ["webinar", "study_group", "qa"],

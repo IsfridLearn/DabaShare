@@ -1,17 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Sora } from "next/font/google";
+import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
-const sora = Sora({
-  variable: "--font-sora",
+// UI text: Inter (variable). Page titles: Newsreader, an editorial serif.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const newsreader = Newsreader({
+  variable: "--font-newsreader",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -30,8 +32,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   interactiveWidget: "resizes-content",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1220" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfbfa" },
+    { media: "(prefers-color-scheme: dark)", color: "#0e0f11" },
   ],
 };
 
@@ -39,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // suppressHydrationWarning: the theme script may add the "dark" class
     // before React hydrates, which is intended.
-    <html lang="en" className={`${sora.variable} ${dmSans.variable} h-full`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${newsreader.variable} h-full`} suppressHydrationWarning>
       <head>
         {/* Static, trusted script (no user input): applies the saved theme before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />

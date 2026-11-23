@@ -53,6 +53,8 @@ async function submit(jar, path, form, fields) {
   for (const [k, v] of Object.entries(fields)) for (const one of [].concat(v)) body.append(k, one);
   return req(jar, path, { method: "POST", body });
 }
+// Value of a plain (non-$ACTION) input inside a form, e.g. a hidden id.
+const field = (form, name) => decode((form.inner.match(new RegExp(`name="${name}"[^>]*value="([^"]*)"`)) || [])[1] || "");
 const redirectedTo = (r) =>
   r.location || (r.html.match(/http-equiv="refresh" content="\d+;url=([^"]+)"/) || [])[1] || null;
 
@@ -87,14 +89,14 @@ const run = async () => {
   ok(r.status === 200 && r.html.includes("Wrong email or password"), "wrong password shows error", String(r.status));
   if (!r.html.includes(`value="e2e-1@e2e.test.invalid"`)) results.push("NOTE no-JS fallback does not refill email after failed login");
   r = await submit(a, "/login", loginForm, { email: "E2E-1@e2e.test.invalid ", password: PASSWORD, next: "" });
-  ok(r.status === 303 && r.location === "/courses", "correct login redirects to /courses", `${r.status} ${r.location}`);
+  ok(r.status === 303 && r.location === "/home", "correct login redirects to /home", `${r.status} ${r.location}`);
   ok(a.names().some((n) => n.includes("auth-token")), "session cookie set");
 
   // Onboarding gate
   r = await req(a, "/profile");
   ok(redirectedTo(r)?.includes("/onboarding"), "un-onboarded user sent to onboarding", `${r.status} ${redirectedTo(r)}`);
   r = await req(a, "/login");
-  ok(r.status === 307 && r.location?.endsWith("/courses"), "signed-in /login redirects away", `${r.status} ${r.location}`);
+  ok(r.status === 307 && r.location?.endsWith("/home"), "signed-in /login redirects away", `${r.status} ${r.location}`);
 
   r = await req(a, "/onboarding");
   ok(r.status === 200 && r.html.includes("Set up your profile") && r.html.includes('value="E2E Student 1"'), "onboarding prefilled from signup");
@@ -234,6 +236,50 @@ const run = async () => {
   r = await req(a, "/matches");
   ok(r.html.includes("E2E Student 2") && r.html.includes("Skill swap"), "matching is symmetric for A");
 
+  // ── Social: posts, follows, likes ────────────────────────────────────
+  r = await req(a, "/home");
+  ok(r.status === 200 && r.html.includes("Your feed is quiet"), "new user's following feed is empty");
+  const postForm = pick(r.html, 'id="post-body"');
+  ok(postForm.inner.includes("course:" + freeId), "composer offers your published course");
+  r2 = await submit(a, "/home", postForm, { body: "   ", attachment: "" });
+  ok(r2.html.includes("Write something first"), "empty post rejected");
+  r2 = await submit(a, "/home", postForm, { body: "Not mine", attachment: "session:00000000-0000-0000-0000-000000000000" });
+  ok(r2.html.includes("only share study sessions you host"), "can't attach a session you don't host");
+  await submit(a, "/home", postForm, { body: "Study night on Friday <b>bring snacks</b>", attachment: "course:" + freeId });
+  r = await req(a, "/home");
+  ok(r.html.includes("Study night on Friday &lt;b&gt;bring snacks&lt;/b&gt;") && r.html.includes('href="/courses/' + freeId + '"'), "post with course card in own feed, HTML-escaped");
+  const postId = (r.html.match(new RegExp('href="/posts/([0-9a-f-]{36})"')) || [])[1];
+  ok(Boolean(postId), "post has a permalink");
+
+  r = await req(b, "/home?feed=everyone");
+  ok(r.html.includes("Study night on Friday"), "everyone feed shows A's post to B");
+  r = await req(b, "/home");
+  ok(!r.html.includes("Study night on Friday"), "following feed leaves out people B doesn't follow");
+  r = await req(b, "/u/" + user);
+  let f = pick(r.html, 'name="profileId"');
+  ok(field(f, "follow") === "1" && r.html.includes(">0</strong> followers<"), "profile shows Follow and 0 followers");
+  await submit(b, "/u/" + user, f, { profileId: field(f, "profileId"), follow: "1" });
+  r = await req(b, "/u/" + user);
+  ok(r.html.includes(">Following<") && r.html.includes(">1</strong> follower<"), "B follows A; follower count updates");
+  ok(r.html.includes("Study night on Friday"), "profile lists the student's posts");
+  r = await req(b, "/home");
+  ok(r.html.includes("Study night on Friday"), "following feed shows people B follows");
+  f = pick(r.html, 'name="like"');
+  await submit(b, "/home", f, { postId: field(f, "postId"), like: "1" });
+  r = await req(b, "/home");
+  ok(r.html.includes(">Liked<") && r.html.includes(", 1 like<"), "B likes the post; count shows");
+  r = await req(a, "/notifications");
+  ok(r.html.includes("E2E Student 2 started following you") && r.html.includes("E2E Student 2 liked your post"), "author notified of follower and like");
+  r = await req(b, "/posts/" + postId);
+  ok(r.status === 200 && r.html.includes("Study night on Friday") && !r.html.includes("Yes, delete"), "permalink opens; no delete for others");
+  r = await req(b, "/report?type=post&id=" + postId);
+  ok(r.status === 200 && r.html.includes("Report a post") && r.html.includes("Study night on Friday"), "posts can be reported");
+  r = await req(b, "/home");
+  f = pick(r.html, 'name="like"');
+  await submit(b, "/home", f, { postId: field(f, "postId"), like: "0" });
+  r = await req(b, "/home");
+  ok(r.html.includes(">Like<") && !r.html.includes(">Liked<"), "unlike");
+
   // ── Phase 6: messaging, report, block ────────────────────────────────
   r = await req(a, "/matches");
   r2 = await submit(a, "/matches", pick(r.html, ">Message</button>"), {});
@@ -308,6 +354,14 @@ const run = async () => {
   r2 = await submit(b, "/settings", forms(r.html).find((f) => f.inner.includes(">Unblock<")), {});
   r = await req(a, "/u/" + user + "_b");
   ok(r.status === 200 && r.html.includes("E2E Student 2"), "unblock restores visibility");
+  r = await req(b, "/u/" + user);
+  ok(r.html.includes(">0</strong> followers<") && pick(r.html, 'name="profileId"').inner.includes('value="1"'), "blocking removed the follow");
+  r = await req(a, "/posts/" + postId);
+  f = forms(r.html).find((x) => x.inner.includes("Yes, delete"));
+  ok(Boolean(f), "author sees Delete on own post");
+  if (f) await submit(a, "/posts/" + postId, f, { postId });
+  r = await req(b, "/posts/" + postId);
+  ok(r.status === 404 || r.html.includes("Page not found"), "deleted post is gone");
 
   // ── Phase 7: sessions and notifications ──────────────────────────────
   const tomorrow = new Date(Date.now() + 32 * 3600 * 1000).toISOString().slice(0, 10);
@@ -443,7 +497,7 @@ const run = async () => {
   ok(r.html.includes("Wrong email or password"), "old password rejected after change");
   r = await req(c, "/login");
   r = await submit(c, "/login", pick(r.html, 'name="password"'), { email: "e2e-1@e2e.test.invalid", password: NEW_PW, next: "" });
-  ok(r.status === 303 && r.location === "/courses", "new password works on second device", r.location);
+  ok(r.status === 303 && r.location === "/home", "new password works on second device", r.location);
 
   // Account deletion on device A
   r = await req(a, "/settings");

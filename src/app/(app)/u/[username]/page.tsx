@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FeedList } from "@/components/feed/feed-list";
+import { FollowButton } from "@/components/feed/follow-button";
 import { MessageButton } from "@/components/messages/message-button";
 import { StudentMenu } from "@/components/safety/student-menu";
 import { Avatar } from "@/components/ui/avatar";
@@ -9,6 +11,7 @@ import { Tag } from "@/components/ui/tag";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getPublishedCoursesBy } from "@/lib/courses/queries";
 import { formatPrice } from "@/lib/courses/validation";
+import { getFeed, getSocial } from "@/lib/feed/queries";
 import { skillOverlap } from "@/lib/profile/overlap";
 import { getProfileDetailsById, getProfileDetailsByUsername, type SkillRef } from "@/lib/profile/queries";
 import { getCategories } from "@/lib/reference";
@@ -32,7 +35,11 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
 
   const isMe = profile.id === me.id;
   const interests = categories.filter((c) => profile.interestIds.includes(c.id));
-  const courses = await getPublishedCoursesBy(profile.id);
+  const [courses, social, posts] = await Promise.all([
+    getPublishedCoursesBy(profile.id),
+    getSocial(profile.id),
+    getFeed("everyone", null, profile.id),
+  ]);
   const overlap = mine && !isMe ? skillOverlap(mine, profile) : null;
   const hasOverlap = Boolean(overlap && (overlap.theyTeachYou.length || overlap.youTeachThem.length));
 
@@ -46,15 +53,28 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
           <p className="mt-2 text-gray-700">
             {[profile.program, profile.university?.name].filter(Boolean).join(" · ")}
           </p>
+          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-small text-fg-muted">
+            <span>
+              <strong className="font-semibold text-fg">{social.followers.toLocaleString("en-US")}</strong>{" "}
+              {social.followers === 1 ? "follower" : "followers"}
+            </span>
+            <span>
+              <strong className="font-semibold text-fg">{social.following.toLocaleString("en-US")}</strong> following
+            </span>
+            {social.follows_me && !isMe && <span className="rounded-[4px] bg-subtle px-1.5 py-0.5 text-caption">Follows you</span>}
+          </p>
         </div>
         {isMe ? (
           <Link href="/profile" className={buttonClasses({ variant: "outline", size: "sm" })}>
             Edit profile
           </Link>
         ) : (
-          <div className="flex w-full items-center gap-2 sm:w-auto">
+          <div className="flex w-full items-start gap-2 sm:w-auto">
             <div className="flex-1 sm:flex-none">
-              <MessageButton otherId={profile.id} size="md" fullWidth />
+              <FollowButton profileId={profile.id} following={social.i_follow} name={profile.display_name} size="md" fullWidth />
+            </div>
+            <div className="flex-1 sm:flex-none">
+              <MessageButton otherId={profile.id} variant="outline" size="md" fullWidth />
             </div>
             <StudentMenu studentId={profile.id} />
           </div>
@@ -97,6 +117,35 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
           <p className="break-words whitespace-pre-line text-gray-700">{profile.bio}</p>
         </Card>
       )}
+
+      <section aria-labelledby="posts-title" className="flex flex-col gap-3">
+        <h2 id="posts-title" className="text-lg font-semibold">
+          Posts
+        </h2>
+        <FeedList
+          key={posts.posts[0]?.id ?? "empty"}
+          initial={posts.posts}
+          initialHasMore={posts.hasMore}
+          scope="everyone"
+          onlyAuthor={profile.id}
+          meId={me.id}
+          label={`Posts by ${profile.display_name}`}
+          empty={
+            <p className="rounded-card border border-dashed border-line-strong px-5 py-6 text-center text-small text-fg-muted">
+              {isMe ? (
+                <>
+                  You haven&apos;t posted yet.{" "}
+                  <Link href="/home" className="font-medium text-brand-ink hover:underline">
+                    Write your first post
+                  </Link>
+                </>
+              ) : (
+                `${profile.display_name} hasn't posted yet.`
+              )}
+            </p>
+          }
+        />
+      </section>
 
       {courses.length > 0 && (
         <Card>

@@ -25,6 +25,20 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 
 ## Log
 
+### 2026-11-29 — Design refresh, Phase 2 (design system + social layer), on branch `design-refresh`
+
+Following the owner's direction, students now land on a LinkedIn-style **Home feed** instead of the course list, can post about their work and events, follow each other and like posts.
+
+- **Migration** `20261129090000_social_feed.sql` (applied to dev): the `posts`, `post_likes` and `follows` tables with RLS and column grants; triggers for the post and follow limits, attachment ownership, the `edited_at` stamp, follower and like notifications (deduplicated), and blocks removing follows; post reports; the `feed_posts` and `profile_social` RPCs.
+- **App:**
+  - The design tokens and primitives, and the new sidebar shell (see DESIGN_AUDIT.md "Phase 2 result").
+  - `/home` (feed, composer, tabs, rail) and `/posts/[id]`.
+  - Follow and posts on `/u/[username]`.
+  - The notification texts and targets, and post reporting.
+  - Like, follow and delete are real forms, so they also work without JavaScript and are covered by the E2E suite.
+- **Not done yet:** the rest of the screens move to the new look in Phase 4. Nothing is merged to `main` or deployed.
+
+
 ### 2026-11-28 — Phase 9 complete
 
 Completion criterion met: critical workflows work, access controls are tested, and no known critical (or high) issues are open.
@@ -141,6 +155,11 @@ Completion criterion met: students can publish, discover, manage and enroll in c
 
 | Date | Check | Result |
 |---|---|---|
+| 2026-11-29 | Design 2: `npm run check` | Passed: 0 type errors, 0 lint problems, 97/97 unit tests |
+| 2026-11-29 | Design 2: `npm run db:test:rls` | **139 passed, 0 failed** (22 new social checks: visibility, blocks, attachment ownership, likes, follows, feed scopes, counts, notifications, reports, edit stamp, deletes) |
+| 2026-11-29 | Design 2: `npm run build` | Passed |
+| 2026-11-29 | Design 2: `npm run test:e2e` | **158 passed, 0 failed** (22 new checks for posting, attachments, feed scopes, follow, like, notifications, permalink, report and delete, and blocks removing follows). Self-cleaned. |
+| 2026-11-29 | Screenshots of Home, Everyone, a public profile and Notifications at 390px and 1280px, light and dark, with seeded content | Checked visually. The demo users were deleted afterwards (0 test users, 0 posts, 0 follows left). |
 | 2026-11-28 | Phase 9: `npm run check` | Passed: 87/87 unit tests |
 | 2026-11-28 | Phase 9: `npm run db:test:rls` | **119 passed, 0 failed** |
 | 2026-11-28 | Phase 9: `npm run test:e2e` | **138 passed, 0 failed** (exit 0, self-cleaned) |

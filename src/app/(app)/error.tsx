@@ -17,8 +17,8 @@ export default function AppError({ error, retry }: { error: unknown; retry: () =
       <p className="text-gray-600">This page couldn&apos;t load. Check your connection and try again.</p>
       <div className="flex flex-wrap justify-center gap-3">
         <Button onClick={() => retry()}>Try again</Button>
-        <Link href="/courses" className={buttonClasses({ variant: "outline" })}>
-          Go to courses
+        <Link href="/home" className={buttonClasses({ variant: "outline" })}>
+          Go to home
         </Link>
       </div>
     </div>

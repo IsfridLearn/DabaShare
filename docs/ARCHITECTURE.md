@@ -68,6 +68,7 @@ docs/                  project documentation
 | `next`, `react`, `react-dom` | Framework |
 | `@supabase/supabase-js`, `@supabase/ssr` | Supabase client with cookie-based sessions for SSR |
 | `zod` | Input validation in Server Actions, and env validation |
+| `lucide-react` | Consistent, tree-shaken line icons for the sidebar, feed and actions (design refresh). Only imported icons are bundled. |
 | `server-only` | Build error if a server module is imported into client code |
 | `tailwindcss`, `@tailwindcss/turbopack` | Styling (scaffold default) |
 | `vitest` (dev) | Unit tests |

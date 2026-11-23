@@ -28,6 +28,7 @@ declare
   enr uuid;
   conv uuid;
   conv2 uuid;
+  v_post uuid;
   msg uuid;
   sess uuid;
   passed integer;
@@ -577,6 +578,100 @@ begin
   exception when others then
     r := r || ('PASS course cap (' || sqlerrm || ')');
   end;
+
+  -- ── Social: posts, likes, follows ───────────────────────────────────────
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  insert into public.posts (author_id, body) values (d, 'Anyone up for a Python study night?') returning id into v_post;
+  r := r || (case when v_post is not null then 'PASS' else 'FAIL' end || ' onboarded student posts');
+  begin
+    insert into public.posts (author_id, body, session_id) values (d, 'Join my session', v_uuid);
+    r := r || 'FAIL can share someone else''s session'::text;
+  exception when others then
+    r := r || ('PASS only your own sessions can be shared (' || sqlerrm || ')');
+  end;
+  begin
+    insert into public.posts (author_id, body, created_at) values (d, 'Backdated', '2000-01-01');
+    r := r || 'FAIL post timestamp is client-settable'::text;
+  exception when others then
+    r := r || ('PASS post timestamps come from the database (' || sqlerrm || ')');
+  end;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  begin
+    insert into public.posts (author_id, body) values (d, 'Posting as D');
+    r := r || 'FAIL can post as someone else'::text;
+  exception when others then
+    r := r || ('PASS cannot post as someone else (' || sqlerrm || ')');
+  end;
+  select count(*) into n from public.feed_posts('everyone') where id = v_post;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' everyone feed shows visible posts');
+  select count(*) into n from public.feed_posts('following') where id = v_post;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' following feed excludes people you don''t follow');
+  insert into public.follows (follower_id, followee_id) values (e, d);
+  select count(*) into n from public.feed_posts('following') where id = v_post;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' following feed includes people you follow');
+  begin
+    insert into public.follows (follower_id, followee_id) values (e, e);
+    r := r || 'FAIL can follow yourself'::text;
+  exception when others then
+    r := r || ('PASS cannot follow yourself (' || sqlerrm || ')');
+  end;
+  insert into public.post_likes (post_id, profile_id) values (v_post, e);
+  begin
+    insert into public.post_likes (post_id, profile_id) values (v_post, d);
+    r := r || 'FAIL can like on someone else''s behalf'::text;
+  exception when others then
+    r := r || ('PASS likes are only your own (' || sqlerrm || ')');
+  end;
+  select like_count::text || '|' || liked_by_me::text into v_text from public.feed_posts('everyone') where id = v_post;
+  r := r || (case when v_text = '1|true' then 'PASS' else 'FAIL' end || ' like count and liked_by_me (' || coalesce(v_text, 'none') || ')');
+  select followers::text || '|' || i_follow::text into v_text from public.profile_social(d);
+  r := r || (case when v_text = '1|true' then 'PASS' else 'FAIL' end || ' profile_social counts and relationship (' || coalesce(v_text, 'none') || ')');
+  update public.posts set body = 'hijacked' where id = v_post;
+  get diagnostics n = row_count;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' cannot edit someone else''s post');
+  insert into public.reports (reporter_id, target_type, target_id, reason) values (e, 'post', v_post, 'spam');
+  select target_snapshot ->> 'body' into v_text from public.reports where reporter_id = e and target_id = v_post;
+  r := r || (case when v_text like 'Anyone up for%' then 'PASS' else 'FAIL' end || ' posts can be reported (snapshot kept)');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.notifications where recipient_id = d and type in ('post_liked', 'new_follower');
+  r := r || (case when n = 2 then 'PASS' else 'FAIL' end || ' author notified of like and new follower (' || n || ')');
+  update public.posts set body = 'Anyone up for a Python study night? (Friday)' where id = v_post;
+  select (edited_at is not null)::text into v_text from public.posts where id = v_post;
+  r := r || (case when v_text = 'true' then 'PASS' else 'FAIL' end || ' editing marks the post as edited');
+
+  -- B blocked A earlier: A never sees B's posts and cannot like or follow B.
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  insert into public.posts (author_id, body) values (b, 'Accounting review notes are up') returning id into v_uuid;
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.feed_posts('everyone') where id = v_uuid;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' posts of someone who blocked you are hidden');
+  begin
+    insert into public.post_likes (post_id, profile_id) values (v_uuid, a);
+    r := r || 'FAIL can like a hidden post'::text;
+  exception when others then
+    r := r || ('PASS cannot like a hidden post (' || sqlerrm || ')');
+  end;
+  begin
+    insert into public.follows (follower_id, followee_id) values (a, b);
+    r := r || 'FAIL can follow someone who blocked you'::text;
+  exception when others then
+    r := r || ('PASS cannot follow someone who blocked you (' || sqlerrm || ')');
+  end;
+
+  -- Blocking removes existing follows both ways.
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  insert into public.blocks (blocker_id, blocked_id) values (d, e);
+  perform set_config('role', admin_role, true);
+  select count(*) into n from public.follows where (follower_id = e and followee_id = d) or (follower_id = d and followee_id = e);
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' blocking removes follows');
+  delete from public.blocks where blocker_id = d and blocked_id = e;
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  delete from public.posts where id = v_post;
+  get diagnostics n = row_count;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' authors can delete their posts');
 
   -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
   perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);

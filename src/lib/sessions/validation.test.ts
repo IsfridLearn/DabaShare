@@ -112,6 +112,8 @@ describe("notificationText", () => {
     expect(notificationText(n({ type: "participation_updated", data: { status: "accepted" } }))).toBe("You're in! Maria accepted you into Calculus prep");
     expect(notificationText(n({ type: "session_cancelled" }))).toBe("Calculus prep was cancelled");
     expect(notificationText(n({ type: "course_removed", course_title: "Old course" }))).toBe("Old course was removed by its tutor");
+    expect(notificationText(n({ type: "new_follower" }))).toBe("Maria started following you");
+    expect(notificationText(n({ type: "post_liked", data: { post_id: "p1" } }))).toBe("Maria liked your post");
   });
   it("copes with deleted actors and items", () => {
     expect(notificationText(n({ type: "session_joined", actor_name: null, session_title: null }))).toBe("A student joined a session");
@@ -125,5 +127,8 @@ describe("notificationTarget", () => {
     expect(notificationTarget({ type: "session_request", data: { session_id: "s1" } })).toBe("/sessions/s1");
     expect(notificationTarget({ type: "course_removed", data: { course_title: "x" } })).toBe("/courses/mine");
     expect(notificationTarget({ type: "session_updated", data: null })).toBe("/notifications");
+    expect(notificationTarget({ type: "post_liked", data: { post_id: "p1" } })).toBe("/posts/p1");
+    expect(notificationTarget({ type: "new_follower", data: {}, actor_username: "maria" })).toBe("/u/maria");
+    expect(notificationTarget({ type: "new_follower", data: {}, actor_username: null })).toBe("/notifications");
   });
 });

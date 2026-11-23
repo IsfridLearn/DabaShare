@@ -26,6 +26,9 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | Meeting link | Host and accepted participants | Host |
 | Participation | The participant and the host | Trigger rules |
 | Notifications | Recipient | Recipient: mark read or delete. Only triggers create them. |
+| Posts | Anyone who can see the author's profile (so blocks and unfinished profiles hide them) | Author: create (onboarded only), edit the body, delete. Author can't change. |
+| Post likes | Anyone who can see the post | Like as yourself on a post you can see; remove your own like |
+| Follows | The follower and the followee | Follow as yourself someone you can see; unfollow your own follows. Blocking removes both directions. |
 | Blocks | Blocker | Blocker |
 | Reports | Reporter and admins | Insert by the reporter, who must be able to see the target. Admins update the status. |
 | Avatars (storage) | Anyone with the URL (public bucket) | Owner, inside `avatars/<user id>/`, at most 2 MB, JPEG, PNG or WebP. `profiles.avatar_path` must point into the owner's folder. |
@@ -33,6 +36,7 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 **Blocking** hides profiles, courses and sessions in both directions. It stops new messages, enrollments, joins and re-requests, and it cancels the pair's existing enrollments and participations silently. A blocked user gets the same "not found" or "not open" message as for a missing item, so the block isn't revealed. Report snapshots respect blocks too.
 
 **Abuse limits (all enforced in the database):**
+- Posts: 30 a day per student. New follows: 200 a day. Like and follow notifications are deduplicated (one unread per post / per follower).
 - New conversations: 30 a day per student. Messages: 20 a minute. Reports: 20 a day.
 - Active courses: 20 per student. Upcoming sessions: 20 per host. Session invitations: 50 a day per host.
 - Recipients can **hide** a conversation (it comes back only if a new message arrives) or block the sender.

@@ -32,4 +32,9 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 | UI | Mobile bottom tab bar with badges; current page highlighted (`aria-current`); account menu; skip link; in-app error screen that keeps the navigation | Done (screenshots + E2E) | 8 |
 | UI | Profile: completeness checklist, skills first on mobile, "Why you two match" and the student's courses on public profiles, photo upload feedback | Done (screenshots + E2E) | 8 |
 | UI | Messages: full-screen chat on mobile with a back button, auto-growing composer, Enter-to-send only with a physical keyboard, no double sends, scroll that keeps your place with a "new messages" button, screen-reader log | Done (screenshots + E2E) | 8 |
+| Social | Home feed at `/home` (where students land after signing in): Following and Everyone tabs, newest first with "Load more" | Done (E2E + RLS) | Design 2 |
+| Social | Posts (text up to 3,000 characters) with an optional attachment of your own upcoming session or published course; delete your own; report others; permalink `/posts/<id>` | Done (E2E + RLS) | Design 2 |
+| Social | Follow and unfollow, follower and following counts, "Follows you", a student's posts on their profile; likes with counts; new-follower and post-liked notifications | Done (E2E + RLS) | Design 2 |
+| Social | Editing posts, comments, images in posts | Not built. Editing is supported by the database (marked "edited") but has no UI yet. | — |
+| UI | Design system v2 (Notion × Linear tokens, Inter + Newsreader, primitives) and the new sidebar app shell | Done (screenshots light and dark, phone and desktop) | Design 2 |
 | Payments | Collecting money for paid courses | Deferred (needs legal and age review) | — |

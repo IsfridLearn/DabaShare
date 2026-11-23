@@ -14,8 +14,60 @@
   - brand        filled buttons, focus rings, active backgrounds
   - *-ink        text in that colour; lighter in dark mode so it stays readable
 */
+/*
+  ── Design system v2: "Notion × Linear" ─────────────────────────────────────
+  Neutral roles (prefer these in new and redesigned screens):
+  - canvas      page background (warm off-white / Linear near-black)
+  - surface     panels, inputs, menus
+  - subtle      quiet fills: hover rows, secondary buttons, chips
+  - fg          primary text      - fg-muted   secondary text   - fg-subtle  meta text
+  - line        hairline borders  - line-strong  input borders, dividers that must show
+  One accent: brand (DabaShare blue) for primary actions, links (brand-ink) and focus.
+  Type: Inter for UI (--font-sans); Newsreader serif for page titles (--font-serif).
+  Surfaces are flat: borders, not shadows. Shadows are for overlays only.
+*/
 @theme {
+  --color-canvas: #fbfbfa;
+  --color-subtle: #f3f3f1;
+  --color-fg: #1f1f1e;
+  --color-fg-muted: #5f5e5b;
+  --color-fg-subtle: #73726e;
+  --color-line: #e8e8e5;
+  --color-line-strong: #d6d6d2;
+
+  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
+
+  --text-display: 2.5rem;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
+  --text-title: 1.875rem;
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.015em;
+  --text-heading: 1.0625rem;
+  --text-heading--line-height: 1.4;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.6;
+  --text-small: 0.8125rem;
+  --text-small--line-height: 1.5;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.08);
+
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+
   --color-surface: #ffffff;
+  /* Legacy gray scale warmed to match the Notion-like neutrals. */
+  --color-gray-50: var(--color-stone-50);
+  --color-gray-100: var(--color-stone-100);
+  --color-gray-200: var(--color-stone-200);
+  --color-gray-300: var(--color-stone-300);
+  --color-gray-400: var(--color-stone-400);
+  --color-gray-500: var(--color-stone-500);
+  --color-gray-600: var(--color-stone-600);
+  --color-gray-700: var(--color-stone-700);
+  --color-gray-800: var(--color-stone-800);
+  --color-gray-900: var(--color-stone-900);
   --color-brand: var(--color-blue-600);
   --color-brand-dark: var(--color-blue-700);
   --color-brand-soft: var(--color-blue-50);
@@ -30,14 +82,17 @@
   --color-danger-ink: var(--color-red-600);
   --color-warning: var(--color-amber-500);
 
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* Legacy name used by older components: now the same precise sans. */
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
-  --radius-card: 14px;
-  --radius-control: 8px;
+  /* Tighter, Linear-like corners: 6px controls, 10px containers. */
+  --radius-card: 10px;
+  --radius-control: 6px;
 
-  --shadow-card: 0 4px 24px rgb(0 0 0 / 0.08);
-  --shadow-card-lg: 0 8px 40px rgb(0 0 0 / 0.12);
+  /* Cards are flat (hairline border only); overlays keep a soft shadow. */
+  --shadow-card: 0 0 #0000;
+  --shadow-card-lg: var(--shadow-overlay);
 }
 
 /*
@@ -50,17 +105,27 @@
 .dark {
   color-scheme: dark;
 
-  --color-surface: #131c2e;
-  --color-gray-50: #0b1220;
-  --color-gray-100: #1e293b;
-  --color-gray-200: #2b3648;
-  --color-gray-300: #3b4659;
-  --color-gray-400: #64748b;
-  --color-gray-500: #94a3b8;
-  --color-gray-600: #a9b4c4;
-  --color-gray-700: #cbd5e1;
-  --color-gray-800: #e2e8f0;
-  --color-gray-900: #f1f5f9;
+  /* Linear-style neutral near-black. */
+  --color-canvas: #0e0f11;
+  --color-surface: #141518;
+  --color-subtle: #1b1c1f;
+  --color-fg: #ededef;
+  --color-fg-muted: #a1a1a8;
+  --color-fg-subtle: #8a8a92;
+  --color-line: #25262a;
+  --color-line-strong: #34363b;
+  --shadow-overlay: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.45);
+
+  --color-gray-50: #0e0f11;
+  --color-gray-100: #1b1c1f;
+  --color-gray-200: #25262a;
+  --color-gray-300: #34363b;
+  --color-gray-400: #5c5e66;
+  --color-gray-500: #8a8a92;
+  --color-gray-600: #a1a1a8;
+  --color-gray-700: #c4c4ca;
+  --color-gray-800: #e2e2e6;
+  --color-gray-900: #ededef;
 
   --color-blue-50: #172554;
   --color-blue-100: #1e2f5c;
@@ -91,13 +156,21 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 font-sans text-gray-800 antialiased;
+    @apply bg-canvas font-sans text-body text-fg antialiased;
+    font-feature-settings: "cv11", "ss01";
   }
 
-  h1,
+  /* Page titles are editorial (serif); section headings are crisp sans. */
+  h1 {
+    @apply font-serif font-medium text-fg;
+  }
   h2,
   h3,
   h4 {
-    @apply font-display text-gray-900;
+    @apply font-sans font-semibold tracking-tight text-fg;
+  }
+
+  ::selection {
+    @apply bg-brand-soft;
   }
 }
