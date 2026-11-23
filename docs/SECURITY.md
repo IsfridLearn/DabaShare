@@ -47,7 +47,9 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 - **No moderation UI.** Admins review `reports` in the Supabase dashboard until one is built.
 - **Data Privacy Act (RA 10173).** The privacy notice, consent checkbox and account deletion come in Phase 3. Have a qualified person review them before a public launch.
 - **Possible minors.** An age confirmation at signup comes in Phase 3. Payments stay disabled.
-- **Built-in email is rate-limited.** Supabase's default SMTP sends only a few emails per hour. Production needs custom SMTP (Phase 10).
+- **Built-in email is rate-limited and restricted.** Supabase's default sender sends only a few emails per hour, and **only delivers to members of the Supabase organization**. Real students can't receive confirmation or reset emails until custom SMTP is configured. That has to happen before anyone outside the team signs up.
+- **Cross-device email links:** with the default templates, opening the confirmation link on another device still confirms the email, but the student has to sign in manually. The reset link has to be opened on the device that requested it.
+- **No-JS fallback:** without JavaScript, the login form doesn't refill the email after an error. In local dev mode only, a no-JS submit of the skill form can hang; production builds are unaffected.
 
 ## Test log
 
@@ -57,4 +59,23 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | 2026-11-22 | Anonymous probe with the publishable key against every table and RPC on dev | Only universities and categories are readable. All 16 other tables, both RPCs and the `private` schema are denied. |
 | 2026-11-22 | `supabase/tests/rls_smoke.sql` on dev (`npm run db:test:rls`), rolled back | **55 passed, 0 failed.** It covers profiles, private flags, avatar paths, skills, course ownership, forged timestamps, enrollment states, notifications, conversation privacy, forged senders, reports, blocks, session capacity, meeting links and cancellation. |
 | 2026-11-22 | Supabase security advisor (`supabase db advisors`) | Only the 2 expected warnings remain: the two RPCs that signed-in users are meant to call. |
-| — | Storage policies, realtime delivery under RLS, auth flows | UNTESTED (Phases 3, 6 and 9) |
+| 2026-11-23 | `npm run db:test:rls` extended with onboarding, interests, skills and account deletion | **65 passed, 0 failed** (rolled back; 0 rows left) |
+| 2026-11-23 | No-JS end-to-end run of the real forms against a **production build** with 2 temporary confirmed users (deleted afterwards) | **34 passed, 0 failed.** Covers route protection, guest redirects, the email-link handler (invalid, foreign code, expired, external `next`), wrong and correct login, onboarding gate and validation, skills, interests, public profile with HTML escaping, safe `next`, the discoverable toggle, logout, and account deletion (the account can't sign in afterwards). |
+| 2026-11-23 | Storage policies with a real signed-in user | Own-folder upload OK. Another user's folder denied. SVG denied (MIME allow-list). Over 2 MB denied. Public URL serves WebP. The owner can delete. `avatar_path` pointing at another folder is denied. |
+| 2026-11-23 | Static review of the Phase 3 auth and profile code by `qa-security-reviewer` (Sonnet) | 0 critical, 0 high, 5 medium and 9 low findings. One low finding was incorrect: `is_admin` and consent timestamps already live in `private.accounts`. Everything else is fixed (see below). |
+| 2026-11-23 | Production-build E2E after the fixes (2 temporary users, deleted afterwards) | **43 passed, 0 failed.** Adds: password change needs the current password, the old password stops working, a reset without a recovery link is refused, and a deleted account's other-device session is cleared via `/auth/signout`. |
+| — | Realtime delivery under RLS, real email delivery, the in-browser avatar upload UI | UNTESTED |
+
+### Phase 3 auth hardening (from review)
+
+- Account deletion removes **every** avatar file, paging through the folder and checking each removal, and aborts before deleting anything if a file remains.
+- `NEXT_PUBLIC_SITE_URL` is required in production. Vercel previews build email links from `VERCEL_URL`.
+- Password reset works only within 15 minutes of following a recovery link (httpOnly cookie holding the user id). The Settings change requires the current password. Both sign out other sessions.
+- Reset and resend return the same neutral message even when rate-limited, so they can't reveal registered emails.
+- Sign-out is local to the device. A token whose account was deleted is cleared through `/auth/signout`, and destructive actions re-verify with `getUser()`.
+- The proxy doesn't redirect Server Action POSTs, and its redirects keep Supabase's no-store headers.
+- The email-link handler accepts only signup, email, recovery and email_change types.
+- Bound action arguments are validated. Interests are added before old ones are removed. Avatar paths are checked to exist, and the client deletes its upload if saving fails.
+- Passwords are limited to 72 bytes, bcrypt's real limit.
+- Accepted risk: `/auth/signout` is a GET route, so a malicious link could sign someone out. Session cookies are SameSite=Lax, so it only works through a top-level navigation, and it can't sign anyone in.
+- Before enabling custom `token_hash` templates, `/auth/confirm` must render a POST "Continue" step so email scanners can't consume the token.

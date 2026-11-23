@@ -1,8 +1,8 @@
 # DabaShare Development Progress
 
-Last updated: 2026-11-22
+Last updated: 2026-11-23
 
-**Current Phase:** Phase 3 — Authentication and Student Profiles (next)
+**Current Phase:** Phase 3 — Authentication and Student Profiles. The code is complete and tested; it's waiting on one manual check, a real signup email.
 
 **Overall Progress:** 2/10 phases completed.
 
@@ -10,7 +10,7 @@ Last updated: 2026-11-22
 
 - [x] Phase 1 — Repository Audit
 - [x] Phase 2 — Architecture and Foundation
-- [ ] Phase 3 — Authentication and Profiles
+- [ ] Phase 3 — Authentication and Profiles (one manual check left, see below)
 - [ ] Phase 4 — Course Marketplace
 - [ ] Phase 5 — Student Matching
 - [ ] Phase 6 — Messaging
@@ -19,55 +19,58 @@ Last updated: 2026-11-22
 - [ ] Phase 9 — Security and Testing
 - [ ] Phase 10 — Deployment
 
+## What's left for Phase 3
+
+1. **Manual check (you):** run `npm run dev`, sign up at http://localhost:3000/signup with **your own email** (an org member, so the built-in sender delivers to it), click the link in the email, and finish onboarding. This is the only part I can't test: real email delivery, plus the in-browser avatar upload.
+2. **Known external blocker for real students:** Supabase's built-in email only delivers to org members, so custom SMTP is needed before anyone else can sign up. It's tracked in DEPLOYMENT.md, and you need to choose a provider.
+
 ## Log
 
-### 2026-11-22 — Phase 2 complete
+### 2026-11-23 — Phase 3
 
-The completion criterion is met: the app runs locally against the real dev database, the foundation is documented, and the database rules have been tested.
-
-- **App foundation:**
-  - Next.js 16.4.6, React 19.3, TypeScript strict, Tailwind 4.3, with Cache Components on (ARCHITECTURE.md A2).
-  - Supabase server and browser clients typed with generated `Database` types, and the session-refreshing proxy.
-  - Validated env.
-  - Ported the prototype design tokens and added shared UI components.
-  - Landing page, error boundary, 404, DabaShare favicon, and the dev-only `/status` page.
-- **Dev database:** the `DabaShare` project (Singapore) is linked, with 6 migrations applied:
-  - 18 public tables with RLS, plus `private.accounts`.
-  - Column-level insert and update grants, and secure default privileges.
-  - Triggers for state machines, capacity, blocks, notifications and report snapshots.
-  - The avatars bucket, the realtime publication, and reference data (15 universities, 14 categories, 55 skills).
-- **Independent review:** `qa-security-reviewer` (Sonnet) did a static review and found 0 critical, 0 high, 3 medium and 12 low issues. Every medium and actionable low finding is fixed in `20261122100000_security_hardening.sql` (details in SECURITY.md).
-- **Reusable RLS test:** `supabase/tests/rls_smoke.sql` (`npm run db:test:rls`) runs 55 checks.
-- **Docs:** `CLAUDE.md`, `README.md`, `ARCHITECTURE.md`, `DATABASE.md`, `SECURITY.md`, `FEATURES.md`, `DEPLOYMENT.md`.
-- **Dependencies added:** `@supabase/supabase-js`, `@supabase/ssr`, `zod`, `server-only`; dev: `vitest`, `supabase` CLI, `@types/node@24`.
-
-### 2026-11-22 — Phase 1 complete
-
-- Audited the prototype ([AUDIT.md](AUDIT.md)), wrote the plan ([DEVELOPMENT_ROADMAP.md](DEVELOPMENT_ROADMAP.md)), and created the agent definitions.
+- **Auth config on dev:**
+  - Localhost redirect URLs, and passwords of 8+ characters with letters and digits.
+  - Custom email templates were rejected by the free tier without SMTP, so the default PKCE templates are used for now (ARCHITECTURE.md A13).
+- **Auth flows:**
+  - Signup with an 18+ confirmation and privacy consent.
+  - Check-email page with resend.
+  - Login with safe `next`, and local logout.
+  - Forgot and reset password, restricted to recovery-link sessions.
+  - Settings password change with the current password.
+  - `/auth/confirm` for both link formats.
+  - Proxy route protection: protected by default, plus guest-only pages.
+- **Profiles:**
+  - Onboarding (username, university, program, bio).
+  - Profile editor with browser-resized avatar upload, teach and learn skills with canonical autocomplete, and interests.
+  - Public profile at `/u/<username>`.
+  - Settings: discoverable toggle, password change, account deletion.
+- **New migration:** `20261123090000_account_deletion.sql` adds `delete_my_account()`.
+- **Next 16 fixes:**
+  - The server Supabase client calls `connection()`, so session reads are request-time.
+  - Per-user pages use `instant = false` (A14).
+- **Draft privacy notice** at `/privacy`, written against RA 10173. It needs review before launch.
 
 ## Testing status
 
 | Date | Check | Result |
 |---|---|---|
-| 2026-11-22 | `npm run check` (typegen + tsc, eslint, vitest) | Passed: 0 type errors, 0 lint problems, 3/3 tests |
-| 2026-11-22 | `npm run build` | Passed |
-| 2026-11-22 | `supabase db push` (6 migrations) on dev | All applied without errors |
-| 2026-11-22 | Anonymous probe of every table, both RPCs and the `private` schema | Only universities and categories are readable. Everything else is denied. |
-| 2026-11-22 | `npm run db:test:rls` (55 checks as impersonated users, rolled back) | **55 passed, 0 failed.** Verified afterwards that 0 users, profiles, courses or messages were left behind. |
-| 2026-11-22 | `supabase db advisors` | Only the 2 expected warnings remain (the RPCs meant for signed-in users) |
-| 2026-11-22 | `/status` on the dev server against real Supabase, signed out | universities 15 ✓, categories 14 ✓, skills "members only" ✓ |
-| — | Auth flows, storage uploads, realtime | UNTESTED (Phases 3, 6 and 9) |
+| 2026-11-23 | `npm run check` | Passed: 0 type errors, 0 lint problems, 35/35 unit tests |
+| 2026-11-23 | `npm run build` | Passed |
+| 2026-11-23 | `npm run db:test:rls` (extended for Phase 3) | **65 passed, 0 failed** (rolled back) |
+| 2026-11-23 | No-JS E2E of the real forms on a **production build** | **43 passed, 0 failed** (details in SECURITY.md). The test users were deleted, and dev is back to 0 users. |
+| 2026-11-23 | Storage policies with a real signed-in user | Own-folder only, no SVG, 2 MB cap, owner delete. All as designed. |
+| 2026-11-23 | Dev-server run | Found a dev-only hang on a no-JS bound-action submit. Production is unaffected (documented). |
+| — | Real email delivery, the in-browser avatar upload UI | UNTESTED. This needs your manual check. |
 
 ## Subagent activity
 
-- `qa-security-reviewer` (Sonnet): one static migration review. Every finding was fixed or documented as an accepted limitation in SECURITY.md (read receipts, the bulk-accept error code, the time-based rate limiting still to come). Nothing is unresolved.
+- `qa-security-reviewer` (Sonnet), Phase 3 code review: 0 critical, 0 high, 5 medium and 9 low findings. 13 are fixed. 1 was incorrect (it assumed admin flags were still on `profiles`). Nothing is unresolved.
 
-## Next steps (Phase 3)
+## Next steps
 
-1. Set the dev project's auth settings: confirm email on, minimum password 8, Site URL and redirect URLs for localhost.
-2. Signup (privacy consent and age confirmation), email verification callback, login, logout, forgot and reset password, protected routes.
-3. Onboarding (username, university, program), profile editing, avatar upload, teach and learn skills, interests, discoverable toggle, account deletion.
+1. Your manual signup check, which closes Phase 3.
+2. Phase 4, the course marketplace: create, edit and delete courses; browse, search and filter by university, price, category and level; course details; free enrollment and paid enrollment requests, with owner approval.
 
 ## Blockers
 
-None.
+- Custom SMTP provider: needed before public signups. Not needed for Phase 4 development.

@@ -20,6 +20,14 @@ describe("parsePublicEnv", () => {
     );
   });
 
+  it("requires the site URL in production", () => {
+    expect(() => parsePublicEnv(valid, { production: true })).toThrow(/NEXT_PUBLIC_SITE_URL: required in production/);
+    expect(
+      parsePublicEnv({ ...valid, NEXT_PUBLIC_SITE_URL: "https://dabashare.example" }, { production: true })
+        .NEXT_PUBLIC_SITE_URL,
+    ).toBe("https://dabashare.example");
+  });
+
   it("rejects a URL that is not a URL", () => {
     expect(() => parsePublicEnv({ ...valid, NEXT_PUBLIC_SUPABASE_URL: "abcd" })).toThrow(
       /NEXT_PUBLIC_SUPABASE_URL/,

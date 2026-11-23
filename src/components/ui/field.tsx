@@ -1,9 +1,4 @@
-import type {
-  InputHTMLAttributes,
-  ReactNode,
-  SelectHTMLAttributes,
-  TextareaHTMLAttributes,
-} from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 const control =
@@ -41,14 +36,14 @@ export function Field({ label, htmlFor, error, hint, children }: FieldProps) {
   );
 }
 
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
+export function Input({ className, ...props }: ComponentProps<"input">) {
   return <input className={cn(control, className)} {...props} />;
 }
 
-export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
   return <textarea className={cn(control, "min-h-24 resize-y", className)} {...props} />;
 }
 
-export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
+export function Select({ className, ...props }: ComponentProps<"select">) {
   return <select className={cn(control, "appearance-auto", className)} {...props} />;
 }

@@ -52,6 +52,10 @@ docs/                  project documentation
 | A9 | Paid courses: the price is shown and enrollment is a request the owner accepts. No payment handling. | Payment collection is deferred until legal and age requirements are evaluated (your requirement). |
 | A10 | Webinars use host-provided meeting links (Meet, Zoom, Jitsi), not built-in video | Built-in video would need paid media infrastructure. |
 | A11 | Signup is open to any email with a self-declared university | Many Davao students use personal email addresses. Domain verification can be added later. |
+| A12 | Members must confirm they are 18 or older | Keeps minors off a platform with open messaging, and avoids parental-consent handling under the Data Privacy Act. Revisit if senior-high or 17-year-old freshmen need access. |
+| A13 | Auth emails use Supabase's default templates (PKCE `?code=` links) for now | The free tier rejects custom templates without custom SMTP. `/auth/confirm` supports both `?code=` and `?token_hash=`, and the branded templates in `supabase/templates/` are ready for when SMTP is set up. |
+| A14 | The server Supabase client calls `connection()`, and signed-in pages set `instant = false` | Session data must never be prerendered. supabase-js reads the clock (token expiry), which Cache Components forbids during prerendering. Per-user pages block on the server and show `loading.tsx` instead of an instant static shell. |
+| A15 | Avatars are resized in the browser to a 512px WebP before upload | It keeps uploads under 2 MB on mobile data, and image transformations aren't available on the free tier. |
 
 ## Dependencies
 

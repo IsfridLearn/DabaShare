@@ -736,6 +736,7 @@ export type Database = {
         }
         Returns: number
       }
+      delete_my_account: { Args: never; Returns: undefined }
       start_direct_conversation: { Args: { other_id: string }; Returns: string }
     }
     Enums: {

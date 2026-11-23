@@ -1,8 +1,9 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
+import { buttonClasses } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
 
 // Ported from the prototype's login page (prototype/Main.html, "login-left").
-// Sign-in and sign-up actions are added in Phase 3.
 export default function HomePage() {
   return (
     <div className="relative flex-1 overflow-hidden bg-linear-135 from-[#f0f4ff] via-[#fafbff] to-[#f5f0ff]">
@@ -25,6 +26,14 @@ export default function HomePage() {
           Connect with students across Davao City universities. Exchange skills, find tutors, and
           build a collaborative learning community.
         </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/signup" className={buttonClasses({ size: "lg" })}>
+            Create your account →
+          </Link>
+          <Link href="/login" className={buttonClasses({ variant: "outline", size: "lg" })}>
+            Sign in
+          </Link>
+        </div>
 
         <ul className="mt-10 flex flex-col gap-6">
           <Feature

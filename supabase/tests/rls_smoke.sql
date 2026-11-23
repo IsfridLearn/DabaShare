@@ -349,6 +349,54 @@ begin
     r := r || ('PASS cancelled session is closed (' || sqlerrm || ')');
   end;
 
+  -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
+  perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
+  begin
+    update public.profiles set onboarded_at = now() where id = c;
+    r := r || 'FAIL onboarding without username allowed'::text;
+  exception when others then
+    r := r || ('PASS onboarding needs username + university (' || sqlerrm || ')');
+  end;
+  begin
+    update public.profiles set username = (select username from public.profiles where id = d) where id = c;
+    r := r || 'FAIL duplicate username allowed'::text;
+  exception when others then
+    r := r || ('PASS usernames are unique (' || sqlerrm || ')');
+  end;
+  update public.profiles
+  set username = 'rls_carol', university_id = 1, program = 'BS Nursing', onboarded_at = now()
+  where id = c;
+  get diagnostics n = row_count;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' C completes onboarding');
+
+  insert into public.profile_interests (profile_id, category_id) values (c, 1), (c, 2);
+  begin
+    insert into public.profile_interests (profile_id, category_id) values (d, 3);
+    r := r || 'FAIL C can add interests to D'::text;
+  exception when others then
+    r := r || ('PASS C cannot add interests to D (' || sqlerrm || ')');
+  end;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.profile_interests where profile_id = c;
+  r := r || (case when n = 2 then 'PASS' else 'FAIL' end || ' D sees C''s interests (' || n || ')');
+  delete from public.profile_interests where profile_id = c;
+  get diagnostics n = row_count;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' D cannot delete C''s interests');
+  delete from public.student_skills where profile_id = a;
+  get diagnostics n = row_count;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' D cannot delete A''s skills');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  perform public.delete_my_account();
+  perform set_config('role', admin_role, true);
+  select count(*) into n from auth.users where id in (a, b, c, d, e);
+  r := r || (case when n = 4 then 'PASS' else 'FAIL' end || ' delete_my_account removes only the caller (' || n || ' left)');
+  select count(*) into n from public.profiles where id = e;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' deleted user''s profile cascades');
+  select count(*) into n from private.accounts where profile_id = e;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' deleted user''s private account row cascades');
+
   -- ── Result (always roll back) ──────────────────────────────────────────
   perform set_config('role', admin_role, true);
   select count(*) filter (where x like 'PASS%'), count(*) filter (where x like 'FAIL%')

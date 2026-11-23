@@ -6,8 +6,12 @@ Status key: **Done** means it works end to end and was tested. **Built** means t
 |---|---|---|---|
 | Foundation | Landing page | Built | 2 |
 | Foundation | Dev status page (`/status`) | Built | 2 |
-| Auth | Register, verify email, log in and out, reset password, session persistence, protected routes | Planned | 3 |
-| Profiles | Onboarding, profile edit, avatar, teach/learn skills, interests, privacy (discoverable) | DB only | 3 |
+| Auth | Register (age and consent), log in and out, session persistence, protected routes, guest-only pages | Done (E2E on a production build) | 3 |
+| Auth | Email confirmation and password-reset emails | Built. Link handling is tested; **real email delivery is UNTESTED**, because the built-in sender only delivers to org members (see SECURITY.md). | 3 |
+| Profiles | Onboarding, profile edit, teach and learn skills (canonical autocomplete), interests, public profile `/u/<username>` | Done (E2E) | 3 |
+| Profiles | Avatar upload (browser-resized WebP), remove photo | Built. Storage rules tested with a real user; **the browser upload UI is UNTESTED**. | 3 |
+| Settings | Discoverable toggle, change password, delete account | Done (E2E) | 3 |
+| Legal | Privacy notice page (draft, needs review) | Built | 3 |
 | Courses | Create, edit and delete; browse, search and filter (university, price, category, level); details | DB only | 4 |
 | Courses | Enroll (free) or request enrollment (paid), owner accepts or declines | DB only | 4 |
 | Matching | Skill and interest based suggestions with reasons, public profiles, "Message" button | Planned | 5 |
