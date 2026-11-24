@@ -1,46 +1,42 @@
+import { Check, Users } from "lucide-react";
 import Link from "next/link";
-import { MatchCard } from "@/components/matching/match-card";
+import { MatchRow } from "@/components/matching/match-card";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Chip, PageHeader, Pagination, RowList } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
-import { cn } from "@/lib/cn";
+import { getFollowingIds } from "@/lib/feed/queries";
 import { MATCH_MODES, MATCH_PAGE_SIZE, matchesHref, parseMatchFilters } from "@/lib/matching/filters";
 import { getMatches, getMyMatchingInputs } from "@/lib/matching/queries";
 
 // Per-user content: navigation waits for the server (loading.tsx shows meanwhile).
 export const instant = false;
 
-export const metadata = { title: "Your matches" };
-
-const pill = (selected: boolean) =>
-  cn(
-    "rounded-full border px-3.5 py-1 text-sm font-medium transition",
-    selected ? "border-brand bg-brand text-white" : "border-gray-200 bg-surface text-gray-600 hover:border-brand hover:text-brand-ink",
-  );
+export const metadata = { title: "People" };
 
 export default async function MatchesPage({ searchParams }: PageProps<"/matches">) {
   const me = await requireOnboardedProfile();
   const filters = parseMatchFilters(await searchParams);
-  const [{ matches, total }, inputs] = await Promise.all([getMatches(filters), getMyMatchingInputs(me.id)]);
-  const pages = Math.ceil(total / MATCH_PAGE_SIZE);
+  const [{ matches, total }, inputs, following] = await Promise.all([
+    getMatches(filters),
+    getMyMatchingInputs(me.id),
+    getFollowingIds(me.id),
+  ]);
   const noInputs = inputs.teach + inputs.learn + inputs.interests === 0;
   const filtered = Boolean(filters.mode || filters.sameUni);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">Your matches</h1>
-        <p className="mt-1.5 max-w-2xl text-gray-600">
-          Students who can teach what you want to learn, and want to learn what you can teach. Skill swaps, where you
-          can help each other, come first.
-        </p>
-      </div>
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+      <PageHeader
+        title="People"
+        description="Students who can teach what you want to learn, and want to learn what you can teach. Skill swaps, where you can help each other, come first."
+      />
 
       {!noInputs && (inputs.teach === 0 || inputs.learn === 0) && (
         <Alert tone="info">
           Add {inputs.teach === 0 ? "skills you can teach" : "skills you want to learn"} to{" "}
-          <Link href="/profile" className="font-semibold underline">
+          <Link href="/profile#skills" className="font-medium underline underline-offset-2">
             your profile
           </Link>{" "}
           to find skill swaps.
@@ -49,85 +45,65 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
 
       <nav aria-label="Filter matches" className="flex flex-wrap items-center gap-2">
         {MATCH_MODES.map((m) => (
-          <Link
-            key={m.label}
-            href={matchesHref({ ...filters, mode: m.value, page: 1 })}
-            aria-current={filters.mode === m.value ? "true" : undefined}
-            className={pill(filters.mode === m.value)}
-          >
+          <Chip key={m.label} href={matchesHref({ ...filters, mode: m.value, page: 1 })} active={filters.mode === m.value}>
             {m.label}
-          </Link>
+          </Chip>
         ))}
-        <Link
-          href={matchesHref({ ...filters, sameUni: !filters.sameUni, page: 1 })}
-          aria-pressed={filters.sameUni}
-          className={pill(filters.sameUni)}
-        >
-          {filters.sameUni ? "✓ " : ""}My university only
-        </Link>
+        <span aria-hidden="true" className="mx-1 h-5 w-px bg-line-strong" />
+        <Chip href={matchesHref({ ...filters, sameUni: !filters.sameUni, page: 1 })} active={filters.sameUni}>
+          {filters.sameUni && <Check className="size-3.5" aria-hidden="true" />}
+          My university only
+        </Chip>
+        {!noInputs && matches.length > 0 && (
+          <p className="text-small text-fg-subtle sm:ml-auto" aria-live="polite">
+            {total === 1 ? "1 match" : `${total} matches`}
+          </p>
+        )}
       </nav>
 
       {noInputs ? (
         <EmptyState
+          icon={<Users className="size-5" />}
           title="Tell us what you know and what you want to learn"
           description="Matches are based on your skills and interests. Add a few to your profile and come back."
           action={
-            <Link href="/profile" className={buttonClasses()}>
+            <Link href="/profile#skills" className={buttonClasses()}>
               Add skills
             </Link>
           }
         />
       ) : matches.length ? (
-        <>
-          <p className="text-sm text-gray-600" aria-live="polite">
-            {total === 1 ? "1 match" : `${total} matches`}
-          </p>
-          <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {matches.map((match) => (
-              <li key={match.profile_id}>
-                <MatchCard match={match} />
-              </li>
-            ))}
-          </ul>
-        </>
+        <RowList label="Matches">
+          {matches.map((match) => (
+            <li key={match.profile_id}>
+              <MatchRow match={match} following={following.has(match.profile_id)} />
+            </li>
+          ))}
+        </RowList>
       ) : filtered ? (
         <EmptyState
+          icon={<Users className="size-5" />}
           title="No matches with these filters"
           action={
-            <Link href="/matches" className={buttonClasses({ variant: "outline" })}>
+            <Link href="/matches" className={buttonClasses({ variant: "secondary" })}>
               Show all matches
             </Link>
           }
         />
       ) : (
         <EmptyState
+          icon={<Users className="size-5" />}
           title="No matches yet"
           description="As more students join and add skills, matches will show up here. Adding more skills and interests helps."
           action={
-            <Link href="/profile" className={buttonClasses({ variant: "outline" })}>
+            <Link href="/profile#skills" className={buttonClasses({ variant: "secondary" })}>
               Edit your skills
             </Link>
           }
         />
       )}
 
-      {pages > 1 && (
-        <nav aria-label="Pages" className="flex items-center justify-center gap-3">
-          {filters.page > 1 && (
-            <Link href={matchesHref({ ...filters, page: filters.page - 1 })} className={buttonClasses({ variant: "outline", size: "sm" })}>
-              ← Previous
-            </Link>
-          )}
-          <span className="text-sm text-gray-600">
-            Page {filters.page} of {pages}
-          </span>
-          {filters.page < pages && (
-            <Link href={matchesHref({ ...filters, page: filters.page + 1 })} className={buttonClasses({ variant: "outline", size: "sm" })}>
-              Next →
-            </Link>
-          )}
-        </nav>
-      )}
+      <Pagination page={filters.page} pages={Math.ceil(total / MATCH_PAGE_SIZE)} hrefFor={(page) => matchesHref({ ...filters, page })} />
     </div>
   );
 }

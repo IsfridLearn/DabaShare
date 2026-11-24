@@ -14,11 +14,11 @@ export function InterestsForm({ categories, selected }: { categories: Category[]
     <form action={action} className="flex flex-col gap-4">
       <fieldset>
         <legend className="sr-only">Learning interests</legend>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {categories.map((c) => (
             <label
               key={c.id}
-              className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-control border border-gray-200 px-3 py-2 text-sm leading-snug hover:bg-gray-50 has-checked:border-brand has-checked:bg-brand-soft"
+              className="flex min-h-10 cursor-pointer items-center gap-2.5 rounded-control border border-line-strong bg-surface px-3 py-2 text-small leading-snug text-fg transition-colors duration-150 hover:bg-subtle has-checked:border-brand has-checked:bg-brand-soft"
             >
               <input
                 type="checkbox"
@@ -34,7 +34,7 @@ export function InterestsForm({ categories, selected }: { categories: Category[]
       </fieldset>
       <FormMessage state={state} />
       <div>
-        <Button type="submit" variant="outline" disabled={pending}>
+        <Button type="submit" variant="secondary" loading={pending}>
           {pending ? "Saving…" : "Save interests"}
         </Button>
       </div>

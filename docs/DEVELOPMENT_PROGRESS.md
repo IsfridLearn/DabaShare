@@ -25,6 +25,14 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 
 ## Log
 
+### 2026-11-30 — Design refresh, Phase 4 (core screens), on branch `design-refresh`
+
+- Every signed-in screen now uses the design system v2 (details in DESIGN_AUDIT.md "Phase 4 result"). The old `Tag` component and the course-only pagination are removed.
+- New shared pieces: `BackLink`, `Properties`, `PanelSection`, `RowList`, `MessagesFrame`, and a quieter `Alert` with an icon.
+- New pure helpers `sessionDay`, `clockRange` and `groupByDay` (Philippine-time day grouping), with unit tests.
+- No database or server-action changes.
+- Tested: `npm run check` (101 unit tests), `npm run build`, and the full E2E suite (158 passed, 0 failed, self-cleaned). Screenshots: UNTESTED this phase (skipped at the owner's request).
+
 ### 2026-11-29 — Design refresh, Phase 3 (auth screens), on branch `design-refresh`
 
 - Sign in, create account, forgot password, new password and check email now share a split editorial layout with no cards or gradients (details in DESIGN_AUDIT.md "Phase 3 result").

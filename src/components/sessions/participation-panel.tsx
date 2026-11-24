@@ -1,11 +1,12 @@
 "use client";
 
+import { ExternalLink } from "lucide-react";
 import { useActionState } from "react";
 import { joinSession, respondToSession } from "@/lib/sessions/actions";
 import type { ParticipantStatus, SessionPhase } from "@/lib/sessions/validation";
 import { initialFormState } from "@/lib/forms";
 import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { FormMessage } from "@/components/ui/form-message";
 
 export function ParticipationPanel({
@@ -39,12 +40,13 @@ export function ParticipationPanel({
             href={meetingUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center rounded-control bg-brand px-5 py-3 font-display font-semibold text-white hover:bg-brand-dark"
+            className={buttonClasses({ size: "lg", fullWidth: true })}
           >
-            {phase === "live" ? "Join the meeting now" : "Open meeting link"} ↗
+            {phase === "live" ? "Join the meeting now" : "Open meeting link"}
+            <ExternalLink className="size-4" aria-hidden="true" />
           </a>
         ) : (
-          <p className="text-sm text-gray-600">The host hasn&apos;t added a meeting link yet.</p>
+          <p className="text-small text-fg-muted">The host hasn&apos;t added a meeting link yet.</p>
         )}
         <form action={respondToSession.bind(null, sessionId, "cancelled")}>
           <Button type="submit" variant="ghost" size="sm">
@@ -66,12 +68,12 @@ export function ParticipationPanel({
             </Button>
           </form>
           <form action={respondToSession.bind(null, sessionId, "declined")}>
-            <Button type="submit" variant="outline">
+            <Button type="submit" variant="secondary">
               Decline
             </Button>
           </form>
         </div>
-        {full && <p className="text-sm text-gray-500">The session is full right now.</p>}
+        {full && <p className="text-small text-fg-subtle">The session is full right now.</p>}
       </div>
     );
   }
@@ -99,10 +101,10 @@ export function ParticipationPanel({
   return (
     <form action={join} className="flex flex-col gap-3">
       <FormMessage state={state} />
-      <Button type="submit" size="lg" fullWidth disabled={pending}>
+      <Button type="submit" size="lg" fullWidth loading={pending}>
         {pending ? "Joining…" : requiresApproval ? "Request to join" : "Join session"}
       </Button>
-      {requiresApproval && <p className="text-sm text-gray-500">The host approves who joins.</p>}
+      {requiresApproval && <p className="text-small text-fg-subtle">The host approves who joins.</p>}
     </form>
   );
 }

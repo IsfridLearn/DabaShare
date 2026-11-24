@@ -11,8 +11,8 @@ export default function ErrorBoundary({ error, retry }: { error: unknown; retry:
 
   return (
     <main className="mx-auto flex max-w-md flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center">
-      <h1 className="text-2xl font-bold">Something went wrong</h1>
-      <p className="text-gray-600">
+      <h1 className="text-title">Something went wrong</h1>
+      <p className="text-fg-muted">
         We couldn&apos;t load this page. Check your connection and try again.
       </p>
       <Button onClick={() => retry()}>Try again</Button>

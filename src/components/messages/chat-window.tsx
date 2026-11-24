@@ -7,7 +7,9 @@ import { dayKey, formatClock, formatDayLabel, MESSAGE_MAX } from "@/lib/messages
 import type { ChatMessage } from "@/lib/messages/queries";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/cn";
+import { ArrowDown, SendHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { controlClasses } from "@/components/ui/field";
 import { FormMessage } from "@/components/ui/form-message";
 
 const initialSend: SendState = { status: "idle" };
@@ -152,30 +154,30 @@ export function ChatWindow({
           </div>
         )}
         {!messages.length && (
-          <p className="py-10 text-center text-sm text-gray-600">No messages yet. Say hello to {otherName}!</p>
+          <p className="py-10 text-center text-small text-fg-muted">No messages yet. Say hello to {otherName}!</p>
         )}
-        <ol className="flex flex-col gap-2">
+        <ol className="flex flex-col gap-1.5">
           {messages.map((m, i) => {
             const mine = m.sender_id === meId;
             const newDay = i === 0 || dayKey(new Date(messages[i - 1].created_at)) !== dayKey(new Date(m.created_at));
             return (
               <li key={m.id} className="flex flex-col">
                 {newDay && (
-                  <span className="my-3 self-center rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                  <span className="my-4 flex items-center gap-3 text-caption font-medium text-fg-subtle before:h-px before:flex-1 before:bg-line after:h-px after:flex-1 after:bg-line">
                     {formatDayLabel(m.created_at)}
                   </span>
                 )}
                 <div className={cn("group flex max-w-[85%] flex-col sm:max-w-[70%]", mine ? "items-end self-end" : "items-start self-start")}>
                   <p
                     className={cn(
-                      "rounded-2xl px-4 py-2 text-[0.95rem] leading-relaxed break-words whitespace-pre-wrap",
-                      mine ? "rounded-br-md bg-brand text-white" : "rounded-bl-md bg-gray-100 text-gray-800",
+                      "rounded-[14px] px-3.5 py-2 text-body leading-relaxed break-words whitespace-pre-wrap",
+                      mine ? "rounded-br-[4px] bg-brand text-white" : "rounded-bl-[4px] bg-subtle text-fg",
                     )}
                   >
                     <span className="sr-only">{mine ? "You" : otherName}: </span>
                     {m.body}
                   </p>
-                  <span className="mt-0.5 flex items-center gap-1 px-1 text-xs text-gray-600">
+                  <span className="mt-0.5 flex items-center gap-1 px-1 text-caption text-fg-subtle">
                     <time dateTime={m.created_at}>{formatClock(m.created_at)}</time>
                     {!mine && (
                       <Link
@@ -198,14 +200,15 @@ export function ChatWindow({
         <button
           type="button"
           onClick={scrollToBottom}
-          className="absolute bottom-28 left-1/2 -translate-x-1/2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-card-lg"
+          className="absolute bottom-24 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-fg px-3.5 py-1.5 text-small font-medium text-canvas shadow-overlay"
         >
-          {unseen === 1 ? "1 new message" : `${unseen} new messages`} ↓
+          {unseen === 1 ? "1 new message" : `${unseen} new messages`}
+          <ArrowDown className="size-3.5" aria-hidden="true" />
         </button>
       )}
 
       {canSend ? (
-        <form ref={formRef} action={action} className="flex flex-col gap-2 border-t border-gray-200 bg-surface p-3" noValidate>
+        <form ref={formRef} action={action} className="flex flex-col gap-1.5 border-t border-line bg-surface p-3" noValidate>
           {state.status === "error" && <FormMessage state={state} />}
           <div className="flex items-end gap-2">
             <label htmlFor="body" className="sr-only">
@@ -227,22 +230,24 @@ export function ChatWindow({
                   if (!pending) formRef.current?.requestSubmit();
                 }
               }}
-              className="field-sizing-content max-h-40 min-h-11 flex-1 resize-none rounded-control border-[1.5px] border-gray-200 px-3.5 py-2.5 text-base focus:border-brand focus:ring-3 focus:ring-brand/15 focus:outline-none md:text-[0.95rem]"
+              className={cn(controlClasses, "field-sizing-content max-h-40 min-h-10 flex-1 resize-none")}
             />
             <Button
               type="submit"
               disabled={pending}
-              className="min-w-22"
+              className="h-10"
+              loading={pending}
+              icon={<SendHorizontal className="size-4" aria-hidden="true" />}
               // Keep focus (and the phone keyboard) in the composer.
               onMouseDown={(e) => e.preventDefault()}
             >
-              {pending ? "Sending…" : "Send"}
+              <span className="max-sm:sr-only">{pending ? "Sending…" : "Send"}</span>
             </Button>
           </div>
-          <p className="hidden text-xs text-gray-600 [@media(pointer:fine)]:block">Enter to send · Shift+Enter for a new line</p>
+          <p className="hidden text-caption text-fg-subtle [@media(pointer:fine)]:block">Enter to send · Shift+Enter for a new line</p>
         </form>
       ) : (
-        <p className="border-t border-gray-200 p-4 text-center text-sm text-gray-600">
+        <p className="border-t border-line p-4 text-center text-small text-fg-muted">
           {unavailableReason ?? "Messaging isn't available in this conversation."}
         </p>
       )}

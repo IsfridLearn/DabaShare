@@ -20,15 +20,15 @@ export function DiscoverableForm({ discoverable }: { discoverable: boolean }) {
           className="mt-1 size-4 shrink-0 accent-brand"
         />
         <span>
-          <span className="font-medium text-gray-900">Show me in matches and search</span>
-          <span className="block text-sm text-gray-600">
+          <span className="font-medium text-fg">Show me in matches and search</span>
+          <span className="mt-0.5 block text-small text-fg-muted">
             When off, you won&apos;t be suggested to other students. People you already message, and the
             courses and sessions you publish, stay visible.
           </span>
         </span>
       </label>
       <div>
-        <Button type="submit" variant="outline" disabled={pending}>
+        <Button type="submit" variant="secondary" loading={pending}>
           {pending ? "Saving…" : "Save privacy setting"}
         </Button>
       </div>
@@ -41,7 +41,7 @@ export function DeleteAccountForm() {
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
       <FormMessage state={state} />
-      <p className="text-sm text-gray-600">
+      <p className="text-small text-fg-muted">
         This permanently deletes your profile, photo, skills, courses, enrollments, messages and study
         sessions. It can&apos;t be undone.
       </p>
@@ -56,7 +56,7 @@ export function DeleteAccountForm() {
         />
       </Field>
       <div>
-        <Button type="submit" variant="danger" disabled={pending}>
+        <Button type="submit" variant="danger" loading={pending}>
           {pending ? "Deleting…" : "Delete my account"}
         </Button>
       </div>

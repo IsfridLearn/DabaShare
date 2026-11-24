@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ReportForm } from "@/components/safety/report-form";
-import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { isUuid } from "@/lib/courses/queries";
 import { REPORT_TARGETS, TARGET_LABEL, type ReportTarget } from "@/lib/safety/options";
@@ -45,18 +45,16 @@ export default async function ReportPage({ searchParams }: PageProps<"/report">)
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">Report a {TARGET_LABEL[target]}</h1>
-        <p className="mt-1.5 text-gray-600">
-          Reports are private. The student isn&apos;t told who reported them. Our team reviews every report.
-        </p>
-      </div>
-      <Card className="flex flex-col gap-5">
-        <blockquote className="rounded-control border-l-4 border-gray-300 bg-gray-50 px-4 py-3 text-sm whitespace-pre-line text-gray-700">
+      <PageHeader
+        title={`Report a ${TARGET_LABEL[target]}`}
+        description="Reports are private. The student isn't told who reported them. Our team reviews every report."
+      />
+      <div className="flex flex-col gap-6">
+        <blockquote className="border-l-2 border-line-strong py-1 pl-4 text-small break-words whitespace-pre-line text-fg-muted">
           {summary.length > 300 ? `${summary.slice(0, 299)}…` : summary}
         </blockquote>
         <ReportForm targetType={target} targetId={id} />
-      </Card>
+      </div>
     </div>
   );
 }

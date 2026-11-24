@@ -9,16 +9,20 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
 import { errorProps, fieldError, FormMessage } from "@/components/ui/form-message";
+import { RowList } from "@/components/ui/primitives";
+
+const emptyBox = "rounded-card border border-dashed border-line-strong px-4 py-4 text-small text-fg-subtle";
+const heading = "mb-2 text-small font-semibold text-fg";
 
 function Person({ p }: { p: Participant }) {
-  if (!p.person) return <span className="text-sm text-gray-500">Student unavailable</span>;
+  if (!p.person) return <span className="text-small text-fg-subtle">Student unavailable</span>;
   return (
     <span className="flex min-w-0 items-center gap-2.5">
-      <Avatar name={p.person.display_name} path={p.person.avatar_path} size={32} />
-      <Link href={`/u/${p.person.username}`} className="truncate font-medium text-gray-900 hover:text-brand-ink">
+      <Avatar name={p.person.display_name} path={p.person.avatar_path} size={28} />
+      <Link href={`/u/${p.person.username}`} className="truncate font-medium text-fg hover:underline">
         {p.person.display_name}
       </Link>
-      {p.person.university && <span className="shrink-0 text-sm text-gray-500">{p.person.university.short_name}</span>}
+      {p.person.university && <span className="shrink-0 text-small text-fg-subtle">{p.person.university.short_name}</span>}
     </span>
   );
 }
@@ -31,11 +35,11 @@ export function ParticipantList({ sessionId, participants }: { sessionId: string
   return (
     <div className="flex flex-col gap-5">
       <section>
-        <h3 className="mb-2 text-base font-semibold">Requests ({requests.length})</h3>
+        <h3 className={heading}>Requests ({requests.length})</h3>
         {requests.length ? (
-          <ul className="divide-y divide-gray-100">
+          <RowList>
             {requests.map((p) => (
-              <li key={p.profile_id} className="flex flex-wrap items-center gap-2 py-2.5">
+              <li key={p.profile_id} className="flex flex-wrap items-center gap-2 px-4 py-2.5">
                 <Person p={p} />
                 <div className="ml-auto flex gap-2">
                   <form action={decideParticipant.bind(null, sessionId, p.profile_id, "accepted")}>
@@ -44,24 +48,24 @@ export function ParticipantList({ sessionId, participants }: { sessionId: string
                     </Button>
                   </form>
                   <form action={decideParticipant.bind(null, sessionId, p.profile_id, "declined")}>
-                    <Button type="submit" size="sm" variant="outline">
+                    <Button type="submit" size="sm" variant="secondary">
                       Decline
                     </Button>
                   </form>
                 </div>
               </li>
             ))}
-          </ul>
+          </RowList>
         ) : (
-          <p className="text-sm text-gray-500">No pending requests.</p>
+          <p className={emptyBox}>No pending requests.</p>
         )}
       </section>
       <section>
-        <h3 className="mb-2 text-base font-semibold">Going ({going.length})</h3>
+        <h3 className={heading}>Going ({going.length})</h3>
         {going.length ? (
-          <ul className="divide-y divide-gray-100">
+          <RowList>
             {going.map((p) => (
-              <li key={p.profile_id} className="flex items-center gap-2 py-2.5">
+              <li key={p.profile_id} className="flex items-center gap-2 px-4 py-2.5">
                 <Person p={p} />
                 <form action={decideParticipant.bind(null, sessionId, p.profile_id, "declined")} className="ml-auto">
                   <Button type="submit" size="sm" variant="ghost">
@@ -70,21 +74,21 @@ export function ParticipantList({ sessionId, participants }: { sessionId: string
                 </form>
               </li>
             ))}
-          </ul>
+          </RowList>
         ) : (
-          <p className="text-sm text-gray-500">Nobody has joined yet.</p>
+          <p className={emptyBox}>Nobody has joined yet.</p>
         )}
       </section>
       {invited.length > 0 && (
         <section>
-          <h3 className="mb-2 text-base font-semibold">Invited, waiting for an answer ({invited.length})</h3>
-          <ul className="divide-y divide-gray-100">
+          <h3 className={heading}>Invited, waiting for an answer ({invited.length})</h3>
+          <RowList>
             {invited.map((p) => (
-              <li key={p.profile_id} className="py-2.5">
+              <li key={p.profile_id} className="px-4 py-2.5">
                 <Person p={p} />
               </li>
             ))}
-          </ul>
+          </RowList>
         </section>
       )}
     </div>
@@ -96,7 +100,7 @@ export function InviteForm({ sessionId }: { sessionId: string }) {
   return (
     <form action={action} className="flex flex-col gap-2" noValidate>
       <FormMessage state={state} />
-      <label htmlFor="invite-username" className="text-sm font-medium text-gray-700">
+      <label htmlFor="invite-username" className="text-small font-medium text-fg">
         Invite a student by username
       </label>
       <div className="flex gap-2">
@@ -109,12 +113,12 @@ export function InviteForm({ sessionId }: { sessionId: string }) {
           {...errorProps(state, "username")}
           aria-describedby={fieldError(state, "username") ? "username-message" : undefined}
         />
-        <Button type="submit" variant="outline" disabled={pending}>
+        <Button type="submit" variant="secondary" loading={pending}>
           {pending ? "Inviting…" : "Invite"}
         </Button>
       </div>
       {fieldError(state, "username") && (
-        <p id="username-message" className="text-sm text-danger-ink">
+        <p id="username-message" className="text-small text-danger-ink">
           {fieldError(state, "username")}
         </p>
       )}
@@ -127,12 +131,12 @@ export function CancelSessionForm({ sessionId }: { sessionId: string }) {
   return (
     <form action={action} className="flex flex-col gap-3">
       <FormMessage state={state} />
-      <label className="flex items-start gap-2.5 text-sm text-gray-700">
+      <label className="flex items-start gap-2.5 text-small text-fg-muted">
         <input type="checkbox" name="confirm" className="mt-0.5 size-4 accent-danger" />
         Cancel this session. Everyone who joined, requested or was invited gets a notification.
       </label>
       <div>
-        <Button type="submit" variant="danger" size="sm" disabled={pending}>
+        <Button type="submit" variant="danger" size="sm" loading={pending}>
           {pending ? "Cancelling…" : "Cancel session"}
         </Button>
       </div>

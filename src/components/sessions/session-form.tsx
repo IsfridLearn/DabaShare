@@ -101,7 +101,7 @@ export function SessionForm({
         <Field label="Max participants" htmlFor="capacity" error={fieldError(state, "capacity")}>
           <Input id="capacity" name="capacity" type="number" min={1} max={500} inputMode="numeric" defaultValue={val("capacity")} {...errorProps(state, "capacity")} />
         </Field>
-        <label className="flex items-start gap-2.5 self-end pb-2 text-sm text-gray-700">
+        <label className="flex items-start gap-2.5 self-end pb-2 text-small text-fg-muted">
           <input
             type="checkbox"
             name="requiresApproval"
@@ -109,8 +109,8 @@ export function SessionForm({
             className="mt-0.5 size-4 accent-brand"
           />
           <span>
-            <span className="font-medium text-gray-900">I approve who joins</span>
-            <span className="block text-gray-500">Otherwise anyone can take a free seat.</span>
+            <span className="font-medium text-fg">I approve who joins</span>
+            <span className="block text-fg-subtle">Otherwise anyone can take a free seat.</span>
           </span>
         </label>
       </div>
@@ -130,7 +130,7 @@ export function SessionForm({
 
       <FormMessage state={state} />
       <div>
-        <Button type="submit" size="lg" disabled={pending}>
+        <Button type="submit" size="lg" loading={pending}>
           {pending ? "Saving…" : submitLabel}
         </Button>
       </div>

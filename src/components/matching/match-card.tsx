@@ -1,64 +1,52 @@
 import Link from "next/link";
+import { FollowButton } from "@/components/feed/follow-button";
 import { MessageButton } from "@/components/messages/message-button";
 import { Avatar } from "@/components/ui/avatar";
-import { buttonClasses } from "@/components/ui/button";
-import { Tag } from "@/components/ui/tag";
+import { Badge } from "@/components/ui/primitives";
 import { isSkillSwap, matchReasons } from "@/lib/matching/filters";
 import type { Match } from "@/lib/matching/queries";
 
-export function MatchCard({ match }: { match: Match }) {
+// One person in the People list. The reasons read as sentences, so a match
+// explains itself without a wall of coloured tags.
+export function MatchRow({ match, following }: { match: Match; following: boolean }) {
   const reasons = matchReasons(match);
   const swap = isSkillSwap(match);
+  const meta = [match.program, match.university_short].filter(Boolean).join(" · ");
 
   return (
-    <article className="flex h-full flex-col gap-4 rounded-card border border-gray-200 bg-surface p-5 shadow-card">
-      <header className="flex items-start gap-3">
-        <Avatar name={match.display_name} path={match.avatar_path} size={52} />
+    <article aria-labelledby={`match-${match.profile_id}`} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:gap-4 sm:px-5">
+      <div className="flex min-w-0 flex-1 gap-3">
+        <Link href={`/u/${match.username}`} className="shrink-0 self-start rounded-full" tabIndex={-1} aria-hidden="true">
+          <Avatar name={match.display_name} path={match.avatar_path} size={44} />
+        </Link>
         <div className="min-w-0 flex-1">
-          <h2 className="truncate text-base font-semibold">
-            <Link href={`/u/${match.username}`} className="hover:text-brand-ink">
+          <h2 id={`match-${match.profile_id}`} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-body">
+            <Link href={`/u/${match.username}`} className="font-semibold text-fg hover:underline">
               {match.display_name}
             </Link>
+            {swap && <Badge tone="brand">Skill swap</Badge>}
           </h2>
-          <p className="truncate text-sm text-gray-500">
-            {[match.program, match.university_short].filter(Boolean).join(" · ") || `@${match.username}`}
+          <p className="truncate text-small text-fg-subtle">
+            {meta || `@${match.username}`}
+            {match.published_courses > 0 &&
+              ` · ${match.published_courses} course${match.published_courses === 1 ? "" : "s"}`}
           </p>
-        </div>
-        {swap && (
-          <Tag tone="paid" className="shrink-0 text-xs font-semibold">
-            Skill swap
-          </Tag>
-        )}
-      </header>
-
-      <dl className="flex flex-col gap-3">
-        {reasons.map((reason) => (
-          <div key={reason.label}>
-            <dt className="mb-1.5 text-xs font-semibold tracking-wide text-gray-500 uppercase">{reason.label}</dt>
-            <dd className="flex flex-wrap gap-1.5">
-              {reason.items.map((item) => (
-                <Tag key={item} tone={reason.tone} className="px-2.5 py-0.5 text-xs">
-                  {item}
-                </Tag>
+          {reasons.length > 0 && (
+            <dl className="mt-2 flex flex-col gap-0.5 text-small">
+              {reasons.map((reason) => (
+                <div key={reason.label} className="flex flex-wrap gap-x-1.5">
+                  <dt className={reason.tone === "neutral" ? "text-fg-subtle" : "font-medium text-fg"}>{reason.label}</dt>
+                  <dd className="text-fg-muted">{reason.items.join(", ")}</dd>
+                </div>
               ))}
-            </dd>
-          </div>
-        ))}
-      </dl>
-
-      <footer className="mt-auto flex items-center justify-between gap-3 border-t border-gray-100 pt-3">
-        <span className="text-sm text-gray-500">
-          {match.published_courses > 0
-            ? `${match.published_courses} course${match.published_courses === 1 ? "" : "s"} offered`
-            : "No courses yet"}
-        </span>
-        <div className="flex gap-2">
-          <Link href={`/u/${match.username}`} className={buttonClasses({ variant: "outline", size: "sm" })}>
-            View profile
-          </Link>
-          <MessageButton otherId={match.profile_id} />
+            </dl>
+          )}
         </div>
-      </footer>
+      </div>
+      <div className="flex shrink-0 items-start gap-2 pl-14 sm:pl-0">
+        <FollowButton profileId={match.profile_id} following={following} name={match.display_name} />
+        <MessageButton otherId={match.profile_id} variant="secondary" />
+      </div>
     </article>
   );
 }

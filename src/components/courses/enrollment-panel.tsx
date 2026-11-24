@@ -72,13 +72,13 @@ export function EnrollmentPanel({
           >
             <Textarea id="note" name="note" maxLength={500} rows={3} defaultValue={state.values?.note} {...errorProps(state, "note")} />
           </Field>
-          <p className="text-sm text-gray-600">
+          <p className="text-small text-fg-muted">
             Paid course: if {tutorName} accepts, you arrange the {formatPrice(pricePhp)} payment with them directly.
             DabaShare doesn&apos;t handle payments.
           </p>
         </>
       )}
-      <Button type="submit" size="lg" fullWidth disabled={pending}>
+      <Button type="submit" size="lg" fullWidth loading={pending}>
         {pending ? "Sending…" : free ? "Enroll for free" : `Request to enroll · ${formatPrice(pricePhp)}`}
       </Button>
     </form>

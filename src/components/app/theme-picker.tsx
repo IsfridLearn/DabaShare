@@ -61,7 +61,7 @@ export function ThemePicker() {
         {OPTIONS.map((o) => (
           <label
             key={o.value}
-            className="flex min-h-16 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-control border border-gray-200 px-2 py-2 text-center text-sm hover:bg-gray-50 has-checked:border-brand has-checked:bg-brand-soft"
+            className="flex min-h-16 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-control border border-line-strong bg-surface px-2 py-2 text-center text-small transition-colors duration-150 hover:bg-subtle has-checked:border-brand has-checked:bg-brand-soft has-focus-visible:outline-2 has-focus-visible:outline-brand"
           >
             <input
               type="radio"
@@ -71,12 +71,12 @@ export function ThemePicker() {
               onChange={() => choose(o.value)}
               className="sr-only"
             />
-            <span className="font-semibold text-gray-900">{o.label}</span>
-            <span className="text-xs text-gray-600">{o.hint}</span>
+            <span className="font-medium text-fg">{o.label}</span>
+            <span className="text-caption text-fg-muted">{o.hint}</span>
           </label>
         ))}
       </div>
-      <p className="mt-2 text-xs text-gray-600">Saved on this device.</p>
+      <p className="mt-2 text-caption text-fg-subtle">Saved on this device.</p>
     </fieldset>
   );
 }

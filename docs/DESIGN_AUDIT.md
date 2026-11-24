@@ -114,3 +114,17 @@ Date: 2026-11-28. Scope: the whole frontend (25 routes and 37 components), measu
 - **Passwords:** a show/hide button (`aria-pressed`, `aria-controls`), and on new passwords a live checklist (8+ characters, a letter, a number) that ticks as you type, read as "Done" or "Needed" by screen readers. `PASSWORD_RULES` is unit-tested against the server schema.
 - **Inline validation:** fields are checked when you leave them (empty fields aren't nagged), and a shown error re-checks as you type, so it clears the moment the value is fixed. The server still validates everything.
 - **Loading:** buttons show a spinner and a "Signing in…" / "Creating account…" label and can't be double-submitted.
+
+## Phase 4 result (core screens)
+
+- **Courses:** a page header with "My courses" and "Post a course", a search bar with an icon, price chips, and the result count in one line. Cards are flat (hairline, no lift); price is plain text, not a coloured pill; skills read as a quiet line.
+- **Course and session details:** a document layout. The title is a serif headline, the description is set at reading width, and a sticky side panel holds the price or join action, a Linear-style properties list and the tutor or host. Owner tools (enrollments, participants, invite, cancel) sit below as settings-style sections.
+- **Sessions:** an agenda grouped by day (Philippine time) with a date tile per row, instead of the card grid. "Live now" is a small badge with a pulsing dot (still when reduced motion is on), not an emoji.
+- **People (matches):** rows instead of cards. Each match explains itself in sentences ("Can teach you: Python, React"); a Skill swap badge is the only colour. Follow and Message buttons on every row.
+- **My courses, Notifications, blocked students, enrollment requests:** Linear-style row lists in one bordered container.
+- **Messages:** one full-height two-pane frame for the inbox and the conversation; quieter bubbles, a hairline day divider, the shared input style, and an icon send button.
+- **My profile and Settings:** settings-style sections (title and description on the left, controls on the right) instead of stacked cards. Skills are neutral removable chips.
+- **Public profile:** a page header (photo, serif name, program, follower counts, actions), posts in the main column, and skills, courses and interests in a side column.
+- **Also:** onboarding, report, error and not-found pages, the privacy notice, and the landing page (now editorial, with no gradient or blurred blobs and only real features).
+- **Icons:** lucide icons replace the remaining emoji and hand-drawn SVGs.
+- Next (Phase 5): toasts, route-shaped skeletons, and responsive passes.

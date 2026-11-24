@@ -1,3 +1,4 @@
+import { Flag, Pencil } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EnrollmentPanel } from "@/components/courses/enrollment-panel";
@@ -6,8 +7,7 @@ import { MessageButton } from "@/components/messages/message-button";
 import { Alert } from "@/components/ui/alert";
 import { Avatar } from "@/components/ui/avatar";
 import { buttonClasses } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tag } from "@/components/ui/tag";
+import { BackLink, Badge, Properties } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getCourseDetail, getCourseEnrollments, getMyEnrollment } from "@/lib/courses/queries";
 import { formatPrice, levelLabel, STATUSES } from "@/lib/courses/validation";
@@ -37,90 +37,122 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
   const notice = typeof query.notice === "string" ? NOTICES[query.notice] : undefined;
   const owner = course.owner;
   const statusLabel = STATUSES.find((s) => s.value === course.status)?.label;
+  const free = course.price_php === 0;
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <Link href="/courses" className="text-sm font-medium text-brand-ink hover:underline">
-        ← All courses
-      </Link>
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+      <BackLink href="/courses">All courses</BackLink>
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <Card className="flex flex-col gap-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <Tag tone={course.price_php === 0 ? "free" : "paid"} className="font-semibold">
-              {formatPrice(course.price_php)}
-            </Tag>
-            <Tag>{levelLabel(course.level)}</Tag>
-            {course.category && <Tag>{course.category.name}</Tag>}
-            {course.status !== "published" && <Tag className="bg-amber-100 text-amber-800">{statusLabel}</Tag>}
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        {/* The course reads like a document. */}
+        <article className="flex min-w-0 flex-col">
+          <p className="flex flex-wrap items-center gap-2 text-small text-fg-subtle">
+            {course.category && <span>{course.category.name}</span>}
+            {course.status !== "published" && <Badge tone="warning">{statusLabel}</Badge>}
+          </p>
+          <h1 className="mt-2 text-title break-words sm:text-display">{course.title}</h1>
+          {owner && (
+            <p className="mt-4 flex items-center gap-2 text-small text-fg-muted">
+              <Avatar name={owner.display_name} path={owner.avatar_path} size={24} />
+              <span>
+                Taught by{" "}
+                <Link href={`/u/${owner.username}`} className="font-medium text-fg hover:underline">
+                  {owner.display_name}
+                </Link>
+                {owner.university && <> · {owner.university.short_name}</>}
+              </span>
+            </p>
+          )}
+
+          <div className="mt-8 border-t border-line pt-8">
+            <h2 className="sr-only">About this course</h2>
+            <p className="max-w-[68ch] text-[1rem] leading-7 break-words whitespace-pre-line text-fg">{course.description}</p>
           </div>
-          <h1 className="text-2xl font-bold break-words sm:text-3xl">{course.title}</h1>
-          <p className="leading-relaxed break-words whitespace-pre-line text-gray-700">{course.description}</p>
+
           {course.skills.length > 0 && (
-            <div>
-              <h2 className="mb-2 text-sm font-semibold text-gray-700">Skills you&apos;ll learn</h2>
-              <ul className="flex flex-wrap gap-2">
+            <section className="mt-10">
+              <h2 className="text-heading">Skills you&apos;ll learn</h2>
+              <ul className="mt-3 flex flex-wrap gap-1.5">
                 {course.skills.map((s) => (
                   <li key={s}>
-                    <Tag tone="learn">{s}</Tag>
+                    <Badge className="px-2 py-1 text-small">{s}</Badge>
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
           )}
-        </Card>
+        </article>
 
-        <div className="flex flex-col gap-6">
+        <aside className="flex flex-col gap-6 lg:sticky lg:top-10 lg:self-start" aria-label="Course details">
+          <section className="order-first flex flex-col gap-4 rounded-card border border-line bg-surface p-5">
+            <div>
+              <h2 className="sr-only">{isOwner ? "Your course" : "Enroll"}</h2>
+              <p className={free ? "text-title font-serif text-success-ink" : "text-title font-serif text-fg"}>{formatPrice(course.price_php)}</p>
+              <p className="mt-0.5 text-small text-fg-muted">
+                {free ? "Free to join" : "Paid directly to the tutor"} · {levelLabel(course.level)}
+              </p>
+            </div>
+            {isOwner ? (
+              <Link href={`/courses/${course.id}/edit`} className={buttonClasses({ variant: "secondary", fullWidth: true })}>
+                <Pencil className="size-4" aria-hidden="true" />
+                Edit course
+              </Link>
+            ) : (
+              <EnrollmentPanel
+                courseId={course.id}
+                pricePhp={course.price_php}
+                tutorName={owner?.display_name ?? "The tutor"}
+                enrollment={enrollment}
+              />
+            )}
+          </section>
+
+          <Properties
+            className="px-1"
+            items={[
+              { label: "Level", value: levelLabel(course.level) },
+              ...(course.category ? [{ label: "Category", value: course.category.name }] : []),
+              { label: "Price", value: formatPrice(course.price_php) },
+              ...(isOwner ? [{ label: "Status", value: statusLabel ?? course.status }] : []),
+            ]}
+          />
+
           {owner && (
-            <Card className="flex flex-col gap-3">
-              <h2 className="text-sm font-semibold text-gray-500">Tutor</h2>
-              <Link href={`/u/${owner.username}`} className="flex items-center gap-3 hover:text-brand-ink">
-                <Avatar name={owner.display_name} path={owner.avatar_path} size={48} />
-                <span>
-                  <span className="block font-semibold">{owner.display_name}</span>
-                  {owner.university && <span className="block text-sm text-gray-500">{owner.university.name}</span>}
+            <section className="flex flex-col gap-3 border-t border-line px-1 pt-6">
+              <h2 className="text-small font-semibold text-fg">Tutor</h2>
+              <Link href={`/u/${owner.username}`} className="group flex items-center gap-3">
+                <Avatar name={owner.display_name} path={owner.avatar_path} size={40} />
+                <span className="min-w-0">
+                  <span className="block truncate font-medium text-fg group-hover:underline">{owner.display_name}</span>
+                  {owner.university && <span className="block truncate text-small text-fg-muted">{owner.university.name}</span>}
                 </span>
               </Link>
               {!isOwner && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <MessageButton otherId={owner.id} variant="outline" />
-                  <Link href={`/report?type=course&id=${course.id}`} className="text-sm text-gray-500 hover:text-danger-ink">
+                <div className="flex flex-wrap items-center gap-3">
+                  <MessageButton otherId={owner.id} variant="secondary" size="sm" />
+                  <Link
+                    href={`/report?type=course&id=${course.id}`}
+                    className="inline-flex items-center gap-1.5 text-small text-fg-subtle hover:text-danger-ink"
+                  >
+                    <Flag className="size-3.5" aria-hidden="true" />
                     Report course
                   </Link>
                 </div>
               )}
-            </Card>
+            </section>
           )}
-
-          <Card className="order-first flex flex-col gap-4 lg:order-none">
-            {isOwner ? (
-              <>
-                <h2 className="text-lg font-semibold">Your course</h2>
-                <Link href={`/courses/${course.id}/edit`} className={buttonClasses({ variant: "outline", fullWidth: true })}>
-                  Edit course
-                </Link>
-              </>
-            ) : (
-              <>
-                <h2 className="text-lg font-semibold">Enroll</h2>
-                <EnrollmentPanel
-                  courseId={course.id}
-                  pricePhp={course.price_php}
-                  tutorName={owner?.display_name ?? "The tutor"}
-                  enrollment={enrollment}
-                />
-              </>
-            )}
-          </Card>
-        </div>
+        </aside>
       </div>
 
       {isOwner && (
-        <Card>
-          <h2 className="mb-4 text-lg font-semibold">Enrollments</h2>
+        <section aria-labelledby="enrollments-title" className="mt-4 border-t border-line pt-8">
+          <h2 id="enrollments-title" className="text-heading">
+            Enrollments
+          </h2>
+          <p className="mt-0.5 mb-5 text-small text-fg-muted">Accept requests to give students a place. They get a notification either way.</p>
           <EnrollmentRequests enrollments={enrollments} />
-        </Card>
+        </section>
       )}
     </div>
   );

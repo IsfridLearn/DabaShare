@@ -1,7 +1,8 @@
+import { Search } from "lucide-react";
 import Link from "next/link";
-import { buttonClasses } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
-import { cn } from "@/lib/cn";
+import { Chip } from "@/components/ui/primitives";
 import { coursesHref, LEVELS, type CourseFilters } from "@/lib/courses/validation";
 import type { Category, University } from "@/lib/reference";
 
@@ -11,26 +12,36 @@ export function CourseFiltersBar({
   filters,
   universities,
   categories,
+  total,
 }: {
   filters: CourseFilters;
   universities: University[];
   categories: Category[];
+  total: number;
 }) {
   const priceOptions = [
-    { value: undefined, label: "All" },
+    { value: undefined, label: "Any price" },
     { value: "free" as const, label: "Free" },
     { value: "paid" as const, label: "Paid" },
   ];
   const active = Boolean(filters.q || filters.uni || filters.cat || filters.level || filters.price);
 
   return (
-    <div className="flex flex-col gap-3 rounded-card border border-gray-200 bg-surface p-4 shadow-card">
-      <form action="/courses" method="get" className="grid grid-cols-2 gap-3 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]">
+    <div className="flex flex-col gap-3">
+      <form
+        action="/courses"
+        method="get"
+        role="search"
+        className="grid grid-cols-2 gap-2 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]"
+      >
         {filters.price && <input type="hidden" name="price" value={filters.price} />}
-        <label className="sr-only" htmlFor="q">
-          Search courses or tutors
-        </label>
-        <Input id="q" name="q" type="search" className="col-span-2 md:col-span-1" placeholder="Search courses, skills or tutors…" defaultValue={filters.q} />
+        <div className="relative col-span-2 md:col-span-1">
+          <label className="sr-only" htmlFor="q">
+            Search courses or tutors
+          </label>
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-fg-subtle" aria-hidden="true" />
+          <Input id="q" name="q" type="search" className="pl-9" placeholder="Search courses, skills or tutors" defaultValue={filters.q} />
+        </div>
         <label className="sr-only" htmlFor="uni">
           University
         </label>
@@ -64,35 +75,28 @@ export function CourseFiltersBar({
             </option>
           ))}
         </Select>
-        <button type="submit" className={`${buttonClasses()} md:col-span-1`}>
+        <Button type="submit" className="h-auto min-h-9">
           Search
-        </button>
+        </Button>
       </form>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-gray-500">Price:</span>
-        {priceOptions.map((option) => {
-          const selected = filters.price === option.value;
-          return (
-            <Link
-              key={option.label}
-              href={coursesHref({ ...filters, price: option.value, page: 1 })}
-              aria-current={selected ? "true" : undefined}
-              className={cn(
-                "rounded-full border px-3.5 py-1 text-sm font-medium transition",
-                selected
-                  ? "border-brand bg-brand text-white"
-                  : "border-gray-200 bg-surface text-gray-600 hover:border-brand hover:text-brand-ink",
-              )}
-            >
-              {option.label}
-            </Link>
-          );
-        })}
-        {active && (
-          <Link href="/courses" className="ml-auto text-sm font-medium text-brand-ink hover:underline">
-            Clear filters
-          </Link>
-        )}
+        {priceOptions.map((option) => (
+          <Chip key={option.label} href={coursesHref({ ...filters, price: option.value, page: 1 })} active={filters.price === option.value}>
+            {option.label}
+          </Chip>
+        ))}
+        <p className="text-small text-fg-subtle sm:ml-auto" aria-live="polite">
+          {total === 1 ? "1 course" : `${total} courses`}
+          {active ? " match your filters" : ""}
+          {active && (
+            <>
+              {" · "}
+              <Link href="/courses" className="font-medium text-fg-muted underline-offset-2 hover:text-fg hover:underline">
+                Clear filters
+              </Link>
+            </>
+          )}
+        </p>
       </div>
     </div>
   );

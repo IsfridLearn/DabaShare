@@ -1,5 +1,5 @@
 import { CourseForm, emptyCourse } from "@/components/courses/course-form";
-import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { createCourse } from "@/lib/courses/actions";
 import { getCategories } from "@/lib/reference";
@@ -14,13 +14,8 @@ export default async function NewCoursePage() {
   const categories = await getCategories();
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">Post a course</h1>
-        <p className="mt-1.5 text-gray-600">Share what you know. Students from any Davao university can enroll.</p>
-      </div>
-      <Card>
-        <CourseForm action={createCourse} defaults={emptyCourse} categories={categories} submitLabel="Post course" />
-      </Card>
+      <PageHeader title="Post a course" description="Share what you know. Students from any Davao university can enroll." />
+      <CourseForm action={createCourse} defaults={emptyCourse} categories={categories} submitLabel="Post course" />
     </div>
   );
 }

@@ -36,7 +36,7 @@ export function Avatar({
         width={size}
         height={size}
         unoptimized
-        className={cn("shrink-0 rounded-full bg-gray-100 object-cover", className)}
+        className={cn("shrink-0 rounded-full bg-subtle object-cover", className)}
         style={style}
       />
     );
@@ -45,7 +45,7 @@ export function Avatar({
     <span
       aria-hidden="true"
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full font-display font-bold text-white",
+        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white",
         colorFor(name),
         className,
       )}

@@ -97,7 +97,7 @@ export function AvatarUploader({
             onChange={onFile}
             aria-label="Choose a profile photo"
           />
-          <Button variant="outline" size="sm" disabled={pending} onClick={() => inputRef.current?.click()}>
+          <Button variant="secondary" size="sm" loading={pending} onClick={() => inputRef.current?.click()}>
             {pending ? "Uploading…" : path ? "Change photo" : "Add photo"}
           </Button>
           {path && (
@@ -120,7 +120,7 @@ export function AvatarUploader({
       </div>
       {error && <Alert tone="error">{error}</Alert>}
       {done && !error && (
-        <p role="status" className="text-sm font-medium text-success-ink">
+        <p role="status" className="text-small font-medium text-success-ink">
           {done}
         </p>
       )}

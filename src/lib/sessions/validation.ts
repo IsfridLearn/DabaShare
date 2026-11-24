@@ -52,6 +52,32 @@ export function formatSessionTime(startsAt: string, endsAt: string): string {
   return `${when.format(new Date(startsAt))} – ${clock.format(new Date(endsAt))}`;
 }
 
+const dayLabel = new Intl.DateTimeFormat("en-PH", { timeZone: "Asia/Manila", weekday: "long", month: "long", day: "numeric" });
+const tile = new Intl.DateTimeFormat("en-PH", { timeZone: "Asia/Manila", weekday: "short", day: "numeric", month: "short" });
+
+// The calendar day a session starts on, in Philippine time.
+export function sessionDay(startsAt: string): { key: string; label: string; weekday: string; day: string; month: string } {
+  const d = new Date(startsAt);
+  const parts = Object.fromEntries(tile.formatToParts(d).map((p) => [p.type, p.value]));
+  return { key: isoToManila(startsAt).date, label: dayLabel.format(d), weekday: parts.weekday, day: parts.day, month: parts.month };
+}
+
+export function clockRange(startsAt: string, endsAt: string): string {
+  return `${clock.format(new Date(startsAt))} – ${clock.format(new Date(endsAt))}`;
+}
+
+// Consecutive sessions on the same PH day, in list order.
+export function groupByDay<T extends { starts_at: string }>(items: T[]): { key: string; label: string; items: T[] }[] {
+  const groups: { key: string; label: string; items: T[] }[] = [];
+  for (const item of items) {
+    const day = sessionDay(item.starts_at);
+    const last = groups.at(-1);
+    if (last?.key === day.key) last.items.push(item);
+    else groups.push({ key: day.key, label: day.label, items: [item] });
+  }
+  return groups;
+}
+
 export function durationLabel(minutes: number): string {
   if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);

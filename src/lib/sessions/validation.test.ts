@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { notificationTarget, notificationText, type NotificationRow } from "@/lib/notifications/format";
-import { durationLabel, isoToManila, manilaToIso, parseTab, sessionPhase, sessionSchema } from "./validation";
+import { clockRange, durationLabel, groupByDay, isoToManila, manilaToIso, parseTab, sessionPhase, sessionDay, sessionSchema } from "./validation";
 
 describe("Manila time conversion", () => {
   it("treats form input as Philippine time", () => {
@@ -130,5 +130,29 @@ describe("notificationTarget", () => {
     expect(notificationTarget({ type: "post_liked", data: { post_id: "p1" } })).toBe("/posts/p1");
     expect(notificationTarget({ type: "new_follower", data: {}, actor_username: "maria" })).toBe("/u/maria");
     expect(notificationTarget({ type: "new_follower", data: {}, actor_username: null })).toBe("/notifications");
+  });
+});
+
+describe("day grouping (PH time)", () => {
+  it("uses the Manila calendar day, not UTC", () => {
+    // 17:00 UTC on the 26th is 01:00 on the 27th in Manila.
+    const day = sessionDay("2026-11-26T17:00:00Z");
+    expect(day.key).toBe("2026-11-27");
+    expect(day.day).toBe("27");
+    expect(day.label).toContain("27");
+  });
+  it("groups consecutive sessions by day", () => {
+    const groups = groupByDay([
+      { starts_at: "2026-11-27T01:00:00Z" },
+      { starts_at: "2026-11-27T10:00:00Z" },
+      { starts_at: "2026-11-28T01:00:00Z" },
+    ]);
+    expect(groups.map((g) => [g.key, g.items.length])).toEqual([
+      ["2026-11-27", 2],
+      ["2026-11-28", 1],
+    ]);
+  });
+  it("formats a clock range", () => {
+    expect(clockRange("2026-11-27T10:00:00Z", "2026-11-27T12:00:00Z")).toMatch(/6:00.*–.*8:00/);
   });
 });

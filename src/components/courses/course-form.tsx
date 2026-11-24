@@ -100,12 +100,12 @@ export function CourseForm({
       </div>
 
       <fieldset className="group flex flex-col gap-3">
-        <legend className="mb-1.5 text-sm font-medium text-gray-700">Price</legend>
+        <legend className="mb-1.5 text-small font-medium text-fg">Price</legend>
         <div className="flex flex-wrap gap-3">
           {(["free", "paid"] as const).map((type) => (
             <label
               key={type}
-              className="flex cursor-pointer items-center gap-2 rounded-control border border-gray-200 px-4 py-2 text-sm has-checked:border-brand has-checked:bg-brand-soft"
+              className="flex cursor-pointer items-center gap-2 rounded-control border border-line-strong bg-surface px-4 py-2 text-small has-checked:border-brand has-checked:bg-brand-soft"
             >
               <input
                 type="radio"
@@ -173,7 +173,7 @@ export function CourseForm({
 
       <FormMessage state={state} />
       <div>
-        <Button type="submit" size="lg" disabled={pending}>
+        <Button type="submit" size="lg" loading={pending}>
           {pending ? "Saving…" : submitLabel}
         </Button>
       </div>

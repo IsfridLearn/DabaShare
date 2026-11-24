@@ -1,13 +1,14 @@
+import { GraduationCap } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import { FeedList } from "@/components/feed/feed-list";
 import { FollowButton } from "@/components/feed/follow-button";
 import { MessageButton } from "@/components/messages/message-button";
 import { StudentMenu } from "@/components/safety/student-menu";
 import { Avatar } from "@/components/ui/avatar";
 import { buttonClasses } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Tag } from "@/components/ui/tag";
+import { Badge } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getPublishedCoursesBy } from "@/lib/courses/queries";
 import { formatPrice } from "@/lib/courses/validation";
@@ -44,15 +45,18 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
   const hasOverlap = Boolean(overlap && (overlap.theyTeachYou.length || overlap.youTeachThem.length));
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <Card className="flex flex-col gap-5 sm:flex-row sm:items-center">
-        <Avatar name={profile.display_name} path={profile.avatar_path} size={96} />
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
+      <header className="flex flex-col gap-5 border-b border-line pb-8 sm:flex-row sm:items-end">
+        <Avatar name={profile.display_name} path={profile.avatar_path} size={88} />
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold break-words">{profile.display_name}</h1>
-          <p className="text-gray-500">@{profile.username}</p>
-          <p className="mt-2 text-gray-700">
-            {[profile.program, profile.university?.name].filter(Boolean).join(" · ")}
-          </p>
+          <h1 className="text-title break-words">{profile.display_name}</h1>
+          <p className="mt-1 text-small text-fg-subtle">@{profile.username}</p>
+          {(profile.program || profile.university) && (
+            <p className="mt-2 flex items-center gap-1.5 text-fg-muted">
+              <GraduationCap className="size-4 shrink-0 text-fg-subtle" aria-hidden="true" />
+              {[profile.program, profile.university?.name].filter(Boolean).join(" · ")}
+            </p>
+          )}
           <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-small text-fg-muted">
             <span>
               <strong className="font-semibold text-fg">{social.followers.toLocaleString("en-US")}</strong>{" "}
@@ -61,11 +65,11 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
             <span>
               <strong className="font-semibold text-fg">{social.following.toLocaleString("en-US")}</strong> following
             </span>
-            {social.follows_me && !isMe && <span className="rounded-[4px] bg-subtle px-1.5 py-0.5 text-caption">Follows you</span>}
+            {social.follows_me && !isMe && <Badge>Follows you</Badge>}
           </p>
         </div>
         {isMe ? (
-          <Link href="/profile" className={buttonClasses({ variant: "outline", size: "sm" })}>
+          <Link href="/profile" className={buttonClasses({ variant: "secondary" })}>
             Edit profile
           </Link>
         ) : (
@@ -74,133 +78,134 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
               <FollowButton profileId={profile.id} following={social.i_follow} name={profile.display_name} size="md" fullWidth />
             </div>
             <div className="flex-1 sm:flex-none">
-              <MessageButton otherId={profile.id} variant="outline" size="md" fullWidth />
+              <MessageButton otherId={profile.id} variant="secondary" size="md" fullWidth />
             </div>
             <StudentMenu studentId={profile.id} />
           </div>
         )}
-      </Card>
+      </header>
 
-      {hasOverlap && overlap && (
-        <Card className="flex flex-col gap-3 border-violet-200 bg-violet-50/40">
-          <h2 className="text-lg font-semibold">Why you two match</h2>
-          {overlap.theyTeachYou.length > 0 && (
-            <div>
-              <p className="mb-1.5 text-sm font-medium text-gray-700">{profile.display_name} can teach you</p>
-              <ul className="flex flex-wrap gap-2">
-                {overlap.theyTeachYou.map((s) => (
-                  <li key={s}>
-                    <Tag tone="teach">{s}</Tag>
-                  </li>
-                ))}
-              </ul>
-            </div>
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_17rem]">
+        <div className="flex min-w-0 flex-col gap-10">
+          {profile.bio && (
+            <section aria-labelledby="about-title">
+              <h2 id="about-title" className="text-heading">
+                About
+              </h2>
+              <p className="mt-2 max-w-[68ch] leading-7 break-words whitespace-pre-line text-fg">{profile.bio}</p>
+            </section>
           )}
-          {overlap.youTeachThem.length > 0 && (
-            <div>
-              <p className="mb-1.5 text-sm font-medium text-gray-700">You can teach {profile.display_name}</p>
-              <ul className="flex flex-wrap gap-2">
-                {overlap.youTeachThem.map((s) => (
-                  <li key={s}>
-                    <Tag tone="learn">{s}</Tag>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </Card>
-      )}
 
-      {profile.bio && (
-        <Card>
-          <h2 className="mb-2 text-lg font-semibold">About</h2>
-          <p className="break-words whitespace-pre-line text-gray-700">{profile.bio}</p>
-        </Card>
-      )}
+          <section aria-labelledby="posts-title" className="flex flex-col gap-3">
+            <h2 id="posts-title" className="text-heading">
+              Posts
+            </h2>
+            <FeedList
+              key={posts.posts[0]?.id ?? "empty"}
+              initial={posts.posts}
+              initialHasMore={posts.hasMore}
+              scope="everyone"
+              onlyAuthor={profile.id}
+              meId={me.id}
+              label={`Posts by ${profile.display_name}`}
+              empty={
+                <p className="rounded-card border border-dashed border-line-strong px-5 py-6 text-center text-small text-fg-muted">
+                  {isMe ? (
+                    <>
+                      You haven&apos;t posted yet.{" "}
+                      <Link href="/home" className="font-medium text-brand-ink hover:underline">
+                        Write your first post
+                      </Link>
+                    </>
+                  ) : (
+                    `${profile.display_name} hasn't posted yet.`
+                  )}
+                </p>
+              }
+            />
+          </section>
+        </div>
 
-      <section aria-labelledby="posts-title" className="flex flex-col gap-3">
-        <h2 id="posts-title" className="text-lg font-semibold">
-          Posts
-        </h2>
-        <FeedList
-          key={posts.posts[0]?.id ?? "empty"}
-          initial={posts.posts}
-          initialHasMore={posts.hasMore}
-          scope="everyone"
-          onlyAuthor={profile.id}
-          meId={me.id}
-          label={`Posts by ${profile.display_name}`}
-          empty={
-            <p className="rounded-card border border-dashed border-line-strong px-5 py-6 text-center text-small text-fg-muted">
-              {isMe ? (
-                <>
-                  You haven&apos;t posted yet.{" "}
-                  <Link href="/home" className="font-medium text-brand-ink hover:underline">
-                    Write your first post
-                  </Link>
-                </>
-              ) : (
-                `${profile.display_name} hasn't posted yet.`
+        <aside className="flex flex-col gap-8" aria-label="Skills and courses">
+          {hasOverlap && overlap && (
+            <section className="rounded-card border border-line bg-surface p-4">
+              <h2 className="text-small font-semibold text-fg">Why you two match</h2>
+              {overlap.theyTeachYou.length > 0 && (
+                <SkillGroup title={`${profile.display_name} can teach you`}>{overlap.theyTeachYou}</SkillGroup>
               )}
-            </p>
-          }
-        />
-      </section>
+              {overlap.youTeachThem.length > 0 && <SkillGroup title={`You can teach ${profile.display_name}`}>{overlap.youTeachThem}</SkillGroup>}
+            </section>
+          )}
 
-      {courses.length > 0 && (
-        <Card>
-          <h2 className="mb-3 text-lg font-semibold">Courses by {isMe ? "you" : profile.display_name}</h2>
-          <ul className="divide-y divide-gray-100">
-            {courses.map((c) => (
-              <li key={c.id}>
-                <Link href={`/courses/${c.id}`} className="flex items-center justify-between gap-3 py-3 hover:text-brand-ink">
-                  <span className="min-w-0 truncate font-medium">{c.title}</span>
-                  <Tag tone={c.price_php === 0 ? "free" : "paid"} className="shrink-0">
-                    {formatPrice(c.price_php)}
-                  </Tag>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
+          <SkillList title="Can teach" skills={profile.teaches} />
+          <SkillList title="Wants to learn" skills={profile.learns} />
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <SkillList title="Can teach" skills={profile.teaches} tone="teach" />
-        <SkillList title="Wants to learn" skills={profile.learns} tone="learn" />
+          {courses.length > 0 && (
+            <RailSection title={`Courses by ${isMe ? "you" : profile.display_name}`}>
+              <ul className="-mx-2 flex flex-col">
+                {courses.map((c) => (
+                  <li key={c.id}>
+                    <Link href={`/courses/${c.id}`} className="flex items-baseline justify-between gap-3 rounded-control px-2 py-1.5 hover:bg-subtle">
+                      <span className="min-w-0 truncate text-small font-medium text-fg">{c.title}</span>
+                      <span className={c.price_php === 0 ? "shrink-0 text-caption text-success-ink" : "shrink-0 text-caption text-fg-muted"}>
+                        {formatPrice(c.price_php)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </RailSection>
+          )}
+
+          {interests.length > 0 && (
+            <RailSection title="Interests">
+              <p className="text-small text-fg-muted">{interests.map((c) => c.name).join(" · ")}</p>
+            </RailSection>
+          )}
+        </aside>
       </div>
-
-      {interests.length > 0 && (
-        <Card>
-          <h2 className="mb-3 text-lg font-semibold">Interests</h2>
-          <ul className="flex flex-wrap gap-2">
-            {interests.map((c) => (
-              <li key={c.id}>
-                <Tag>{c.name}</Tag>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
     </div>
   );
 }
 
-function SkillList({ title, skills, tone }: { title: string; skills: SkillRef[]; tone: "teach" | "learn" }) {
+function RailSection({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card>
-      <h2 className="mb-3 text-lg font-semibold">{title}</h2>
+    <section>
+      <h2 className="mb-2 text-small font-semibold text-fg">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function SkillGroup({ title, children }: { title: string; children: string[] }) {
+  return (
+    <div className="mt-3">
+      <p className="mb-1.5 text-caption text-fg-subtle">{title}</p>
+      <ul className="flex flex-wrap gap-1.5">
+        {children.map((s) => (
+          <li key={s}>
+            <Badge tone="brand">{s}</Badge>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function SkillList({ title, skills }: { title: string; skills: SkillRef[] }) {
+  return (
+    <RailSection title={title}>
       {skills.length ? (
-        <ul className="flex flex-wrap gap-2">
+        <ul className="flex flex-wrap gap-1.5">
           {skills.map((s) => (
             <li key={s.id}>
-              <Tag tone={tone}>{s.name}</Tag>
+              <Badge className="px-2 py-1 text-small">{s.name}</Badge>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-gray-500">Nothing listed yet.</p>
+        <p className="text-small text-fg-subtle">Nothing listed yet.</p>
       )}
-    </Card>
+    </RailSection>
   );
 }

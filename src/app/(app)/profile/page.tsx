@@ -1,3 +1,4 @@
+import { ArrowRight, ExternalLink, Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AvatarUploader } from "@/components/profile/avatar-uploader";
@@ -6,7 +7,7 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { SkillsEditor, SkillSuggestions } from "@/components/profile/skills-editor";
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { PageHeader, PanelSection } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { updateProfile } from "@/lib/profile/actions";
 import { profileCompleteness } from "@/lib/profile/completeness";
@@ -20,7 +21,7 @@ export const metadata = { title: "My profile" };
 
 const NOTICES: Record<string, string> = {
   welcome:
-    "Welcome to DabaShare! Add what you can teach and what you want to learn, then check Matches for learning partners.",
+    "Welcome to DabaShare! Add what you can teach and what you want to learn, then check People for learning partners.",
   "password-updated": "Your password has been updated.",
 };
 
@@ -39,24 +40,27 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
   const missing = completeness.items.filter((i) => !i.done);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">My profile</h1>
-          <p className="mt-1 text-gray-600">This is what other students see about you.</p>
-        </div>
-        <Link href={`/u/${details.username}`} className={buttonClasses({ variant: "outline", size: "sm" })}>
-          View public profile
-        </Link>
-      </div>
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+      <PageHeader
+        title="My profile"
+        description="This is what other students see about you."
+        actions={
+          <Link href={`/u/${details.username}`} className={buttonClasses({ variant: "secondary" })}>
+            View public profile
+            <ExternalLink className="size-4" aria-hidden="true" />
+          </Link>
+        }
+      />
 
       {notice && <Alert tone="success">{notice}</Alert>}
 
       {missing.length > 0 && (
-        <Card className="flex flex-col gap-3">
+        <section aria-labelledby="completeness-title" className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 sm:p-5">
           <div className="flex items-center justify-between gap-3">
-            <h2 className="text-base font-semibold">Profile {completeness.percent}% complete</h2>
-            <span className="text-sm text-gray-600">
+            <h2 id="completeness-title" className="text-small font-semibold text-fg">
+              Profile {completeness.percent}% complete
+            </h2>
+            <span className="text-caption text-fg-subtle">
               {completeness.done} of {completeness.total}
             </span>
           </div>
@@ -66,69 +70,65 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
             aria-valuenow={completeness.percent}
             aria-valuemin={0}
             aria-valuemax={100}
-            className="h-2 overflow-hidden rounded-full bg-gray-100"
+            className="h-1 overflow-hidden rounded-full bg-subtle"
           >
             <div className="h-full rounded-full bg-success" style={{ width: `${completeness.percent}%` }} />
           </div>
-          <ul className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-1.5">
             {missing.map((item) => (
               <li key={item.key}>
                 <a
                   href={item.href}
-                  className="inline-flex min-h-9 items-center rounded-full border border-gray-200 px-3 text-sm text-gray-700 hover:border-brand hover:text-brand-ink"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-control border border-line-strong px-2.5 text-small text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg"
                 >
-                  + {item.label}
+                  <Plus className="size-3.5" aria-hidden="true" />
+                  {item.label}
                 </a>
               </li>
             ))}
           </ul>
-        </Card>
+        </section>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        {/* Skills drive matching, so on phones they come first. */}
-        <Card id="about" className="order-2 flex scroll-mt-20 flex-col gap-6 lg:order-none">
-          <h2 className="text-lg font-semibold">About you</h2>
-          <AvatarUploader userId={details.id} name={details.display_name} path={details.avatar_path} />
-          <ProfileForm
-            action={updateProfile}
-            universities={universities}
-            submitLabel="Save profile"
-            defaults={{
-              username: details.username ?? "",
-              displayName: details.display_name,
-              universityId: details.university_id ? String(details.university_id) : "",
-              program: details.program ?? "",
-              bio: details.bio ?? "",
-            }}
-          />
-        </Card>
-
-        <div className="order-1 flex flex-col gap-6 lg:order-none">
-          <Card id="skills" className="flex scroll-mt-20 flex-col gap-6">
-            <div>
-              <h2 className="text-lg font-semibold">Skills</h2>
-              <p className="mt-1 text-sm text-gray-600">
-                Matching pairs you with students who teach what you want to learn, and want to learn what
-                you teach.
-              </p>
-            </div>
+      <div>
+        {/* Skills drive matching, so they come first. */}
+        <PanelSection
+          id="skills"
+          title="Skills"
+          description="Matching pairs you with students who teach what you want to learn, and want to learn what you teach."
+        >
+          <div className="flex flex-col gap-6">
             <SkillSuggestions id="skill-suggestions" names={skillNames} />
             <SkillsEditor kind="teach" skills={details.teaches} suggestionsId="skill-suggestions" />
             <SkillsEditor kind="learn" skills={details.learns} suggestionsId="skill-suggestions" />
-            <Link href="/matches" className="text-sm font-medium text-brand-ink hover:underline">
-              See students who match these skills →
+            <Link href="/matches" className="inline-flex items-center gap-1 self-start text-small font-medium text-brand-ink hover:underline">
+              See students who match these skills
+              <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
-          </Card>
+          </div>
+        </PanelSection>
 
-          <Card id="interests" className="flex scroll-mt-20 flex-col gap-4">
-            <div>
-              <h2 className="text-lg font-semibold">Learning interests</h2>
-              <p className="mt-1 text-sm text-gray-600">Pick the subjects you care about.</p>
-            </div>
-            <InterestsForm categories={categories} selected={details.interestIds} />
-          </Card>
-        </div>
+        <PanelSection id="interests" title="Learning interests" description="Pick the subjects you care about.">
+          <InterestsForm categories={categories} selected={details.interestIds} />
+        </PanelSection>
+
+        <PanelSection id="about" title="About you" description="Your photo, name, university and a short bio.">
+          <div className="flex max-w-xl flex-col gap-6">
+            <AvatarUploader userId={details.id} name={details.display_name} path={details.avatar_path} />
+            <ProfileForm
+              action={updateProfile}
+              universities={universities}
+              submitLabel="Save profile"
+              defaults={{
+                username: details.username ?? "",
+                displayName: details.display_name,
+                universityId: details.university_id ? String(details.university_id) : "",
+                program: details.program ?? "",
+                bio: details.bio ?? "",
+              }}
+            />
+          </div>
+        </PanelSection>
       </div>
     </div>
   );

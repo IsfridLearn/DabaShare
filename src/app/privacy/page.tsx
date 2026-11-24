@@ -14,8 +14,8 @@ export default function PrivacyPage() {
       <Link href="/" className="text-brand-ink" aria-label="DabaShare home">
         <Logo />
       </Link>
-      <h1 className="mt-8 text-3xl font-bold">Privacy notice</h1>
-      <p className="mt-2 text-gray-600">Last updated 23 November 2026</p>
+      <h1 className="mt-10 text-display">Privacy notice</h1>
+      <p className="mt-2 text-small text-fg-subtle">Last updated 23 November 2026</p>
 
       <div className="mt-6">
         <Alert tone="info">
@@ -24,7 +24,7 @@ export default function PrivacyPage() {
         </Alert>
       </div>
 
-      <div className="mt-8 flex flex-col gap-8 text-gray-700">
+      <div className="mt-10 flex flex-col gap-8 leading-7 text-fg">
         <Section title="What we collect">
           <ul className="list-disc space-y-1 pl-5">
             <li>Account details: your email address and a securely hashed password.</li>
@@ -101,7 +101,7 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
-      <h2 className="mb-2 text-xl font-semibold">{title}</h2>
+      <h2 className="mb-2 text-heading">{title}</h2>
       {children}
     </section>
   );

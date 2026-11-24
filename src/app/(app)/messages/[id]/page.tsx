@@ -1,8 +1,10 @@
+import { ChevronLeft, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChatWindow } from "@/components/messages/chat-window";
 import { ConversationList } from "@/components/messages/conversation-list";
 import { InboxLive } from "@/components/messages/inbox-live";
+import { MessagesFrame } from "@/components/messages/messages-frame";
 import { StudentMenu } from "@/components/safety/student-menu";
 import { Avatar } from "@/components/ui/avatar";
 import { requireOnboardedProfile } from "@/lib/auth/session";
@@ -29,43 +31,38 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
   const name = conversation.other_name ?? "DabaShare member";
 
   return (
-    // Phones: the chat fills the screen between the top bar and the tab bar.
-    <div className="-mx-4 -mt-6 -mb-28 flex h-[calc(100dvh-7.5rem)] flex-col xl:m-0 xl:h-[calc(100dvh-10rem)]">
+    <>
       <InboxLive />
       <h1 className="sr-only">Conversation with {name}</h1>
-      <div className="grid min-h-0 flex-1 overflow-hidden bg-surface md:rounded-card md:border md:border-gray-200 md:shadow-card md:grid-cols-[20rem_minmax(0,1fr)] xl:m-0">
-        <div className="hidden overflow-y-auto border-r border-gray-200 md:block">
-          <ConversationList items={inbox} activeId={id} meId={me.id} />
-        </div>
-        <section className="flex min-h-0 flex-col" aria-label={`Conversation with ${name}`}>
-          <header className="flex items-center gap-2 border-b border-gray-200 px-2 py-2 sm:px-4">
+      <MessagesFrame title="Messages" titleAs="h2" conversationOpen list={<ConversationList items={inbox} activeId={id} meId={me.id} />}>
+        <section className="flex min-h-0 flex-1 flex-col" aria-label={`Conversation with ${name}`}>
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-line px-2 sm:px-4">
             <Link
               href="/messages"
-              className="flex size-11 shrink-0 items-center justify-center rounded-control text-gray-600 hover:bg-gray-100 md:hidden"
+              className="flex size-10 shrink-0 items-center justify-center rounded-control text-fg-muted hover:bg-subtle hover:text-fg md:hidden"
               aria-label="Back to all messages"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
+              <ChevronLeft className="size-5" aria-hidden="true" />
             </Link>
-            <Avatar name={name} path={conversation.other_avatar} size={40} />
-            <div className="min-w-0 flex-1">
+            <Avatar name={name} path={conversation.other_avatar} size={32} />
+            <div className="min-w-0 flex-1 leading-tight">
               {conversation.other_username ? (
-                <Link href={`/u/${conversation.other_username}`} className="block truncate font-semibold hover:text-brand-ink">
+                <Link href={`/u/${conversation.other_username}`} className="block truncate font-semibold text-fg hover:underline">
                   {name}
                 </Link>
               ) : (
-                <span className="block truncate font-semibold">{name}</span>
+                <span className="block truncate font-semibold text-fg">{name}</span>
               )}
-              {conversation.other_username && <span className="block truncate text-xs text-gray-600">@{conversation.other_username}</span>}
+              {conversation.other_username && <span className="block truncate text-caption text-fg-subtle">@{conversation.other_username}</span>}
             </div>
             <form action={hideConversation.bind(null, id)}>
               <button
                 type="submit"
-                className="rounded-control px-2.5 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                className="inline-flex h-9 items-center gap-1.5 rounded-control px-2.5 text-small font-medium text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg"
                 title="Hide this conversation until a new message arrives"
               >
-                Hide
+                <EyeOff className="size-4" aria-hidden="true" />
+                <span className="max-sm:sr-only">Hide</span>
               </button>
             </form>
             {conversation.other_id && conversation.other_username && (
@@ -87,7 +84,7 @@ export default async function ConversationPage({ params }: PageProps<"/messages/
             }
           />
         </section>
-      </div>
-    </div>
+      </MessagesFrame>
+    </>
   );
 }

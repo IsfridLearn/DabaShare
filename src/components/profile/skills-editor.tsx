@@ -1,12 +1,12 @@
 "use client";
 
+import { Plus, X } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
 import { addSkill, removeSkill } from "@/lib/profile/actions";
 import type { SkillKind, SkillRef } from "@/lib/profile/queries";
 import { initialFormState } from "@/lib/forms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/field";
-import { Tag } from "@/components/ui/tag";
 
 const COPY: Record<SkillKind, { title: string; empty: string; placeholder: string }> = {
   teach: {
@@ -42,30 +42,30 @@ export function SkillsEditor({
 
   return (
     <section aria-labelledby={`${inputId}-title`} className="flex flex-col gap-3">
-      <h3 id={`${inputId}-title`} className="text-base font-semibold">
+      <h3 id={`${inputId}-title`} className="text-small font-semibold text-fg">
         {copy.title}
       </h3>
       {skills.length ? (
-        <ul className="flex flex-wrap gap-2">
+        <ul className="flex flex-wrap gap-1.5">
           {skills.map((skill) => (
             <li key={skill.id}>
-              <Tag tone={kind} className="py-0.5 pr-1 break-words whitespace-normal">
+              <span className="inline-flex items-center gap-0.5 rounded-control border border-line-strong bg-surface py-0.5 pr-0.5 pl-2.5 text-small font-medium break-words text-fg">
                 {skill.name}
                 <form action={removeSkill.bind(null, kind, skill.id)} className="inline-flex">
                   <button
                     type="submit"
-                    className="grid size-7 place-items-center rounded-full text-base leading-none opacity-70 hover:bg-black/10 hover:opacity-100 focus-visible:outline-2 focus-visible:outline-current"
+                    className="grid size-6 place-items-center rounded-[4px] text-fg-subtle transition-colors duration-150 hover:bg-subtle hover:text-fg focus-visible:outline-2 focus-visible:outline-brand"
                     aria-label={`Remove ${skill.name}`}
                   >
-                    ×
+                    <X className="size-3.5" aria-hidden="true" />
                   </button>
                 </form>
-              </Tag>
+              </span>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="text-sm text-gray-500">{copy.empty}</p>
+        <p className="text-small text-fg-subtle">{copy.empty}</p>
       )}
       <form action={action} className="flex gap-2" noValidate>
         <label htmlFor={inputId} className="sr-only">
@@ -82,12 +82,12 @@ export function SkillsEditor({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${inputId}-error` : undefined}
         />
-        <Button type="submit" variant="outline" disabled={pending}>
+        <Button type="submit" variant="secondary" loading={pending} icon={<Plus className="size-4" aria-hidden="true" />}>
           {pending ? "Adding…" : "Add"}
         </Button>
       </form>
       {error && (
-        <p id={`${inputId}-error`} className="text-sm text-danger-ink">
+        <p id={`${inputId}-error`} className="text-small text-danger-ink">
           {error}
         </p>
       )}

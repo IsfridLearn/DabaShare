@@ -13,11 +13,11 @@ export default function AppError({ error, retry }: { error: unknown; retry: () =
 
   return (
     <div role="alert" className="mx-auto flex max-w-md flex-col items-center gap-4 py-16 text-center">
-      <h1 className="text-2xl font-bold">Something went wrong</h1>
-      <p className="text-gray-600">This page couldn&apos;t load. Check your connection and try again.</p>
+      <h1 className="text-title">Something went wrong</h1>
+      <p className="text-fg-muted">This page couldn&apos;t load. Check your connection and try again.</p>
       <div className="flex flex-wrap justify-center gap-3">
         <Button onClick={() => retry()}>Try again</Button>
-        <Link href="/home" className={buttonClasses({ variant: "outline" })}>
+        <Link href="/home" className={buttonClasses({ variant: "secondary" })}>
           Go to home
         </Link>
       </div>

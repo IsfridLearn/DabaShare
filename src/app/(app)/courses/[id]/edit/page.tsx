@@ -1,8 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CourseForm } from "@/components/courses/course-form";
 import { DeleteCourseForm } from "@/components/courses/owner-tools";
-import { Card } from "@/components/ui/card";
+import { BackLink, PageHeader, PanelSection } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { updateCourse } from "@/lib/courses/actions";
 import { getCourseDetail } from "@/lib/courses/queries";
@@ -22,11 +21,8 @@ export default async function EditCoursePage({ params }: PageProps<"/courses/[id
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <Link href={`/courses/${course.id}`} className="text-sm font-medium text-brand-ink hover:underline">
-        ← Back to course
-      </Link>
-      <h1 className="text-2xl font-bold">Edit course</h1>
-      <Card>
+      <BackLink href={`/courses/${course.id}`}>Back to course</BackLink>
+      <PageHeader title="Edit course" />
         <CourseForm
           action={updateCourse.bind(null, course.id)}
           categories={categories}
@@ -42,14 +38,15 @@ export default async function EditCoursePage({ params }: PageProps<"/courses/[id
             skills: course.skills.join(", "),
           }}
         />
-      </Card>
-      <Card className="flex flex-col gap-3 border-red-200">
-        <h2 className="text-lg font-semibold text-danger-ink">Delete course</h2>
-        <p className="text-sm text-gray-600">
-          To stop new enrollments but keep the course for current students, set its visibility to Archived instead.
-        </p>
-        <DeleteCourseForm courseId={course.id} />
-      </Card>
+      <div className="mt-6 border-t border-line">
+        <PanelSection
+          title="Delete course"
+          tone="danger"
+          description="To stop new enrollments but keep the course for current students, set its visibility to Archived instead."
+        >
+          <DeleteCourseForm courseId={course.id} />
+        </PanelSection>
+      </div>
     </div>
   );
 }

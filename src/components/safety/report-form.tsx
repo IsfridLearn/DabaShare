@@ -19,12 +19,12 @@ export function ReportForm({ targetType, targetId }: { targetType: ReportTarget;
       <input type="hidden" name="targetType" value={targetType} />
       <input type="hidden" name="targetId" value={targetId} />
       <fieldset>
-        <legend className="mb-2 text-sm font-medium text-gray-700">What&apos;s wrong?</legend>
+        <legend className="mb-2 text-small font-medium text-fg">What&apos;s wrong?</legend>
         <div className="flex flex-col gap-2">
           {REPORT_REASONS.map((r) => (
             <label
               key={r.value}
-              className="flex cursor-pointer items-center gap-2.5 rounded-control border border-gray-200 px-3 py-2 text-sm has-checked:border-brand has-checked:bg-brand-soft"
+              className="flex cursor-pointer items-center gap-2.5 rounded-control border border-line-strong bg-surface px-3 py-2 text-small text-fg transition-colors duration-150 hover:bg-subtle has-checked:border-brand has-checked:bg-brand-soft"
             >
               <input
                 type="radio"
@@ -37,13 +37,13 @@ export function ReportForm({ targetType, targetId }: { targetType: ReportTarget;
             </label>
           ))}
         </div>
-        {fieldError(state, "reason") && <p className="mt-1 text-sm text-danger-ink">{fieldError(state, "reason")}</p>}
+        {fieldError(state, "reason") && <p className="mt-1 text-small text-danger-ink">{fieldError(state, "reason")}</p>}
       </fieldset>
       <Field label="Details (optional)" htmlFor="details" error={fieldError(state, "details")}>
         <Textarea id="details" name="details" maxLength={1000} rows={4} defaultValue={state.values?.details} {...errorProps(state, "details")} />
       </Field>
       <div>
-        <Button type="submit" variant="danger" disabled={pending}>
+        <Button type="submit" variant="danger" loading={pending}>
           {pending ? "Sending…" : "Send report"}
         </Button>
       </div>

@@ -1,3 +1,4 @@
+import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
@@ -160,5 +161,72 @@ export function Section({
       </div>
       {children}
     </section>
+  );
+}
+
+// ── BackLink: "← All courses" at the top of a detail page ──────────────────
+export function BackLink({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className="-ml-1.5 inline-flex items-center gap-1 self-start rounded-control px-1.5 py-1 text-small font-medium text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg"
+    >
+      <ChevronLeft className="size-4" aria-hidden="true" />
+      {children}
+    </Link>
+  );
+}
+
+// ── Properties: Linear-style label/value rows for a detail page ────────────
+export function Properties({ items, className }: { items: { label: string; value: ReactNode }[]; className?: string }) {
+  return (
+    <dl className={cn("flex flex-col text-small", className)}>
+      {items.map((item) => (
+        <div key={item.label} className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-3 py-1.5">
+          <dt className="text-fg-subtle">{item.label}</dt>
+          <dd className="min-w-0 font-medium break-words text-fg">{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+// ── PanelSection: settings-style row, title on the left, content on the right ─
+export function PanelSection({
+  id,
+  title,
+  description,
+  tone = "default",
+  children,
+}: {
+  id?: string;
+  title: string;
+  description?: ReactNode;
+  tone?: "default" | "danger";
+  children: ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      aria-labelledby={id ? `${id}-title` : undefined}
+      className="grid scroll-mt-20 gap-4 border-t border-line py-8 first:border-t-0 first:pt-2 md:grid-cols-[15rem_minmax(0,1fr)] md:gap-10"
+    >
+      <div>
+        <h2 id={id ? `${id}-title` : undefined} className={cn("text-heading", tone === "danger" && "text-danger-ink")}>
+          {title}
+        </h2>
+        {description && <p className="mt-1 text-small text-fg-muted">{description}</p>}
+      </div>
+      <div className="min-w-0">{children}</div>
+    </section>
+  );
+}
+
+// ── List: hairline-divided rows inside one bordered container ──────────────
+export function RowList({ label, children, className }: { label?: string; children: ReactNode; className?: string }) {
+  return (
+    <ul aria-label={label} className={cn("divide-y divide-line overflow-hidden rounded-card border border-line bg-surface", className)}>
+      {children}
+    </ul>
   );
 }

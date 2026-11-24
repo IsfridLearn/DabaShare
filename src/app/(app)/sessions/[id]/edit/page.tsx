@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SessionForm } from "@/components/sessions/session-form";
-import { Card } from "@/components/ui/card";
+import { BackLink, PageHeader } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getCategories } from "@/lib/reference";
 import { updateSession } from "@/lib/sessions/actions";
@@ -28,11 +27,8 @@ export default async function EditSessionPage({ params }: PageProps<"/sessions/[
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <Link href={`/sessions/${session.id}`} className="text-sm font-medium text-brand-ink hover:underline">
-        ← Back to session
-      </Link>
-      <h1 className="text-2xl font-bold">Edit session</h1>
-      <Card>
+      <BackLink href={`/sessions/${session.id}`}>Back to session</BackLink>
+      <PageHeader title="Edit session" />
         <SessionForm
           action={updateSession.bind(null, session.id)}
           categories={categories}
@@ -51,7 +47,6 @@ export default async function EditSessionPage({ params }: PageProps<"/sessions/[
             meetingUrl: meetingUrl ?? "",
           }}
         />
-      </Card>
     </div>
   );
 }

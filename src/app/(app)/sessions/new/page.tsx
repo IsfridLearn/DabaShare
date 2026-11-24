@@ -1,5 +1,5 @@
 import { emptySession, SessionForm } from "@/components/sessions/session-form";
-import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getCategories } from "@/lib/reference";
 import { createSession } from "@/lib/sessions/actions";
@@ -17,13 +17,11 @@ export default async function NewSessionPage() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold">Host a webinar or study group</h1>
-        <p className="mt-1.5 text-gray-600">Times are in Philippine time. You can add or change the meeting link later.</p>
-      </div>
-      <Card>
+      <PageHeader
+        title="Host a session"
+        description="A webinar or study group. Times are in Philippine time, and you can add or change the meeting link later."
+      />
         <SessionForm action={createSession} defaults={emptySession} categories={categories} submitLabel="Schedule session" minDate={today} />
-      </Card>
     </div>
   );
 }

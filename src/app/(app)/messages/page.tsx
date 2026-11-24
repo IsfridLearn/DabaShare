@@ -1,5 +1,7 @@
+import { MessagesSquare } from "lucide-react";
 import { ConversationList } from "@/components/messages/conversation-list";
 import { InboxLive } from "@/components/messages/inbox-live";
+import { MessagesFrame } from "@/components/messages/messages-frame";
 import { Alert } from "@/components/ui/alert";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getInbox } from "@/lib/messages/queries";
@@ -21,18 +23,23 @@ export default async function MessagesPage({ searchParams }: PageProps<"/message
   const notice = typeof query.notice === "string" ? NOTICES[query.notice] : undefined;
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
       <InboxLive />
-      <h1 className="text-2xl font-bold">Messages</h1>
-      {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
-      <div className="grid overflow-hidden rounded-card border border-gray-200 bg-surface shadow-card md:h-[calc(100dvh-14rem)] md:grid-cols-[20rem_minmax(0,1fr)]">
-        <div className="overflow-y-auto md:border-r md:border-gray-200">
-          <ConversationList items={items} meId={me.id} />
+      <MessagesFrame
+        title="Messages"
+        conversationOpen={false}
+        notice={notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
+        list={<ConversationList items={items} meId={me.id} />}
+      >
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
+          <span aria-hidden="true" className="flex size-10 items-center justify-center rounded-full bg-subtle text-fg-muted">
+            <MessagesSquare className="size-5" />
+          </span>
+          <p className="max-w-xs text-small text-fg-muted">
+            {items.length ? "Select a conversation to read and reply." : "Your conversations will appear here."}
+          </p>
         </div>
-        <div className="hidden items-center justify-center p-8 text-center text-gray-500 md:flex">
-          {items.length ? "Select a conversation to read and reply." : "Your conversations will appear here."}
-        </div>
-      </div>
-    </div>
+      </MessagesFrame>
+    </>
   );
 }

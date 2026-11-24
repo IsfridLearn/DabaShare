@@ -103,7 +103,7 @@ export function ProfileForm({
       </Field>
       <FormMessage state={state} />
       <div>
-        <Button type="submit" disabled={pending}>
+        <Button type="submit" loading={pending}>
           {pending ? "Saving…" : submitLabel}
         </Button>
       </div>

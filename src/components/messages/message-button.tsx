@@ -9,7 +9,7 @@ export function MessageButton({
   fullWidth = false,
 }: {
   otherId: string;
-  variant?: "primary" | "outline";
+  variant?: "primary" | "secondary" | "outline";
   size?: "sm" | "md";
   fullWidth?: boolean;
 }) {
