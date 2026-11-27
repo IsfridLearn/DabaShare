@@ -54,6 +54,8 @@ export type Enrollment = {
   note: string | null;
   created_at: string;
   decided_at: string | null;
+  /** Set by the tutor when the student finished the course. */
+  completed_at: string | null;
 };
 
 export type OwnerEnrollment = Enrollment & { student: PersonRef | null };
@@ -87,7 +89,7 @@ export async function getMyEnrollment(courseId: string, userId: string): Promise
   const supabase = await createClient();
   const { data } = await supabase
     .from("course_enrollments")
-    .select("id, status, note, created_at, decided_at")
+    .select("id, status, note, created_at, decided_at, completed_at")
     .eq("course_id", courseId)
     .eq("student_id", userId)
     .maybeSingle();
@@ -99,7 +101,7 @@ export async function getCourseEnrollments(courseId: string): Promise<OwnerEnrol
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("course_enrollments")
-    .select(`id, status, note, created_at, decided_at, student:profiles(${PERSON})`)
+    .select(`id, status, note, created_at, decided_at, completed_at, student:profiles(${PERSON})`)
     .eq("course_id", courseId)
     .order("created_at", { ascending: false })
     .limit(500)

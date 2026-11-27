@@ -7,6 +7,8 @@ import { NoticeToast } from "@/components/ui/toast";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getMyLearning, getMyTeaching, type EnrollmentStatus } from "@/lib/courses/queries";
 import { formatPrice, STATUSES } from "@/lib/courses/validation";
+import { getNextLessons, type Lesson } from "@/lib/courses/space-queries";
+import { clockRange, sessionDay } from "@/lib/sessions/validation";
 
 // Per-user content: navigation waits for the server (loading.tsx shows meanwhile).
 export const instant = false;
@@ -25,6 +27,10 @@ const row = "group flex items-center gap-x-4 gap-y-1 px-4 py-3.5 transition-colo
 export default async function MyCoursesPage({ searchParams }: PageProps<"/courses/mine">) {
   const me = await requireOnboardedProfile();
   const [teaching, learning, query] = await Promise.all([getMyTeaching(me.id), getMyLearning(me.id), searchParams]);
+  const next = await getNextLessons([
+    ...teaching.map((c) => c.id),
+    ...learning.filter((e) => e.status === "accepted" && e.course).map((e) => e.course!.id),
+  ]);
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-10">
@@ -53,6 +59,7 @@ export default async function MyCoursesPage({ searchParams }: PageProps<"/course
                     <span className="block text-small text-fg-subtle">
                       {formatPrice(c.price_php)} · {c.students === 1 ? "1 student" : `${c.students} students`}
                     </span>
+                    <NextLesson lesson={next.get(c.id)} />
                   </span>
                   {c.status !== "published" && <Badge tone="warning">{STATUSES.find((s) => s.value === c.status)?.label}</Badge>}
                   {c.pending > 0 && (
@@ -91,6 +98,7 @@ export default async function MyCoursesPage({ searchParams }: PageProps<"/course
                         {e.course.owner ? `with ${e.course.owner.display_name} · ` : ""}
                         {formatPrice(e.course.price_php)}
                       </span>
+                      {e.status === "accepted" && <NextLesson lesson={next.get(e.course.id)} />}
                     </span>
                     <Badge tone={ENROLLMENT[e.status].tone}>{ENROLLMENT[e.status].label}</Badge>
                     <ChevronRight className="size-4 shrink-0 text-fg-subtle group-hover:text-fg" aria-hidden="true" />
@@ -113,5 +121,15 @@ export default async function MyCoursesPage({ searchParams }: PageProps<"/course
         )}
       </Section>
     </div>
+  );
+}
+
+function NextLesson({ lesson }: { lesson?: Lesson }) {
+  if (!lesson) return null;
+  const day = sessionDay(lesson.starts_at);
+  return (
+    <span className="mt-1 block truncate text-caption text-brand-ink">
+      Next lesson: {day.weekday} {day.month} {day.day} · {clockRange(lesson.starts_at, lesson.ends_at)}
+    </span>
   );
 }

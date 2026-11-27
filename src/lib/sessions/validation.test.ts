@@ -114,6 +114,10 @@ describe("notificationText", () => {
     expect(notificationText(n({ type: "course_removed", course_title: "Old course" }))).toBe("Old course was removed by its tutor");
     expect(notificationText(n({ type: "new_follower" }))).toBe("Maria started following you");
     expect(notificationText(n({ type: "post_liked", data: { post_id: "p1" } }))).toBe("Maria liked your post");
+    expect(notificationText(n({ type: "lesson_scheduled" }))).toBe("New or changed lessons in Accounting 101");
+    expect(notificationText(n({ type: "course_update" }))).toBe("Maria posted an update in Accounting 101");
+    expect(notificationText(n({ type: "course_completed" }))).toBe("You finished Accounting 101. Leave a review?");
+    expect(notificationText(n({ type: "review_received", data: { course_id: "k1", rating: 5 } }))).toBe("Maria gave Accounting 101 5 out of 5");
   });
   it("copes with deleted actors and items", () => {
     expect(notificationText(n({ type: "session_joined", actor_name: null, session_title: null }))).toBe("A student joined a session");
@@ -130,6 +134,12 @@ describe("notificationTarget", () => {
     expect(notificationTarget({ type: "post_liked", data: { post_id: "p1" } })).toBe("/posts/p1");
     expect(notificationTarget({ type: "new_follower", data: {}, actor_username: "maria" })).toBe("/u/maria");
     expect(notificationTarget({ type: "new_follower", data: {}, actor_username: null })).toBe("/notifications");
+  });
+  it("opens the right course tab", () => {
+    expect(notificationTarget({ type: "lesson_scheduled", data: { course_id: "k1" } })).toBe("/courses/k1?tab=schedule");
+    expect(notificationTarget({ type: "course_update", data: { course_id: "k1" } })).toBe("/courses/k1?tab=updates");
+    expect(notificationTarget({ type: "course_completed", data: { course_id: "k1" } })).toBe("/courses/k1?tab=reviews");
+    expect(notificationTarget({ type: "review_received", data: { course_id: "k1", rating: 5 } })).toBe("/courses/k1?tab=reviews");
   });
 });
 

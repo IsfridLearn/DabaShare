@@ -25,6 +25,13 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 
 ## Log
 
+### 2026-11-28 — Course space and reviews, on branch `course-space`
+
+- After enrolling, learning now happens on DabaShare: lessons with places or meeting links, tutor updates with materials, completion, and reviews from students who finished. Ratings show in the catalogue and on profiles. Plan and result are in COURSE_SPACE.md.
+- Migrations `20261202090000_course_space.sql` and `20261202100000_course_space_hardening.sql` were applied to the shared database. Both are additive; the live app is unaffected until the screens ship.
+- Tested: check (114 unit tests), build, RLS **170/0**, E2E **167/0**, and an accessibility and overflow sweep (44 screenshots, 0 issues). Independent security review: 0 critical, 0 high; the 4 medium findings are fixed.
+- Not deployed. Waiting for the owner's go-ahead.
+
 ### 2026-12-02 — Design v3 "The Commons", on branch `design-v3`
 
 - A full redesign after a study of the product and the four references (Linear, Are.na, Notion, an academic editorial site), with two subagent reviews of the rendered UI. The decisions and the result are in DESIGN_V3.md.

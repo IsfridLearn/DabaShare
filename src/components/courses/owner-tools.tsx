@@ -9,13 +9,14 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/ui/form-message";
 import { RowList } from "@/components/ui/primitives";
+import { CompletionToggle } from "./space/completion-toggle";
 
 export function EnrollmentRequests({ enrollments }: { enrollments: OwnerEnrollment[] }) {
   const pending = enrollments.filter((e) => e.status === "requested");
   const accepted = enrollments.filter((e) => e.status === "accepted");
 
   return (
-    <div className="grid gap-8 lg:grid-cols-2">
+    <div className="flex flex-col gap-8">
       <section className="flex flex-col gap-2">
         <h3 className="text-small font-semibold text-fg">
           Requests <span className="font-normal text-fg-subtle">({pending.length})</span>
@@ -52,13 +53,16 @@ export function EnrollmentRequests({ enrollments }: { enrollments: OwnerEnrollme
         {accepted.length ? (
           <RowList>
             {accepted.map((e) => (
-              <li key={e.id} className="flex items-center gap-2 px-4 py-3">
+              <li key={e.id} className="flex flex-wrap items-center gap-2 px-4 py-3">
                 <Person enrollment={e} />
-                <form action={decideEnrollment.bind(null, e.id, "declined")} className="ml-auto">
-                  <Button type="submit" size="sm" variant="ghost">
-                    Remove
-                  </Button>
-                </form>
+                <div className="ml-auto flex items-start gap-1">
+                  <CompletionToggle enrollmentId={e.id} completed={Boolean(e.completed_at)} name={e.student?.display_name ?? "this student"} />
+                  <form action={decideEnrollment.bind(null, e.id, "declined")}>
+                    <Button type="submit" size="sm" variant="ghost">
+                      Remove
+                    </Button>
+                  </form>
+                </div>
               </li>
             ))}
           </RowList>

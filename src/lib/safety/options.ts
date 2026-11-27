@@ -1,6 +1,6 @@
 import type { Enums } from "@/lib/supabase/database.types";
 
-export const REPORT_TARGETS = ["profile", "course", "message", "session", "post"] as const satisfies readonly Enums<"report_target">[];
+export const REPORT_TARGETS = ["profile", "course", "message", "session", "post", "review"] as const satisfies readonly Enums<"report_target">[];
 export type ReportTarget = (typeof REPORT_TARGETS)[number];
 
 export const REPORT_REASONS: { value: Enums<"report_reason">; label: string }[] = [
@@ -17,4 +17,5 @@ export const TARGET_LABEL: Record<ReportTarget, string> = {
   message: "message",
   session: "study session",
   post: "post",
+  review: "review",
 };

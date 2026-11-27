@@ -30,7 +30,9 @@ export function EnrollmentPanel({
       <div className="flex flex-col gap-3">
         <Alert tone="success">
           You&apos;re enrolled.{" "}
-          {free ? "Reach out to the tutor to plan your sessions." : `Arrange the ${formatPrice(pricePhp)} payment and schedule directly with ${tutorName}.`}
+          {free
+            ? "Lessons and updates from your tutor show up in the Schedule and Updates tabs."
+            : `Arrange the ${formatPrice(pricePhp)} payment directly with ${tutorName}. Lessons and updates show up in the Schedule and Updates tabs.`}
         </Alert>
         <form action={cancelEnrollment.bind(null, enrollment!.id)}>
           <Button type="submit" variant="ghost" size="sm">

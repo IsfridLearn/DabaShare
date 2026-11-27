@@ -14,6 +14,7 @@ export type NotificationRow = {
 function field(data: Json, key: string): string | undefined {
   if (data && typeof data === "object" && !Array.isArray(data)) {
     const value = (data as Record<string, Json | undefined>)[key];
+    if (typeof value === "number") return String(value);
     return typeof value === "string" ? value : undefined;
   }
   return undefined;
@@ -67,6 +68,16 @@ export function notificationText(n: NotificationRow): string {
       return `${who} started following you`;
     case "post_liked":
       return `${who} liked your post`;
+    case "lesson_scheduled":
+      return `New or changed lessons in ${course}`;
+    case "course_update":
+      return `${who} posted an update in ${course}`;
+    case "course_completed":
+      return `You finished ${course}. Leave a review?`;
+    case "review_received": {
+      const rating = field(n.data, "rating");
+      return rating ? `${who} gave ${course} ${rating} out of 5` : `${who} reviewed ${course}`;
+    }
     default:
       return "You have a new notification";
   }
@@ -83,6 +94,9 @@ export function notificationTarget(n: Pick<NotificationRow, "type" | "data"> & {
   const session = field(n.data, "session_id");
   if (n.type === "new_message" && conversation) return `/messages/${conversation}`;
   if (n.type === "course_removed") return "/courses/mine";
+  if (course && n.type === "lesson_scheduled") return `/courses/${course}?tab=schedule`;
+  if (course && n.type === "course_update") return `/courses/${course}?tab=updates`;
+  if (course && (n.type === "course_completed" || n.type === "review_received")) return `/courses/${course}?tab=reviews`;
   if (course) return `/courses/${course}`;
   if (session) return `/sessions/${session}`;
   return "/notifications";

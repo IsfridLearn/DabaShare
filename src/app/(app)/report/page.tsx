@@ -30,6 +30,11 @@ async function preview(type: ReportTarget, id: string): Promise<string | null> {
     const { data } = await supabase.from("courses").select("title").eq("id", id).maybeSingle();
     return data?.title ?? null;
   }
+  if (type === "review") {
+    const { data } = await supabase.from("course_reviews").select("rating, body").eq("id", id).maybeSingle();
+    if (!data) return null;
+    return `${data.rating} out of 5${data.body ? `: ${data.body}` : ""}`;
+  }
   const { data } = await supabase.from("study_sessions").select("title").eq("id", id).maybeSingle();
   return data?.title ?? null;
 }

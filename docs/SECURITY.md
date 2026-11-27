@@ -29,6 +29,10 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | Posts | Anyone who can see the author's profile (so blocks and unfinished profiles hide them) | Author: create (onboarded only), edit the body, delete. Author can't change. |
 | Post likes | Anyone who can see the post, except likes by someone in a block relationship with you | Like as yourself (onboarded only) on a post you can see; remove your own like |
 | Follows | The follower and the followee | Follow as yourself (onboarded only) someone you can see; unfollow your own follows. Blocking removes both directions. |
+| Course lessons | Course members: the tutor and students with an accepted enrollment, with no block between them | Tutor only. Times must be in the future and within 2 years, at most 50 upcoming lessons per course. A place can't contain control characters, and the app renders only strict http(s) URLs as links. |
+| Course updates | Course members | The tutor posts (as themselves) and deletes. At most 20 a day per course. Links must be http(s). |
+| Course reviews | Anyone who can see the course, except reviews by someone in a block relationship with you | Only a student the tutor marked as finished, and not in a block relationship with the tutor. One review per course; the author edits or deletes it. |
+| Course completion (`completed_at`) | The student and the tutor | Only through `set_enrollment_completed`, by the tutor, for accepted students. Needs a lesson that has ended or 7 days since joining. At most 30 a day per tutor. A student who reviewed stays finished. |
 | Blocks | Blocker | Blocker |
 | Reports | Reporter and admins | Insert by the reporter, who must be able to see the target. Admins update the status. |
 | Avatars (storage) | Anyone with the URL (public bucket) | Owner, inside `avatars/<user id>/`, at most 2 MB, JPEG, PNG or WebP. `profiles.avatar_path` must point into the owner's folder. |
@@ -58,6 +62,10 @@ Earlier limits:
 - **Social limits count live rows.** The 30-posts and 200-follows daily limits count rows that still exist, so deleting posts or unfollowing frees capacity, and two simultaneous inserts can both pass the check. Notifications stay deduplicated (one unread per post or follower), so the effect is extra writes, not notification spam. Likes have no daily limit. Revisit with a counter table if abuse shows up.
 - **Unliking keeps the like notification.** A "liked your post" notification stays after the like is removed (cosmetic).
 
+- **Ratings can still be gamed with alt accounts.** A tutor can enrol a second account, wait a week (or hold one lesson), mark it finished and review. The time rule and daily cap slow this down; real student verification would close it.
+- **Free-course meeting links are effectively public.** Anyone can join a free course instantly, so "members only" means "anyone who joins". The lesson form says so.
+- **Minor:** limit triggers count rows without locking, so concurrent inserts can slightly exceed a limit. They also run before RLS, so a non-owner can learn whether a course is at its lesson or update limit. Deleting a lesson or update leaves an old notification pointing at it.
+
 - **Avatars are public by URL.** File names are unguessable, but anyone who has a URL can view it.
 - **Rate limits:** messages are capped at 20 a minute and reports at 20 a day per student, in the database. Signup and login throttling relies on Supabase Auth's built-in limits, to be reviewed in Phase 9.
 - **Read receipts:** conversation members can see each other's `last_read_at`. This is intentional, for a future "Seen" indicator.
@@ -73,6 +81,7 @@ Earlier limits:
 
 | Date | What was tested | Result |
 |---|---|---|
+| 2026-11-28 | Course space and reviews (`20261202090000_course_space.sql`). Independent review by `qa-security-reviewer` (Sonnet). | 0 critical, 0 high, 4 medium and 8 low findings. Fixed in `20261202100000_course_space_hardening.sql`: lesson-place validation, completion and review notification deduplication, blocked reviewers, rating-gaming friction, lesson edit checks, the review-protection rule, and indexes. The rest are listed above. RLS smoke **170 passed, 0 failed**, and every new check failed before its fix. E2E **167 passed, 0 failed**. |
 | 2026-12-01 | Static review of the social layer (`20261129090000_social_feed.sql`, feed actions and queries, notification targets, post reports) by `qa-security-reviewer` (Sonnet) | 0 critical, 0 high, 1 medium and 6 low findings. The medium (unfinished accounts could like and follow, producing anonymous notifications) and 3 low ones (own like removing another's notification, likes visible across a block, sharing a cancelled or past session) are fixed in `20261201090000_social_feed_hardening.sql`, with 5 new RLS checks that failed before the fix. Stricter feed cursor validation in the app. The rest are listed under known limitations. |
 | 2026-11-22 | Static review of all migrations by `qa-security-reviewer` (Sonnet) | 0 critical, 0 high, 3 medium and 12 low findings. Every medium and the actionable low ones were fixed in `20261122100000_security_hardening.sql`. |
 | 2026-11-22 | Anonymous probe with the publishable key against every table and RPC on dev | Only universities and categories are readable. All 16 other tables, both RPCs and the `private` schema are denied. |

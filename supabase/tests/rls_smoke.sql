@@ -29,6 +29,9 @@ declare
   conv uuid;
   conv2 uuid;
   v_post uuid;
+  v_course uuid;
+  v_enr uuid;
+  v_review uuid;
   msg uuid;
   sess uuid;
   passed integer;
@@ -708,6 +711,157 @@ begin
   delete from public.posts where id = v_post;
   get diagnostics n = row_count;
   r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' authors can delete their posts');
+
+  -- ── Course space: lessons, updates, completion, reviews ─────────────────
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  insert into public.courses (owner_id, title, description, category_id, level, price_php)
+  values (d, 'Statistics Study Circle', 'Weekly problem sets and review.', 2, 'beginner', 0)
+  returning id into v_course;
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  insert into public.course_enrollments (course_id, student_id) values (v_course, e) returning id into v_enr;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  insert into public.course_lessons (course_id, title, starts_at, ends_at, location)
+  values (v_course, 'Week 1', now() + interval '1 day', now() + interval '1 day 2 hours', 'https://meet.example.com/stats');
+  get diagnostics n = row_count;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' tutor schedules a lesson');
+  begin
+    insert into public.course_lessons (course_id, title, starts_at, ends_at, location) values (v_course, 'Bad link', now() + interval '2 days', now() + interval '2 days 1 hour', E'java	script:alert(1)');
+    r := r || 'FAIL lesson accepts a hidden-character link'::text;
+  exception when others then
+    r := r || ('PASS lesson places reject control characters (' || sqlerrm || ')');
+  end;
+  begin
+    insert into public.course_lessons (course_id, title, starts_at, ends_at) values (v_course, 'Past', now() - interval '2 hours', now() - interval '1 hour');
+    r := r || 'FAIL lesson can start in the past'::text;
+  exception when others then
+    r := r || ('PASS lessons start in the future (' || sqlerrm || ')');
+  end;
+  insert into public.course_updates (course_id, author_id, body, link_url)
+  values (v_course, d, 'Problem set 1 is up.', 'https://drive.example.com/ps1');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.course_lessons where course_id = v_course;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' enrolled student sees the schedule');
+  select count(*) into n from public.course_updates where course_id = v_course;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' enrolled student sees updates');
+  select count(*) into n from public.notifications
+  where recipient_id = e and type in ('lesson_scheduled', 'course_update') and read_at is null;
+  r := r || (case when n = 2 then 'PASS' else 'FAIL' end || ' student notified of the lesson and the update');
+  begin
+    insert into public.course_lessons (course_id, title, starts_at, ends_at) values (v_course, 'Student lesson', now() + interval '3 days', now() + interval '3 days 1 hour');
+    r := r || 'FAIL a student can add lessons'::text;
+  exception when others then
+    r := r || ('PASS only the tutor adds lessons (' || sqlerrm || ')');
+  end;
+  begin
+    insert into public.course_reviews (course_id, author_id, rating) values (v_course, e, 5);
+    r := r || 'FAIL can review before finishing'::text;
+  exception when others then
+    r := r || ('PASS reviews need a finished course (' || sqlerrm || ')');
+  end;
+  begin
+    perform public.set_enrollment_completed(v_enr, true);
+    r := r || 'FAIL a student can mark themselves finished'::text;
+  exception when others then
+    r := r || ('PASS only the tutor marks completion (' || sqlerrm || ')');
+  end;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.course_lessons where course_id = v_course;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' non-members don''t see lessons');
+  select count(*) into n from public.course_updates where course_id = v_course;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' non-members don''t see updates');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  begin
+    perform public.set_enrollment_completed(v_enr, true);
+    r := r || 'FAIL completion right after joining'::text;
+  exception when others then
+    r := r || ('PASS completion needs a past lesson or a week (' || sqlerrm || ')');
+  end;
+  perform set_config('role', admin_role, true);
+  update public.course_enrollments set decided_at = now() - interval '8 days' where id = v_enr;
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  perform public.set_enrollment_completed(v_enr, true);
+  perform public.set_enrollment_completed(v_enr, false);
+  perform public.set_enrollment_completed(v_enr, true);
+  perform set_config('request.jwt.claims', json_build_object('sub', e, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.notifications where recipient_id = e and type = 'course_completed';
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' completion notification is deduplicated (' || n || ')');
+  insert into public.course_reviews (course_id, author_id, rating, body)
+  values (v_course, e, 5, 'Clear explanations and good problem sets.') returning id into v_review;
+  r := r || (case when v_review is not null then 'PASS' else 'FAIL' end || ' finished student reviews the course');
+  begin
+    insert into public.course_reviews (course_id, author_id, rating) values (v_course, e, 1);
+    r := r || 'FAIL can review the same course twice'::text;
+  exception when others then
+    r := r || ('PASS one review per course (' || sqlerrm || ')');
+  end;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.notifications where recipient_id = d and type = 'review_received';
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' tutor notified of the review');
+  update public.course_reviews set rating = 1 where id = v_review;
+  get diagnostics n = row_count;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' tutor can''t edit a review');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select rating_avg::text || '|' || rating_count::text into v_text from public.course_rating_summary(array[v_course]);
+  r := r || (case when v_text = '5.0|1' then 'PASS' else 'FAIL' end || ' rating summary for visitors');
+  insert into public.reports (reporter_id, target_type, target_id, reason) values (a, 'review', v_review, 'spam');
+  select target_snapshot ->> 'rating' into v_text from public.reports where reporter_id = a and target_id = v_review;
+  r := r || (case when v_text = '5' then 'PASS' else 'FAIL' end || ' reviews can be reported (snapshot kept)');
+
+  perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.course_lessons where course_id = v_course;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' unfinished accounts don''t see lessons');
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  insert into public.course_lessons (course_id, title, starts_at, ends_at, location)
+  values (v_course, 'Week 2', now() + interval '8 days', now() + interval '8 days 1 hour', 'Library: 2nd floor');
+  get diagnostics n = row_count;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' plain places with a colon are allowed');
+  begin
+    insert into public.course_lessons (course_id, title, starts_at, ends_at, location) values (v_course, 'Sneaky', now() + interval '9 days', now() + interval '9 days 1 hour', E' javascript:alert(1)');
+    r := r || 'FAIL lesson place with leading space accepted'::text;
+  exception when others then
+    r := r || ('PASS lesson places can''t carry hidden characters (' || sqlerrm || ')');
+  end;
+  begin
+    update public.course_lessons set starts_at = now() - interval '1 hour', ends_at = now() + interval '1 hour' where course_id = v_course and title = 'Week 2';
+    r := r || 'FAIL lesson moved into the past'::text;
+  exception when others then
+    r := r || ('PASS lesson edits keep times in the future (' || sqlerrm || ')');
+  end;
+  begin
+    perform public.set_enrollment_completed(v_enr, false);
+    r := r || 'FAIL tutor un-finishes a student who reviewed'::text;
+  exception when others then
+    r := r || ('PASS reviewers stay finished (' || sqlerrm || ')');
+  end;
+
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  insert into public.course_enrollments (course_id, student_id) values (v_course, a) returning id into v_uuid;
+  perform set_config('role', admin_role, true);
+  update public.course_enrollments set decided_at = now() - interval '8 days' where id = v_uuid;
+  perform set_config('role', 'authenticated', true);
+  perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);
+  perform public.set_enrollment_completed(v_uuid, true);
+  insert into public.blocks (blocker_id, blocked_id) values (d, a);
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  begin
+    insert into public.course_reviews (course_id, author_id, rating) values (v_course, a, 1);
+    r := r || 'FAIL a blocked student can review'::text;
+  exception when others then
+    r := r || ('PASS blocked students can''t review (' || sqlerrm || ')');
+  end;
+  select count(*) into n from public.course_lessons where course_id = v_course;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' removed students lose the schedule');
+  perform set_config('role', admin_role, true);
+  delete from public.blocks where blocker_id = d and blocked_id = a;
+  perform set_config('role', 'authenticated', true);
+
 
   -- ── Phase 3: onboarding, interests, skills, account deletion ───────────
   perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);

@@ -141,6 +141,7 @@ export type Database = {
       }
       course_enrollments: {
         Row: {
+          completed_at: string | null
           course_id: string
           created_at: string
           decided_at: string | null
@@ -151,6 +152,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          completed_at?: string | null
           course_id: string
           created_at?: string
           decided_at?: string | null
@@ -161,6 +163,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          completed_at?: string | null
           course_id?: string
           created_at?: string
           decided_at?: string | null
@@ -183,6 +186,95 @@ export type Database = {
             columns: ["student_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_lessons: {
+        Row: {
+          course_id: string
+          created_at: string
+          ends_at: string
+          id: string
+          location: string | null
+          notes: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          ends_at: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          ends_at?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_reviews: {
+        Row: {
+          author_id: string
+          body: string | null
+          course_id: string
+          created_at: string
+          id: string
+          rating: number
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body?: string | null
+          course_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string | null
+          course_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_reviews_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_reviews_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]
@@ -213,6 +305,48 @@ export type Database = {
             columns: ["skill_id"]
             isOneToOne: false
             referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_updates: {
+        Row: {
+          author_id: string
+          body: string
+          course_id: string
+          created_at: string
+          id: string
+          link_url: string | null
+        }
+        Insert: {
+          author_id: string
+          body: string
+          course_id: string
+          created_at?: string
+          id?: string
+          link_url?: string | null
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          course_id?: string
+          created_at?: string
+          id?: string
+          link_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_updates_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_updates_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]
@@ -871,6 +1005,14 @@ export type Database = {
         }
         Returns: number
       }
+      course_rating_summary: {
+        Args: { course_ids: string[] }
+        Returns: {
+          course_id: string
+          rating_avg: number
+          rating_count: number
+        }[]
+      }
       delete_my_account: { Args: never; Returns: undefined }
       feed_posts: {
         Args: {
@@ -1009,6 +1151,10 @@ export type Database = {
         Args: { skill_names: string[]; target_course: string }
         Returns: undefined
       }
+      set_enrollment_completed: {
+        Args: { done: boolean; target: string }
+        Returns: undefined
+      }
       start_direct_conversation: { Args: { other_id: string }; Returns: string }
       suggest_matches: {
         Args: {
@@ -1034,6 +1180,13 @@ export type Database = {
           username: string
         }[]
       }
+      tutor_rating_summary: {
+        Args: { tutor: string }
+        Returns: {
+          rating_avg: number
+          rating_count: number
+        }[]
+      }
       unread_conversation_count: { Args: never; Returns: number }
       unread_notification_count: { Args: never; Returns: number }
     }
@@ -1053,6 +1206,10 @@ export type Database = {
         | "course_removed"
         | "new_follower"
         | "post_liked"
+        | "lesson_scheduled"
+        | "course_update"
+        | "course_completed"
+        | "review_received"
       participant_status:
         | "invited"
         | "requested"
@@ -1061,7 +1218,13 @@ export type Database = {
         | "cancelled"
       report_reason: "spam" | "harassment" | "inappropriate" | "scam" | "other"
       report_status: "open" | "reviewing" | "resolved" | "dismissed"
-      report_target: "profile" | "course" | "message" | "session" | "post"
+      report_target:
+        | "profile"
+        | "course"
+        | "message"
+        | "session"
+        | "post"
+        | "review"
       request_status: "requested" | "accepted" | "declined" | "cancelled"
       session_status: "scheduled" | "cancelled"
       session_type: "webinar" | "study_group" | "qa"
@@ -1208,6 +1371,10 @@ export const Constants = {
         "course_removed",
         "new_follower",
         "post_liked",
+        "lesson_scheduled",
+        "course_update",
+        "course_completed",
+        "review_received",
       ],
       participant_status: [
         "invited",
@@ -1218,7 +1385,14 @@ export const Constants = {
       ],
       report_reason: ["spam", "harassment", "inappropriate", "scam", "other"],
       report_status: ["open", "reviewing", "resolved", "dismissed"],
-      report_target: ["profile", "course", "message", "session", "post"],
+      report_target: [
+        "profile",
+        "course",
+        "message",
+        "session",
+        "post",
+        "review",
+      ],
       request_status: ["requested", "accepted", "declined", "cancelled"],
       session_status: ["scheduled", "cancelled"],
       session_type: ["webinar", "study_group", "qa"],

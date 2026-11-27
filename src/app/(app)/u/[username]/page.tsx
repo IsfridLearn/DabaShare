@@ -13,6 +13,8 @@ import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getPublishedCoursesBy } from "@/lib/courses/queries";
 import { formatPrice } from "@/lib/courses/validation";
 import { getFeed, getSocial } from "@/lib/feed/queries";
+import { getTutorRating } from "@/lib/courses/space-queries";
+import { RatingInline } from "@/components/courses/space/stars";
 import { skillOverlap } from "@/lib/profile/overlap";
 import { getProfileDetailsById, getProfileDetailsByUsername, type SkillRef } from "@/lib/profile/queries";
 import { getCategories } from "@/lib/reference";
@@ -36,9 +38,10 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
 
   const isMe = profile.id === me.id;
   const interests = categories.filter((c) => profile.interestIds.includes(c.id));
-  const [courses, social, posts] = await Promise.all([
+  const [courses, social, tutorRating, posts] = await Promise.all([
     getPublishedCoursesBy(profile.id),
     getSocial(profile.id),
+    getTutorRating(profile.id),
     getFeed("everyone", null, profile.id),
   ]);
   const overlap = mine && !isMe ? skillOverlap(mine, profile) : null;
@@ -65,6 +68,12 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
             <span>
               <strong className="font-semibold text-fg">{social.following.toLocaleString("en-US")}</strong> following
             </span>
+            {tutorRating && (
+              <span className="inline-flex items-center gap-1">
+                <RatingInline avg={tutorRating.avg} count={tutorRating.count} />
+                <span>as a tutor</span>
+              </span>
+            )}
             {social.follows_me && !isMe && <Badge>Follows you</Badge>}
           </p>
         </div>

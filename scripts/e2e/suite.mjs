@@ -199,19 +199,53 @@ const run = async () => {
 
   r = await req(a, "/courses/mine");
   ok(r.html.includes("1 new request") && r.html.includes("Secret draft"), "My courses shows pending request and draft");
-  r = await req(a, "/courses/" + paidId);
+  r = await req(a, "/courses/" + paidId + "?tab=students");
   ok(r.html.includes("I can do weekends."), "owner sees the request note");
   const accept = forms(r.html).find((f) => f.inner.includes(">Accept<"));
-  r2 = await submit(a, "/courses/" + paidId, accept, {});
+  r2 = await submit(a, "/courses/" + paidId + "?tab=students", accept, {});
   r = await req(b, "/courses/" + paidId);
   ok(r.html.includes("Arrange the ₱250 payment"), "accepted student sees payment note");
   r = await req(b, "/courses/mine");
   ok(r.html.includes("Accounting 101") && r.html.includes("Enrolled"), "B's learning list shows the course");
 
+  // Course space: schedule, updates, completion, reviews.
+  const lessonDay = new Date(Date.now() + 3 * 86400000 + 8 * 3600000).toISOString().slice(0, 10);
+  r = await req(a, "/courses/" + paidId + "?tab=schedule");
+  ok(r.html.includes("Add a lesson"), "tutor sees the lesson form");
+  r2 = await submit(a, "/courses/" + paidId + "?tab=schedule", pick(r.html, 'name="duration"'), {
+    title: "Week 1: Journal entries",
+    date: lessonDay,
+    time: "18:00",
+    duration: "90",
+    location: "https://meet.example.com/acct-week1",
+    notes: "Bring a calculator.",
+  });
+  r = await req(b, "/courses/" + paidId + "?tab=schedule");
+  ok(r.html.includes("Week 1: Journal entries") && r.html.includes("meet.example.com/acct-week1"), "enrolled student sees the lesson and its link");
+  ok(!r.html.includes("Add a lesson"), "students don't get the lesson form");
+  r = await req(b, "/courses/" + paidId);
+  ok(r.html.includes("Next lesson") && r.html.includes("Week 1: Journal entries"), "course page shows the next lesson to members");
+
+  r = await req(a, "/courses/" + paidId + "?tab=updates");
+  r2 = await submit(a, "/courses/" + paidId + "?tab=updates", pick(r.html, 'name="link"'), { body: "Problem set 1 is up.", link: "https://drive.example.com/ps1" });
+  r = await req(b, "/courses/" + paidId + "?tab=updates");
+  ok(r.html.includes("Problem set 1 is up.") && r.html.includes("drive.example.com/ps1"), "enrolled student sees the update");
+  r = await req(b, "/notifications");
+  ok(r.html.includes("New or changed lessons in Accounting 101") && r.html.includes("posted an update in Accounting 101"), "student notified of the lesson and the update");
+
+  r = await req(a, "/courses/" + paidId + "?tab=students");
+  const finish = pick(r.html, "Mark as finished");
+  r2 = await submit(a, "/courses/" + paidId + "?tab=students", finish, { enrollmentId: field(finish, "enrollmentId"), done: "1" });
+  ok(r2.html.includes("after a lesson has taken place"), "completion waits for a past lesson or a week");
+  r = await req(b, "/courses/" + paidId + "?tab=reviews");
+  ok(r.html.includes("No reviews yet") && !r.html.includes('name="rating"'), "students can't review before finishing");
+
   r = await req(b, "/courses/" + freeId);
   r2 = await submit(b, "/courses/" + freeId, forms(r.html).find((f) => f.inner.includes("Leave this course")), {});
   r = await req(b, "/courses/" + freeId);
   ok(r.html.includes("Enroll for free"), "student can leave and re-enroll later");
+  r = await req(b, "/courses/" + freeId + "?tab=schedule");
+  ok(!r.html.includes("Add a lesson") && r.html.includes("About this course"), "after leaving, members-only tabs fall back to the overview");
 
   r = await req(a, "/courses/" + freeId + "/edit");
   const edit = pick(r.html, 'name="title"');

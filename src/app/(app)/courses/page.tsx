@@ -7,6 +7,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader, Pagination } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { searchCourses } from "@/lib/courses/queries";
+import { getRatingSummaries } from "@/lib/courses/space-queries";
 import { coursesHref, PAGE_SIZE, parseCourseFilters } from "@/lib/courses/validation";
 import { getCategories, getUniversities } from "@/lib/reference";
 
@@ -24,6 +25,7 @@ export default async function CoursesPage({ searchParams }: PageProps<"/courses"
     getUniversities(),
     getCategories(),
   ]);
+  const ratings = await getRatingSummaries(courses.map((c) => c.id));
   const filtered = Boolean(filters.q || filters.uni || filters.cat || filters.level || filters.price);
   const category = categories.find((c) => c.id === filters.cat);
 
@@ -58,7 +60,7 @@ export default async function CoursesPage({ searchParams }: PageProps<"/courses"
           <ul className="divide-y divide-line border-b border-line">
             {courses.map((course) => (
               <li key={course.id}>
-                <CourseEntry course={course} />
+                <CourseEntry course={course} rating={ratings.get(course.id)} />
               </li>
             ))}
           </ul>

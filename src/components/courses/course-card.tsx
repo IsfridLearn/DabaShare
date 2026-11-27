@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { Avatar } from "@/components/ui/avatar";
 import type { CourseListItem } from "@/lib/courses/queries";
+import type { RatingSummary } from "@/lib/courses/space-queries";
+import { RatingInline } from "./space/stars";
 import { formatPrice, levelLabel } from "@/lib/courses/validation";
 
 const MAX_SKILLS = 3;
 
 // A catalogue entry, read like a course bulletin: department and level as a
 // condensed label, the title large, who teaches it, and the price set apart.
-export function CourseEntry({ course }: { course: CourseListItem }) {
+export function CourseEntry({ course, rating }: { course: CourseListItem; rating?: RatingSummary }) {
   const free = course.price_php === 0;
   const extra = course.skill_names.length - MAX_SKILLS;
 
@@ -41,9 +43,12 @@ export function CourseEntry({ course }: { course: CourseListItem }) {
           )}
         </div>
       </div>
-      <p className={free ? "font-display text-[1.25rem] leading-none text-brand-ink" : "font-display text-[1.25rem] leading-none text-fg"}>
-        {formatPrice(course.price_php)}
-      </p>
+      <div className="flex flex-col items-end gap-2">
+        <p className={free ? "font-display text-[1.25rem] leading-none text-brand-ink" : "font-display text-[1.25rem] leading-none text-fg"}>
+          {formatPrice(course.price_php)}
+        </p>
+        {rating && <RatingInline avg={rating.avg} count={rating.count} />}
+      </div>
     </Link>
   );
 }
