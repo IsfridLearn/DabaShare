@@ -32,10 +32,10 @@ export function CourseFiltersBar({
         action="/courses"
         method="get"
         role="search"
-        className="grid grid-cols-2 gap-2 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]"
+        className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]"
       >
         {filters.price && <input type="hidden" name="price" value={filters.price} />}
-        <div className="relative col-span-2 md:col-span-1">
+        <div className="relative col-span-2 sm:col-span-4 lg:col-span-1">
           <label className="sr-only" htmlFor="q">
             Search courses or tutors
           </label>

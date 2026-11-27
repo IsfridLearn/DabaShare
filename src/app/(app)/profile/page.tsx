@@ -8,6 +8,7 @@ import { SkillsEditor, SkillSuggestions } from "@/components/profile/skills-edit
 import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button";
 import { PageHeader, PanelSection } from "@/components/ui/primitives";
+import { NoticeToast } from "@/components/ui/toast";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { updateProfile } from "@/lib/profile/actions";
 import { profileCompleteness } from "@/lib/profile/completeness";
@@ -19,9 +20,9 @@ export const instant = false;
 
 export const metadata = { title: "My profile" };
 
-const NOTICES: Record<string, string> = {
-  welcome:
-    "Welcome to DabaShare! Add what you can teach and what you want to learn, then check People for learning partners.",
+// The welcome note is guidance, so it stays on the page; the rest are toasts.
+const WELCOME = "Welcome to DabaShare! Add what you can teach and what you want to learn, then check People for learning partners.";
+const TOASTS: Record<string, string> = {
   "password-updated": "Your password has been updated.",
 };
 
@@ -35,7 +36,8 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
     searchParams,
   ]);
   if (!details) notFound();
-  const notice = typeof params.notice === "string" ? NOTICES[params.notice] : undefined;
+  const welcome = params.notice === "welcome";
+  const toast = typeof params.notice === "string" ? TOASTS[params.notice] : undefined;
   const completeness = profileCompleteness(details);
   const missing = completeness.items.filter((i) => !i.done);
 
@@ -52,7 +54,8 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
         }
       />
 
-      {notice && <Alert tone="success">{notice}</Alert>}
+      {welcome && <Alert tone="success">{WELCOME}</Alert>}
+      {toast && <NoticeToast key={toast} message={toast} />}
 
       {missing.length > 0 && (
         <section aria-labelledby="completeness-title" className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 sm:p-5">

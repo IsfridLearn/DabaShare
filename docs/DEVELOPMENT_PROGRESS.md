@@ -25,6 +25,13 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 
 ## Log
 
+### 2026-12-01 — Design refresh, Phase 5 (interactions + responsive), on branch `design-refresh`
+
+- **Toasts:** new `Toast`, `NoticeToast` (for `?notice=` redirects; removes the notice from the address bar) and `ResultToast` (for form results). `FormMessage` takes `successAs="toast"`. Errors always stay inline.
+- **Skeletons:** `src/components/ui/skeletons.tsx` and a `loading.tsx` for each of the 21 signed-in routes, shaped like the page they stand in for.
+- **Responsive fixes:** see DESIGN_AUDIT.md "Phase 5 result".
+- Tested: `npm run check` (101 unit tests), `npm run build`, E2E 158 passed, 0 failed (self-cleaned). Screenshots of 13 signed-in screens at 360, 768, 1024 and 1440px (plus host views, the landing page, and dark mode samples), with an automatic horizontal-overflow check: no page scrolls sideways at any width.
+
 ### 2026-11-30 — Design refresh, Phase 4 (core screens), on branch `design-refresh`
 
 - Every signed-in screen now uses the design system v2 (details in DESIGN_AUDIT.md "Phase 4 result"). The old `Tag` component and the course-only pagination are removed.

@@ -49,7 +49,7 @@ export default async function MatchesPage({ searchParams }: PageProps<"/matches"
             {m.label}
           </Chip>
         ))}
-        <span aria-hidden="true" className="mx-1 h-5 w-px bg-line-strong" />
+        <span aria-hidden="true" className="mx-1 hidden h-5 w-px bg-line-strong sm:block" />
         <Chip href={matchesHref({ ...filters, sameUni: !filters.sameUni, page: 1 })} active={filters.sameUni}>
           {filters.sameUni && <Check className="size-3.5" aria-hidden="true" />}
           My university only

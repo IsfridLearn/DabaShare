@@ -1,9 +1,13 @@
 import type { FormState } from "@/lib/forms";
 import { Alert } from "./alert";
+import { ResultToast } from "./toast";
 
-// Top-of-form status line for a Server Action result.
-export function FormMessage({ state }: { state: FormState }) {
+// Status line for a Server Action result. Errors always stay inline next to
+// the form. A success can be a toast instead (`successAs="toast"`) when the
+// form stays on screen and the outcome needs no follow-up.
+export function FormMessage({ state, successAs = "inline" }: { state: FormState; successAs?: "inline" | "toast" }) {
   if (state.status === "idle" || !state.message) return null;
+  if (state.status === "success" && successAs === "toast") return <ResultToast result={state} message={state.message} />;
   return <Alert tone={state.status === "error" ? "error" : "success"}>{state.message}</Alert>;
 }
 

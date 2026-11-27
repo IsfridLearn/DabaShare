@@ -3,6 +3,7 @@ import { ConversationList } from "@/components/messages/conversation-list";
 import { InboxLive } from "@/components/messages/inbox-live";
 import { MessagesFrame } from "@/components/messages/messages-frame";
 import { Alert } from "@/components/ui/alert";
+import { NoticeToast } from "@/components/ui/toast";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getInbox } from "@/lib/messages/queries";
 
@@ -25,10 +26,11 @@ export default async function MessagesPage({ searchParams }: PageProps<"/message
   return (
     <>
       <InboxLive />
+      {notice && notice.tone !== "error" && <NoticeToast key={notice.text} tone={notice.tone} message={notice.text} />}
       <MessagesFrame
         title="Messages"
         conversationOpen={false}
-        notice={notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
+        notice={notice?.tone === "error" && <Alert tone="error">{notice.text}</Alert>}
         list={<ConversationList items={items} meId={me.id} />}
       >
         <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">

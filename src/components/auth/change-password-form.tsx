@@ -13,7 +13,7 @@ export function ChangePasswordForm() {
 
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
-      <FormMessage state={state} />
+      <FormMessage state={state} successAs="toast" />
       <Field label="Current password" htmlFor="currentPassword" error={fieldError(state, "currentPassword")}>
         <PasswordInput id="currentPassword" name="currentPassword" autoComplete="current-password" required {...errorProps(state, "currentPassword")} />
       </Field>

@@ -35,7 +35,7 @@ export function SessionRow({ session, meId }: { session: SessionListItem; meId: 
     >
       <span
         aria-hidden="true"
-        className="flex w-12 shrink-0 flex-col items-center rounded-control border border-line bg-canvas py-1.5 leading-none"
+        className="flex w-12 shrink-0 flex-col items-center self-start rounded-control border border-line bg-canvas py-1.5 leading-none"
       >
         <span className="text-[0.625rem] font-semibold tracking-wide text-fg-subtle uppercase">{day.month}</span>
         <span className="mt-1 font-serif text-[1.375rem] font-medium text-fg">{day.day}</span>

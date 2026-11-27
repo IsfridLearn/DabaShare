@@ -1,9 +1,9 @@
 import { ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
-import { Alert } from "@/components/ui/alert";
 import { buttonClasses } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Badge, PageHeader, RowList, Section } from "@/components/ui/primitives";
+import { NoticeToast } from "@/components/ui/toast";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { getMyLearning, getMyTeaching, type EnrollmentStatus } from "@/lib/courses/queries";
 import { formatPrice, STATUSES } from "@/lib/courses/validation";
@@ -39,7 +39,7 @@ export default async function MyCoursesPage({ searchParams }: PageProps<"/course
             </Link>
           }
         />
-        {query.notice === "deleted" && <Alert tone="success">The course was deleted and its students were notified.</Alert>}
+        {query.notice === "deleted" && <NoticeToast message="The course was deleted and its students were notified." />}
       </div>
 
       <Section title="Teaching">

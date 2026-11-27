@@ -6,6 +6,7 @@ import { CancelSessionForm, InviteForm, ParticipantList } from "@/components/ses
 import { ParticipationPanel } from "@/components/sessions/participation-panel";
 import { LiveDot } from "@/components/sessions/session-card";
 import { Alert } from "@/components/ui/alert";
+import { NoticeToast } from "@/components/ui/toast";
 import { Avatar } from "@/components/ui/avatar";
 import { buttonClasses } from "@/components/ui/button";
 import { BackLink, Badge, PanelSection, Properties } from "@/components/ui/primitives";
@@ -50,10 +51,12 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       <BackLink href="/sessions">All sessions</BackLink>
-      {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
+      {notice?.tone === "error" && <Alert tone="error">{notice.text}</Alert>}
+      {notice && notice.tone !== "error" && <NoticeToast key={notice.text} tone={notice.tone} message={notice.text} />}
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <article className="flex min-w-0 flex-col">
+      <div className="flex flex-col gap-8 lg:grid lg:gap-10 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <article className="contents lg:flex lg:min-w-0 lg:flex-col">
+          <header className="order-1 lg:order-none">
           <p className="flex flex-wrap items-center gap-2 text-small text-fg-subtle">
             {phase === "live" && (
               <Badge tone="danger">
@@ -73,16 +76,19 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
             {day.label} · {time} <span className="text-fg-subtle">(PH time)</span>
           </p>
 
+          </header>
+          <div className="order-3 lg:order-none">
           {session.description && (
-            <div className="mt-8 border-t border-line pt-8">
+            <div className="border-t lg:mt-8 border-line pt-8">
               <h2 className="sr-only">About this session</h2>
               <p className="max-w-[68ch] text-[1rem] leading-7 break-words whitespace-pre-line text-fg">{session.description}</p>
             </div>
           )}
+          </div>
         </article>
 
-        <aside className="flex flex-col gap-6 lg:sticky lg:top-10 lg:self-start" aria-label="Session details">
-          <section className="flex flex-col gap-4 rounded-card border border-line bg-surface p-5">
+        <aside className="contents lg:sticky lg:top-10 lg:flex lg:flex-col lg:gap-6 lg:self-start" aria-label="Session details">
+          <section className="order-2 flex flex-col gap-4 rounded-card lg:order-none border border-line bg-surface p-5">
             {isHost ? (
               <>
                 <h2 className="text-heading">Your session</h2>
@@ -122,6 +128,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
             )}
           </section>
 
+          <div className="order-4 flex flex-col gap-6 lg:order-none">
           <Properties
             className="px-1"
             items={[
@@ -154,6 +161,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<"/
               )}
             </section>
           )}
+          </div>
         </aside>
       </div>
 

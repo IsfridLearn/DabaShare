@@ -37,10 +37,10 @@ export default function LandingPage() {
           <Logo size={26} />
         </Link>
         <nav aria-label="Account" className="flex items-center gap-1 sm:gap-2">
-          <Link href="/login" className={buttonClasses({ variant: "ghost" })}>
+          <Link href="/login" className={buttonClasses({ variant: "ghost", size: "sm" })}>
             Sign in
           </Link>
-          <Link href="/signup" className={buttonClasses()}>
+          <Link href="/signup" className={buttonClasses({ size: "sm" })}>
             Create account
           </Link>
         </nav>

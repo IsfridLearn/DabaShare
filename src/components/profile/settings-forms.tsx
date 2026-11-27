@@ -11,7 +11,7 @@ export function DiscoverableForm({ discoverable }: { discoverable: boolean }) {
   const [state, action, pending] = useActionState(setDiscoverable, initialFormState);
   return (
     <form action={action} className="flex flex-col gap-4">
-      <FormMessage state={state} />
+      <FormMessage state={state} successAs="toast" />
       <label className="flex items-start gap-3">
         <input
           type="checkbox"
@@ -40,7 +40,7 @@ export function DeleteAccountForm() {
   const [state, action, pending] = useActionState(deleteAccount, initialFormState);
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
-      <FormMessage state={state} />
+      <FormMessage state={state} successAs="toast" />
       <p className="text-small text-fg-muted">
         This permanently deletes your profile, photo, skills, courses, enrollments, messages and study
         sessions. It can&apos;t be undone.

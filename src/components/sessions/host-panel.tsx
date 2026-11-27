@@ -99,7 +99,7 @@ export function InviteForm({ sessionId }: { sessionId: string }) {
   const [state, action, pending] = useActionState(inviteToSession.bind(null, sessionId), initialFormState);
   return (
     <form action={action} className="flex flex-col gap-2" noValidate>
-      <FormMessage state={state} />
+      <FormMessage state={state} successAs="toast" />
       <label htmlFor="invite-username" className="text-small font-medium text-fg">
         Invite a student by username
       </label>

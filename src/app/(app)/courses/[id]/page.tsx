@@ -5,6 +5,7 @@ import { EnrollmentPanel } from "@/components/courses/enrollment-panel";
 import { EnrollmentRequests } from "@/components/courses/owner-tools";
 import { MessageButton } from "@/components/messages/message-button";
 import { Alert } from "@/components/ui/alert";
+import { NoticeToast } from "@/components/ui/toast";
 import { Avatar } from "@/components/ui/avatar";
 import { buttonClasses } from "@/components/ui/button";
 import { BackLink, Badge, Properties } from "@/components/ui/primitives";
@@ -42,11 +43,13 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
       <BackLink href="/courses">All courses</BackLink>
-      {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
+      {notice?.tone === "error" && <Alert tone="error">{notice.text}</Alert>}
+      {notice && notice.tone !== "error" && <NoticeToast key={notice.text} tone={notice.tone} message={notice.text} />}
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_19rem]">
+      <div className="flex flex-col gap-8 lg:grid lg:gap-10 lg:grid-cols-[minmax(0,1fr)_19rem]">
         {/* The course reads like a document. */}
-        <article className="flex min-w-0 flex-col">
+        <article className="contents lg:flex lg:min-w-0 lg:flex-col">
+          <header className="order-1 lg:order-none">
           <p className="flex flex-wrap items-center gap-2 text-small text-fg-subtle">
             {course.category && <span>{course.category.name}</span>}
             {course.status !== "published" && <Badge tone="warning">{statusLabel}</Badge>}
@@ -65,7 +68,9 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
             </p>
           )}
 
-          <div className="mt-8 border-t border-line pt-8">
+          </header>
+          <div className="order-3 lg:order-none">
+          <div className="border-t lg:mt-8 border-line pt-8">
             <h2 className="sr-only">About this course</h2>
             <p className="max-w-[68ch] text-[1rem] leading-7 break-words whitespace-pre-line text-fg">{course.description}</p>
           </div>
@@ -82,10 +87,11 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
               </ul>
             </section>
           )}
+          </div>
         </article>
 
-        <aside className="flex flex-col gap-6 lg:sticky lg:top-10 lg:self-start" aria-label="Course details">
-          <section className="order-first flex flex-col gap-4 rounded-card border border-line bg-surface p-5">
+        <aside className="contents lg:sticky lg:top-10 lg:flex lg:flex-col lg:gap-6 lg:self-start" aria-label="Course details">
+          <section className="order-2 flex flex-col gap-4 rounded-card lg:order-none border border-line bg-surface p-5">
             <div>
               <h2 className="sr-only">{isOwner ? "Your course" : "Enroll"}</h2>
               <p className={free ? "text-title font-serif text-success-ink" : "text-title font-serif text-fg"}>{formatPrice(course.price_php)}</p>
@@ -108,6 +114,7 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
             )}
           </section>
 
+          <div className="order-4 flex flex-col gap-6 lg:order-none">
           <Properties
             className="px-1"
             items={[
@@ -142,6 +149,7 @@ export default async function CoursePage({ params, searchParams }: PageProps<"/c
               )}
             </section>
           )}
+          </div>
         </aside>
       </div>
 

@@ -101,7 +101,7 @@ export function ProfileForm({
           {...errorProps(state, "bio")}
         />
       </Field>
-      <FormMessage state={state} />
+      <FormMessage state={state} successAs="toast" />
       <div>
         <Button type="submit" loading={pending}>
           {pending ? "Saving…" : submitLabel}

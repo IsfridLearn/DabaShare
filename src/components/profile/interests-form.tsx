@@ -14,7 +14,7 @@ export function InterestsForm({ categories, selected }: { categories: Category[]
     <form action={action} className="flex flex-col gap-4">
       <fieldset>
         <legend className="sr-only">Learning interests</legend>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div className="grid grid-cols-2 gap-2">
           {categories.map((c) => (
             <label
               key={c.id}
@@ -32,7 +32,7 @@ export function InterestsForm({ categories, selected }: { categories: Category[]
           ))}
         </div>
       </fieldset>
-      <FormMessage state={state} />
+      <FormMessage state={state} successAs="toast" />
       <div>
         <Button type="submit" variant="secondary" loading={pending}>
           {pending ? "Saving…" : "Save interests"}

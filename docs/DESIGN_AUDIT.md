@@ -128,3 +128,14 @@ Date: 2026-11-28. Scope: the whole frontend (25 routes and 37 components), measu
 - **Also:** onboarding, report, error and not-found pages, the privacy notice, and the landing page (now editorial, with no gradient or blurred blobs and only real features).
 - **Icons:** lucide icons replace the remaining emoji and hand-drawn SVGs.
 - Next (Phase 5): toasts, route-shaped skeletons, and responsive passes.
+
+## Phase 5 result (interactions and responsive)
+
+- **Feedback rule:** a page-level outcome after a redirect (course posted, changes saved, session cancelled, conversation hidden, password updated) and a form that stays on screen (profile, interests, privacy, password, invitation) show a **toast**: bottom-right on desktop, above the tab bar on phones, auto-hides after 5 seconds, dismissable, announced to screen readers, and rendered on the server so it also works without JavaScript. Errors stay **inline** next to the form. Onboarding guidance (the welcome note) stays on the page.
+- **Loading:** every signed-in route has a placeholder shaped like its page (feed, course grid, document detail, agenda, rows, two-pane messages, settings sections, profile, forms) instead of the same three grey boxes (U4).
+- **Responsive pass** at 360, 768, 1024 and 1440px:
+  - Course and session pages on phones put the Enroll / Join panel straight under the title (it was below the whole description).
+  - Public profiles on phones show skills, "why you match" and courses before the posts.
+  - Course filters on tablets get their own row for search, so the dropdown labels aren't cut off.
+  - The session date tile no longer stretches to the row height; the filter divider on People is hidden on phones; interests use two columns on phones; the landing page header buttons fit at 360px.
+- Next (Phase 6): final QA (full check, build, E2E and RLS suites, and a last look at light and dark at all widths).

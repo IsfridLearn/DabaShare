@@ -85,10 +85,11 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
         )}
       </header>
 
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_17rem]">
-        <div className="flex min-w-0 flex-col gap-10">
+      {/* Phones: about, then skills and courses, then posts. */}
+      <div className="flex flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1fr)_17rem]">
+        <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-10">
           {profile.bio && (
-            <section aria-labelledby="about-title">
+            <section aria-labelledby="about-title" className="order-1 lg:order-none">
               <h2 id="about-title" className="text-heading">
                 About
               </h2>
@@ -96,7 +97,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
             </section>
           )}
 
-          <section aria-labelledby="posts-title" className="flex flex-col gap-3">
+          <section aria-labelledby="posts-title" className="order-3 flex flex-col gap-3 lg:order-none">
             <h2 id="posts-title" className="text-heading">
               Posts
             </h2>
@@ -126,7 +127,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
           </section>
         </div>
 
-        <aside className="flex flex-col gap-8" aria-label="Skills and courses">
+        <aside className="order-2 flex flex-col gap-8 lg:order-none" aria-label="Skills and courses">
           {hasOverlap && overlap && (
             <section className="rounded-card border border-line bg-surface p-4">
               <h2 className="text-small font-semibold text-fg">Why you two match</h2>
