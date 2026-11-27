@@ -7,14 +7,14 @@
 /*
   ── DabaShare design v3: "The Commons" (see docs/DESIGN_V3.md) ─────────────
   Printed academic matter, not a dashboard: charcoal ink on warm paper, rules
-  instead of boxes, condensed labels, forest green used sparingly as ink.
+  instead of boxes, condensed labels, DabaShare blue used sparingly as ink.
 
   Neutral roles
   - canvas      paper (page background)       - surface   controls, panels
   - subtle      quiet fills: hover rows, chips - fg / fg-muted / fg-subtle  ink
   - line        hairline rules                 - line-strong  input borders
-  One accent: brand (forest) for the primary action, the current location,
-  links and positive states. success maps to it, so there is one green.
+  One accent: brand (DabaShare blue) for the primary action, the current
+  location and links. success is a quiet green for confirmations.
   Every text pairing meets WCAG AA (checked in DESIGN_V3.md).
 */
 @theme {
@@ -27,10 +27,10 @@
   --color-line: #e3e0d6;
   --color-line-strong: #cfcbbe;
 
-  --color-brand: #1f4a35;
-  --color-brand-dark: #173a29;
-  --color-brand-soft: #e4ece5;
-  --color-brand-ink: #1f4a35;
+  --color-brand: #1d4ed8;
+  --color-brand-dark: #1e40af;
+  --color-brand-soft: #e3e9f6;
+  --color-brand-ink: #1e40af;
 
   --color-success: #1f4a35;
   --color-success-soft: #e4ece5;
@@ -91,11 +91,11 @@
   --color-line: #272824;
   --color-line-strong: #36372f;
 
-  /* Filled forest stays dark enough for white text; ink becomes light. */
-  --color-brand: #2e6a4a;
-  --color-brand-dark: #275b3f;
-  --color-brand-soft: #1b2a21;
-  --color-brand-ink: #8cc2a0;
+  /* Filled blue stays dark enough for white text; ink becomes light. */
+  --color-brand: #2f5fd8;
+  --color-brand-dark: #2a52bb;
+  --color-brand-soft: #172238;
+  --color-brand-ink: #8fb1f7;
 
   --color-success: #2e6a4a;
   --color-success-soft: #1b2a21;

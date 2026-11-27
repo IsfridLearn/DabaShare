@@ -5,7 +5,7 @@ import { Avatar } from "@/components/ui/avatar";
 import type { Match } from "@/lib/matching/queries";
 
 // One person in the directory. The reason you match leads, in a sentence,
-// with the skills in forest; everything else stays quiet.
+// with the skills in the brand blue; everything else stays quiet.
 export function MatchRow({ match, following }: { match: Match; following: boolean }) {
   const meta = [match.program, match.university_short].filter(Boolean).join(" · ");
   const extras = [

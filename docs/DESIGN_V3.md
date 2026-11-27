@@ -49,6 +49,8 @@ Page-level H1s become the small condensed page label in a compact page bar (stil
 
 ### Colour
 
+**Owner decision (2026-12-02): the accent is DabaShare blue, not forest green.** It's a deep blue (`#1D4ED8`, ink `#1E40AF`) so it reads as ink on warm paper rather than default SaaS blue. Forest stays only as the quiet "success" colour (confirmations). Where this document says "forest" for the accent, read "blue".
+
 | Token | Light | Dark |
 |---|---|---|
 | paper (canvas) | `#F5F3EC` warm off-white | `#121311` |
@@ -56,8 +58,9 @@ Page-level H1s become the small condensed page label in a compact page bar (stil
 | ink (fg) | `#1C1D1A` charcoal | `#ECEBE4` |
 | ink-muted / subtle | `#55564F` / `#605F57` | `#A9A89F` / `#8C8B82` |
 | rule / rule-strong | `#E3E0D6` / `#CFCBBE` | `#272824` / `#36372F` |
-| forest (brand) | `#1F4A35`, hover `#173A29` | buttons `#2E6A4A`, text `#8CC2A0` |
-| forest-soft | `#E4ECE5` | `#1B2A21` |
+| brand (blue) | `#1D4ED8`, hover and ink `#1E40AF` | buttons `#2F5FD8`, text `#8FB1F7` |
+| brand-soft | `#E3E9F6` | `#172238` |
+| success (forest) | `#1F4A35` on `#E4ECE5` | `#8CC2A0` on `#1B2A21` |
 | clay (danger) | `#A8321F` | `#E08A75` |
 | ochre (warning) | `#8A6414` | `#D9B35A` |
 

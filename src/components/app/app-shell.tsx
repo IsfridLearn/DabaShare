@@ -44,7 +44,7 @@ const YOU: Item[] = [
 // Phones: the five most used places, thumb-reachable.
 const TABS = MAIN.filter((i) => i.href !== "/notifications");
 
-// Current place: ink text on a quiet fill, a forest icon and a 2px forest
+// Current place: ink text on a quiet fill, a blue icon and a 2px blue
 // rule on the left edge. Everything else stays muted.
 const sideLink =
   "group relative flex h-8 items-center gap-2.5 rounded-control px-2.5 text-[0.875rem] font-medium text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg " +
