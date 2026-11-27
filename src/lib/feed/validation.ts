@@ -34,9 +34,13 @@ export const postSchema = z.object({
 // Keyset cursor for "Load more": the last post's timestamp and id.
 export type FeedCursor = { ts: string; id: string };
 
+// Only the ISO timestamps Postgres returns (e.g. 2026-11-23T10:00:00.123456+00:00),
+// so a hand-made cursor can't reach the database as an unparsable value.
+const ISO_TS = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,6})?(Z|[+-]\d{2}:\d{2})$/;
+
 export function parseCursor(ts: unknown, id: unknown): FeedCursor | null {
   if (typeof ts !== "string" || typeof id !== "string" || !UUID.test(id)) return null;
-  if (Number.isNaN(Date.parse(ts))) return null;
+  if (!ISO_TS.test(ts) || Number.isNaN(Date.parse(ts))) return null;
   return { ts, id };
 }
 

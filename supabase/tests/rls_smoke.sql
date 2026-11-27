@@ -640,6 +640,27 @@ begin
   update public.posts set body = 'Anyone up for a Python study night? (Friday)' where id = v_post;
   select (edited_at is not null)::text into v_text from public.posts where id = v_post;
   r := r || (case when v_text = 'true' then 'PASS' else 'FAIL' end || ' editing marks the post as edited');
+  -- Liking your own post must not remove Erin's unread like notification.
+  insert into public.post_likes (post_id, profile_id) values (v_post, d);
+  select count(*) into n from public.notifications
+  where recipient_id = d and type = 'post_liked' and actor_id = e and read_at is null;
+  r := r || (case when n = 1 then 'PASS' else 'FAIL' end || ' own like keeps others'' like notification (' || n || ')');
+  delete from public.post_likes where post_id = v_post and profile_id = d;
+
+  -- C hasn't finished onboarding: can't like or follow (no anonymous notifications).
+  perform set_config('request.jwt.claims', json_build_object('sub', c, 'role', 'authenticated')::text, true);
+  begin
+    insert into public.post_likes (post_id, profile_id) values (v_post, c);
+    r := r || 'FAIL unfinished account can like'::text;
+  exception when others then
+    r := r || ('PASS unfinished account cannot like (' || sqlerrm || ')');
+  end;
+  begin
+    insert into public.follows (follower_id, followee_id) values (c, d);
+    r := r || 'FAIL unfinished account can follow'::text;
+  exception when others then
+    r := r || ('PASS unfinished account cannot follow (' || sqlerrm || ')');
+  end;
 
   -- B blocked A earlier: A never sees B's posts and cannot like or follow B.
   perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
@@ -659,6 +680,21 @@ begin
   exception when others then
     r := r || ('PASS cannot follow someone who blocked you (' || sqlerrm || ')');
   end;
+  -- Likes from someone in a block relationship are hidden (B blocked A).
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  insert into public.post_likes (post_id, profile_id) values (v_post, b);
+  perform set_config('request.jwt.claims', json_build_object('sub', a, 'role', 'authenticated')::text, true);
+  select count(*) into n from public.post_likes where post_id = v_post and profile_id = b;
+  r := r || (case when n = 0 then 'PASS' else 'FAIL' end || ' likes by someone who blocked you are hidden');
+  -- A cancelled session can't be shared, even by its host (A hosts sess).
+  begin
+    insert into public.posts (author_id, body, session_id) values (a, 'Come to my session', sess);
+    r := r || 'FAIL a cancelled session can be shared'::text;
+  exception when others then
+    r := r || ('PASS cancelled sessions can''t be shared (' || sqlerrm || ')');
+  end;
+  perform set_config('request.jwt.claims', json_build_object('sub', b, 'role', 'authenticated')::text, true);
+  delete from public.post_likes where post_id = v_post and profile_id = b;
 
   -- Blocking removes existing follows both ways.
   perform set_config('request.jwt.claims', json_build_object('sub', d, 'role', 'authenticated')::text, true);

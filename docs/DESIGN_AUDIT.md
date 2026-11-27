@@ -139,3 +139,8 @@ Date: 2026-11-28. Scope: the whole frontend (25 routes and 37 components), measu
   - Course filters on tablets get their own row for search, so the dropdown labels aren't cut off.
   - The session date tile no longer stretches to the row height; the filter divider on People is hidden on phones; interests use two columns on phones; the landing page header buttons fit at 360px.
 - Next (Phase 6): final QA (full check, build, E2E and RLS suites, and a last look at light and dark at all widths).
+
+## Phase 6 result (final QA)
+
+- Every page passes the automatic checks (no sideways scrolling at 360 to 1440px; named controls, labelled fields, one h1, unique ids, alt text, page titles) in light and dark mode, after two fixes: a duplicate id on Settings and the course Visibility field (now radio cards, so the explanations are readable on phones).
+- The design refresh is complete: the problems D1 to D8 and U1 to U6 from the Phase 1 audit are addressed (U1 by the Home feed, per the owner's direction).

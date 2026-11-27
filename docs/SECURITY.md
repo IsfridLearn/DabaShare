@@ -27,8 +27,8 @@ Status: designed and hardened in Phase 2, with a database-level smoke test (55 c
 | Participation | The participant and the host | Trigger rules |
 | Notifications | Recipient | Recipient: mark read or delete. Only triggers create them. |
 | Posts | Anyone who can see the author's profile (so blocks and unfinished profiles hide them) | Author: create (onboarded only), edit the body, delete. Author can't change. |
-| Post likes | Anyone who can see the post | Like as yourself on a post you can see; remove your own like |
-| Follows | The follower and the followee | Follow as yourself someone you can see; unfollow your own follows. Blocking removes both directions. |
+| Post likes | Anyone who can see the post, except likes by someone in a block relationship with you | Like as yourself (onboarded only) on a post you can see; remove your own like |
+| Follows | The follower and the followee | Follow as yourself (onboarded only) someone you can see; unfollow your own follows. Blocking removes both directions. |
 | Blocks | Blocker | Blocker |
 | Reports | Reporter and admins | Insert by the reporter, who must be able to see the target. Admins update the status. |
 | Avatars (storage) | Anyone with the URL (public bucket) | Owner, inside `avatars/<user id>/`, at most 2 MB, JPEG, PNG or WebP. `profiles.avatar_path` must point into the owner's folder. |
@@ -55,6 +55,9 @@ Earlier limits:
 - **Account deletion doesn't require a recent sign-in.** The typed "DELETE" confirmation is in the app, and `delete_my_account()` trusts any valid session. Acceptable today with no XSS vector; revisit if third-party scripts are ever added.
 - **Auth rate limits are per IP**, at Supabase's default of 30 sign-ins or sign-ups per 5 minutes. A class on shared campus Wi-Fi could hit that, so raise it for production (see DEPLOYMENT.md).
 
+- **Social limits count live rows.** The 30-posts and 200-follows daily limits count rows that still exist, so deleting posts or unfollowing frees capacity, and two simultaneous inserts can both pass the check. Notifications stay deduplicated (one unread per post or follower), so the effect is extra writes, not notification spam. Likes have no daily limit. Revisit with a counter table if abuse shows up.
+- **Unliking keeps the like notification.** A "liked your post" notification stays after the like is removed (cosmetic).
+
 - **Avatars are public by URL.** File names are unguessable, but anyone who has a URL can view it.
 - **Rate limits:** messages are capped at 20 a minute and reports at 20 a day per student, in the database. Signup and login throttling relies on Supabase Auth's built-in limits, to be reviewed in Phase 9.
 - **Read receipts:** conversation members can see each other's `last_read_at`. This is intentional, for a future "Seen" indicator.
@@ -70,6 +73,7 @@ Earlier limits:
 
 | Date | What was tested | Result |
 |---|---|---|
+| 2026-12-01 | Static review of the social layer (`20261129090000_social_feed.sql`, feed actions and queries, notification targets, post reports) by `qa-security-reviewer` (Sonnet) | 0 critical, 0 high, 1 medium and 6 low findings. The medium (unfinished accounts could like and follow, producing anonymous notifications) and 3 low ones (own like removing another's notification, likes visible across a block, sharing a cancelled or past session) are fixed in `20261201090000_social_feed_hardening.sql`, with 5 new RLS checks that failed before the fix. Stricter feed cursor validation in the app. The rest are listed under known limitations. |
 | 2026-11-22 | Static review of all migrations by `qa-security-reviewer` (Sonnet) | 0 critical, 0 high, 3 medium and 12 low findings. Every medium and the actionable low ones were fixed in `20261122100000_security_hardening.sql`. |
 | 2026-11-22 | Anonymous probe with the publishable key against every table and RPC on dev | Only universities and categories are readable. All 16 other tables, both RPCs and the `private` schema are denied. |
 | 2026-11-22 | `supabase/tests/rls_smoke.sql` on dev (`npm run db:test:rls`), rolled back | **55 passed, 0 failed.** It covers profiles, private flags, avatar paths, skills, course ownership, forged timestamps, enrollment states, notifications, conversation privacy, forged senders, reports, blocks, session capacity, meeting links and cancellation. |

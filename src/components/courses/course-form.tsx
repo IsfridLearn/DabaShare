@@ -161,15 +161,27 @@ export function CourseForm({
         />
       </Field>
 
-      <Field label="Visibility" htmlFor="status" error={fieldError(state, "status")}>
-        <Select id="status" name="status" defaultValue={v.status} {...errorProps(state, "status")}>
-          {STATUSES.map((s) => (
-            <option key={s.value} value={s.value}>
-              {s.label} — {s.hint}
-            </option>
-          ))}
-        </Select>
-      </Field>
+      {/* Radio cards, so each option's explanation stays readable on phones. */}
+      <fieldset className="flex flex-col gap-2" aria-describedby={fieldError(state, "status") ? "status-message" : undefined}>
+        <legend className="mb-1.5 text-small font-medium text-fg">Visibility</legend>
+        {STATUSES.map((s) => (
+          <label
+            key={s.value}
+            className="flex cursor-pointer items-start gap-2.5 rounded-control border border-line-strong bg-surface px-3.5 py-2.5 text-small transition-colors duration-150 hover:bg-subtle has-checked:border-brand has-checked:bg-brand-soft"
+          >
+            <input type="radio" name="status" value={s.value} defaultChecked={v.status === s.value} className="mt-0.5 accent-brand" />
+            <span>
+              <span className="font-medium text-fg">{s.label}</span>
+              <span className="block text-fg-muted">{s.hint}</span>
+            </span>
+          </label>
+        ))}
+        {fieldError(state, "status") && (
+          <p id="status-message" className="text-small text-danger-ink">
+            {fieldError(state, "status")}
+          </p>
+        )}
+      </fieldset>
 
       <FormMessage state={state} />
       <div>

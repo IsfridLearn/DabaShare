@@ -38,7 +38,7 @@ export default async function SettingsPage() {
           <BlockedList blocked={blocked ?? []} />
         </PanelSection>
 
-        <PanelSection id="password" title="Password" description={user?.email ? `Signed in as ${user.email}` : undefined}>
+        <PanelSection id="change-password" title="Password" description={user?.email ? `Signed in as ${user.email}` : undefined}>
           <div className="max-w-md">
             <ChangePasswordForm />
           </div>

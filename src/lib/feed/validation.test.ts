@@ -36,7 +36,10 @@ describe("postSchema", () => {
 describe("parseCursor", () => {
   it("needs a valid timestamp and id", () => {
     expect(parseCursor("2026-11-23T10:00:00Z", ID)).toEqual({ ts: "2026-11-23T10:00:00Z", id: ID });
+    expect(parseCursor("2026-11-23T10:00:00.123456+00:00", ID)).not.toBeNull();
     expect(parseCursor("yesterday", ID)).toBeNull();
+    expect(parseCursor("Nov 5 2026", ID)).toBeNull();
+    expect(parseCursor("2026-11-23 10:00", ID)).toBeNull();
     expect(parseCursor("2026-11-23T10:00:00Z", "1")).toBeNull();
   });
 });
