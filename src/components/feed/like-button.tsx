@@ -35,7 +35,7 @@ function LikeSubmit({ state }: { state: LikeState }) {
       className={cn(
         "inline-flex h-8 items-center gap-1.5 rounded-control px-2 text-small font-medium transition-colors duration-150",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
-        liked ? "text-rose-600 hover:bg-subtle dark:text-rose-400" : "text-fg-muted hover:bg-subtle hover:text-fg",
+        liked ? "text-danger-ink hover:bg-subtle" : "text-fg-muted hover:bg-subtle hover:text-fg",
       )}
     >
       <Heart className={cn("size-4", liked && "fill-current")} aria-hidden="true" />

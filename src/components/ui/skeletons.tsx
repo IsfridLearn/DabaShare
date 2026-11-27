@@ -60,40 +60,52 @@ export function ListPageSkeleton({ avatar = true, width = "max-w-4xl" }: { avata
 
 export function FeedSkeleton() {
   return (
-    <Loading className="mx-auto flex w-full max-w-2xl flex-col gap-5 xl:mr-[calc(18rem+2.5rem)]">
-      <Skeleton className="h-9 w-28" />
-      <Skeleton className="h-28 rounded-card" />
+    <Loading className="mx-auto flex w-full max-w-2xl flex-col gap-6 xl:mr-[calc(17rem+3rem)]">
+      <Skeleton className="h-13 rounded-card" />
       <div className="flex gap-5 border-b border-line pb-2.5">
         <Skeleton className="h-4 w-20" />
         <Skeleton className="h-4 w-20" />
       </div>
-      <Rows count={4} tall />
+      <div className="-mt-6 divide-y divide-line">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="flex gap-3 py-5">
+            <Skeleton className="size-9 shrink-0 rounded-full" />
+            <div className="flex flex-1 flex-col gap-2 pt-0.5">
+              <Skeleton className="h-4 w-1/3" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-4/5" />
+            </div>
+          </div>
+        ))}
+      </div>
     </Loading>
   );
 }
 
+// Same shape as the catalogue: search, departments, then ruled entries.
 export function CourseGridSkeleton() {
   return (
-    <Loading className="flex flex-col gap-6">
-      <HeaderSkeleton />
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]">
-        <Skeleton className="col-span-2 h-9 sm:col-span-4 lg:col-span-1" />
-        <Skeleton className="h-9" />
-        <Skeleton className="h-9" />
-        <Skeleton className="h-9" />
-        <Skeleton className="h-9 sm:w-20" />
+    <Loading className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+      <HeaderSkeleton description={false} />
+      <div className="flex gap-2">
+        <Skeleton className="h-10 flex-1" />
+        <Skeleton className="h-10 w-20" />
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }, (_, i) => (
-          <div key={i} className="flex h-52 flex-col gap-3 rounded-card border border-line bg-surface p-5">
-            <Skeleton className="h-3 w-1/2" />
-            <Skeleton className="h-5 w-4/5" />
-            <Skeleton className="h-3 w-full" />
-            <Skeleton className="h-3 w-3/4" />
-            <div className="mt-auto flex items-center gap-2">
-              <Skeleton className="size-5 rounded-full" />
-              <Skeleton className="h-3 w-24" />
+      <div className="flex gap-2">
+        {["w-10", "w-28", "w-24", "w-20", "w-24"].map((w, i) => (
+          <Skeleton key={i} className={`h-7 ${w}`} />
+        ))}
+      </div>
+      <div className="divide-y divide-line border-y border-line">
+        {Array.from({ length: 4 }, (_, i) => (
+          <div key={i} className="flex justify-between gap-6 py-6">
+            <div className="flex flex-1 flex-col gap-2.5">
+              <Skeleton className="h-3 w-40" />
+              <Skeleton className="h-7 w-2/3" />
+              <Skeleton className="h-3 w-full max-w-xl" />
+              <Skeleton className="h-3 w-48" />
             </div>
+            <Skeleton className="h-6 w-14" />
           </div>
         ))}
       </div>

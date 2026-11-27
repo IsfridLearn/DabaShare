@@ -12,11 +12,11 @@ const base =
   "disabled:cursor-not-allowed disabled:opacity-55";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-brand text-white hover:bg-brand-dark",
-  secondary: "border border-line-strong bg-surface text-fg hover:bg-subtle",
-  outline: "border border-line-strong bg-surface text-fg hover:bg-subtle",
+  primary: "bg-brand text-white hover:bg-brand-dark active:bg-brand-dark",
+  secondary: "border border-line-strong bg-surface text-fg hover:border-fg-subtle/50 hover:bg-subtle",
+  outline: "border border-line-strong bg-surface text-fg hover:border-fg-subtle/50 hover:bg-subtle",
   ghost: "text-fg-muted hover:bg-subtle hover:text-fg",
-  danger: "bg-danger text-white hover:bg-red-700",
+  danger: "bg-danger text-white hover:bg-danger-dark",
 };
 
 const sizes: Record<Size, string> = {

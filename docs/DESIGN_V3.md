@@ -1,6 +1,6 @@
 # DabaShare design v3: "The Commons"
 
-Status: Phase 1 (study and decisions) is done. Nothing is implemented yet. Branch `design-v3`.
+Status: implemented on branch `design-v3` (phases 1–8). Not deployed yet.
 
 ## 1. Why the current UI still reads as generic
 
@@ -54,7 +54,7 @@ Page-level H1s become the small condensed page label in a compact page bar (stil
 | paper (canvas) | `#F5F3EC` warm off-white | `#121311` |
 | surface | `#FBFAF7` | `#191A17` |
 | ink (fg) | `#1C1D1A` charcoal | `#ECEBE4` |
-| ink-muted / subtle | `#55564F` / `#6A6960` | `#A9A89F` / `#8C8B82` |
+| ink-muted / subtle | `#55564F` / `#605F57` | `#A9A89F` / `#8C8B82` |
 | rule / rule-strong | `#E3E0D6` / `#CFCBBE` | `#272824` / `#36372F` |
 | forest (brand) | `#1F4A35`, hover `#173A29` | buttons `#2E6A4A`, text `#8CC2A0` |
 | forest-soft | `#E4ECE5` | `#1B2A21` |
@@ -119,3 +119,43 @@ Each phase ends with real screenshots reviewed in the browser and is refined bef
 - People search needs a text filter on `suggest_matches` or a separate profile search RPC.
 - Read receipts or typing indicators need `last_read_at` exposed and Realtime presence.
 - Comments on posts need a comments table.
+
+## 7. Result
+
+**Foundations.**
+- Instrument Sans (normal and condensed widths) replaced Inter and Newsreader.
+- New paper/ink/forest tokens in light and dark. The subtle grey was darkened to `#605F57` (5.8:1) after review.
+- Muted earth avatars. 4px/6px radii.
+- New primitives: `text-label`, `font-display`, a compact `PageHeader` page bar, `Segmented` and `GroupHeader`.
+- The sidebar marks the current place with a forest rule and has a **New post** action, which opens the composer focused (`/home?compose=1`).
+
+**Screens.**
+- **Home:** a one-line composer that opens on focus (pure CSS). Unboxed, ruled posts. Attachments as forest-ruled catalogue references. A "This week" rail (a sessions timetable, *Can teach you*, *New courses*) built from real data.
+- **Courses:**
+  - The catalogue is a ruled list (department label, condensed title, tutor, price set apart), not a card grid. There's one search field, the real categories as a strip that fades at the edge, a Filters dropdown and removable filter chips.
+  - The course page has a masthead, *About this course*, *Skills you'll learn*, and *Your tutor* with their other real courses.
+- **People:** skill swaps are grouped first. Rows lead with the reason in a sentence. There's a segmented view switch (shorter labels on phones), a separate "My university only" toggle, and quiet Message/Follow buttons.
+- **Profiles:** a display-size name and label-and-rule sections. *Why you two match* is a forest-ruled note. Skills are bordered chips and interests are toggle chips.
+- **Messages:** consecutive messages are grouped (same person, under 5 minutes) with the time once per group. Bubbles are quiet: forest tint for yours, paper for theirs. Report appears on hover.
+- **Sessions:** a ruled agenda with the date in condensed type and the status as text.
+- **Landing:** a condensed display hero, the real universities from the database, and three numbered steps. **Sign-in:** the same numbered points.
+
+**Review loop.** The first independent review confirmed the seven generic patterns were solved. I applied its refinements: ruled sessions, profile chips, the filters row, quieter bubbles, smaller avatars, ink selection controls, darker metadata. Two suggestions were declined:
+- Cutting the Home rail would remove real learning and connection opportunities.
+- Its timestamp-grouping note was a misreading of an alternating conversation.
+
+**Preserved.** All routes, Server Actions, forms (still working without JavaScript), RLS and the data model are unchanged, and so are all the strings the E2E suite checks. There are no new dependencies.
+
+**Tested.**
+- `npm run check`: 103 unit tests, including new ones for message grouping.
+- `npm run build`.
+- E2E: **158 passed, 0 failed**.
+- Accessibility and overflow sweep:
+  - 17 signed-in pages at 360/768/1024/1440 in light mode, and 11 in dark at 360/1440;
+  - 7 signed-out pages at 4 widths in both themes;
+  - 146 screenshots, 0 issues.
+
+**Remaining** (see §6 for backend work):
+- Course covers, people search and sorting need backend support.
+- Real campus photography needs consent-cleared photos.
+- The composer's attachment picker is still a native select.

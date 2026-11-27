@@ -3,7 +3,7 @@ import Link from "next/link";
 import { LiveDot, SessionRow } from "@/components/sessions/session-card";
 import { buttonClasses } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { PageHeader, Pagination, RowList, Tabs } from "@/components/ui/primitives";
+import { PageHeader, Pagination, Tabs } from "@/components/ui/primitives";
 import { requireOnboardedProfile } from "@/lib/auth/session";
 import { listSessions, SESSIONS_PAGE } from "@/lib/sessions/queries";
 import { groupByDay, parseTab, type SessionTab } from "@/lib/sessions/validation";
@@ -32,7 +32,6 @@ export default async function SessionsPage({ searchParams }: PageProps<"/session
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <PageHeader
         title="Sessions"
-        description="Webinars, study groups and Q&A sessions, hosted by students across Davao."
         actions={
           <Link href="/sessions/new" className={buttonClasses()}>
             <Plus className="size-4" aria-hidden="true" />
@@ -63,14 +62,14 @@ export default async function SessionsPage({ searchParams }: PageProps<"/session
         <div className="flex flex-col gap-6">
           {groupByDay(sessions).map((group) => (
             <section key={group.key} aria-label={group.label}>
-              <h2 className="mb-2 text-small font-semibold text-fg-muted">{group.label}</h2>
-              <RowList>
+              <h2 className="border-b border-line pb-2 text-label text-fg-muted">{group.label}</h2>
+              <ul className="divide-y divide-line">
                 {group.items.map((s) => (
                   <li key={s.id}>
                     <SessionRow session={s} meId={me.id} />
                   </li>
                 ))}
-              </RowList>
+              </ul>
             </section>
           ))}
         </div>

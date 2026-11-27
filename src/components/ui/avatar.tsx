@@ -2,7 +2,15 @@ import Image from "next/image";
 import { cn } from "@/lib/cn";
 import { avatarUrl } from "@/lib/profile/avatar";
 
-const COLORS = ["bg-blue-600", "bg-violet-600", "bg-emerald-700", "bg-amber-700", "bg-rose-600", "bg-cyan-700"];
+// Muted earth tones: initials sit quietly on paper instead of shouting.
+const COLORS = [
+  "bg-avatar-forest",
+  "bg-avatar-clay",
+  "bg-avatar-ochre",
+  "bg-avatar-slate",
+  "bg-avatar-plum",
+  "bg-avatar-teal",
+];
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -45,11 +53,11 @@ export function Avatar({
     <span
       aria-hidden="true"
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white",
+        "inline-flex shrink-0 items-center justify-center rounded-full font-semibold tracking-wide text-white [font-stretch:85%]",
         colorFor(name),
         className,
       )}
-      style={{ ...style, fontSize: Math.max(12, size * 0.38) }}
+      style={{ ...style, fontSize: Math.max(10, size * 0.36) }}
     >
       {initials(name)}
     </span>

@@ -49,7 +49,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
       <header className="flex flex-col gap-5 border-b border-line pb-8 sm:flex-row sm:items-end">
         <Avatar name={profile.display_name} path={profile.avatar_path} size={88} />
         <div className="min-w-0 flex-1">
-          <h1 className="text-title break-words">{profile.display_name}</h1>
+          <h1 className="text-[2.25rem] leading-none break-words sm:text-display">{profile.display_name}</h1>
           <p className="mt-1 text-small text-fg-subtle">@{profile.username}</p>
           {(profile.program || profile.university) && (
             <p className="mt-2 flex items-center gap-1.5 text-fg-muted">
@@ -90,7 +90,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
         <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:gap-10">
           {profile.bio && (
             <section aria-labelledby="about-title" className="order-1 lg:order-none">
-              <h2 id="about-title" className="text-heading">
+              <h2 id="about-title" className="border-b border-line pb-2 text-label text-fg-muted">
                 About
               </h2>
               <p className="mt-2 max-w-[68ch] leading-7 break-words whitespace-pre-line text-fg">{profile.bio}</p>
@@ -98,7 +98,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
           )}
 
           <section aria-labelledby="posts-title" className="order-3 flex flex-col gap-3 lg:order-none">
-            <h2 id="posts-title" className="text-heading">
+            <h2 id="posts-title" className="text-label text-fg-muted">
               Posts
             </h2>
             <FeedList
@@ -129,8 +129,8 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
 
         <aside className="order-2 flex flex-col gap-8 lg:order-none" aria-label="Skills and courses">
           {hasOverlap && overlap && (
-            <section className="rounded-card border border-line bg-surface p-4">
-              <h2 className="text-small font-semibold text-fg">Why you two match</h2>
+            <section className="border-l-2 border-brand pl-4">
+              <h2 className="text-label text-brand-ink">Why you two match</h2>
               {overlap.theyTeachYou.length > 0 && (
                 <SkillGroup title={`${profile.display_name} can teach you`}>{overlap.theyTeachYou}</SkillGroup>
               )}
@@ -172,7 +172,7 @@ export default async function PublicProfilePage({ params }: PageProps<"/u/[usern
 function RailSection({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
-      <h2 className="mb-2 text-small font-semibold text-fg">{title}</h2>
+      <h2 className="mb-2.5 border-b border-line pb-2 text-label text-fg-muted">{title}</h2>
       {children}
     </section>
   );
@@ -181,14 +181,8 @@ function RailSection({ title, children }: { title: string; children: ReactNode }
 function SkillGroup({ title, children }: { title: string; children: string[] }) {
   return (
     <div className="mt-3">
-      <p className="mb-1.5 text-caption text-fg-subtle">{title}</p>
-      <ul className="flex flex-wrap gap-1.5">
-        {children.map((s) => (
-          <li key={s}>
-            <Badge tone="brand">{s}</Badge>
-          </li>
-        ))}
-      </ul>
+      <p className="text-small text-fg-muted">{title}</p>
+      <p className="font-medium text-brand-ink">{children.join(", ")}</p>
     </div>
   );
 }
@@ -200,7 +194,7 @@ function SkillList({ title, skills }: { title: string; skills: SkillRef[] }) {
         <ul className="flex flex-wrap gap-1.5">
           {skills.map((s) => (
             <li key={s.id}>
-              <Badge className="px-2 py-1 text-small">{s.name}</Badge>
+              <span className="inline-block rounded-control border border-line-strong bg-surface px-2.5 py-1 text-small font-medium text-fg">{s.name}</span>
             </li>
           ))}
         </ul>

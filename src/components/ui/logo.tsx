@@ -14,7 +14,7 @@ export function Logo({ size = 32, className }: { size?: number; className?: stri
         <rect x="8" y="22" width="16" height="4" rx="2" fill="currentColor" opacity="0.3" />
         <circle cx="16" cy="10" r="3" fill="currentColor" />
       </svg>
-      <span className="text-xl font-semibold tracking-tight text-fg">DabaShare</span>
+      <span className="font-display text-[1.375rem] leading-none tracking-[-0.01em] text-fg">DabaShare</span>
     </span>
   );
 }

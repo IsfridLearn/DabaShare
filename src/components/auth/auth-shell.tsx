@@ -1,13 +1,12 @@
-import { CalendarDays, MessagesSquare, Sparkles } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/ui/logo";
 
 // Every point is a real feature; no invented numbers or testimonials.
 const POINTS = [
-  { icon: Sparkles, title: "Teach what you know", text: "Offer a course or a skill swap. Your classmates' strengths are the curriculum." },
-  { icon: MessagesSquare, title: "Find the right study partner", text: "Matches explain themselves: who can teach you, and who wants to learn from you." },
-  { icon: CalendarDays, title: "Learn together, live", text: "Join study groups, webinars and Q&A sessions, or host your own." },
+  { title: "Teach what you know", text: "Offer a course or a skill swap. Your classmates' strengths are the curriculum." },
+  { title: "Find the right study partner", text: "Matches explain themselves: who can teach you, and who wants to learn from you." },
+  { title: "Learn together, live", text: "Join study groups, webinars and Q&A sessions, or host your own." },
 ];
 
 // Split editorial layout: a quiet identity panel on wide screens, and the
@@ -20,23 +19,21 @@ export function AuthShell({ children }: { children: ReactNode }) {
           <Logo size={28} />
         </Link>
         <div className="max-w-md">
-          <p className="text-caption font-medium tracking-wide text-fg-subtle uppercase">For college students in Davao City</p>
-          <p className="mt-4 font-serif text-[2.75rem] leading-[1.08] font-medium tracking-[-0.02em] text-fg">
-            Learn from the student <em className="text-brand-ink">next to you.</em>
+          <p className="text-label text-brand-ink">A student commons for Davao City</p>
+          <p className="mt-4 font-display text-[3rem] leading-[0.98] tracking-[-0.01em] text-fg">
+            Learn from the student next to you.
           </p>
-          <ul className="mt-10 flex flex-col gap-6">
-            {POINTS.map(({ icon: Icon, title, text }) => (
-              <li key={title} className="flex gap-3.5">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-control border border-line-strong bg-surface text-fg-muted">
-                  <Icon className="size-4" strokeWidth={1.75} aria-hidden="true" />
-                </span>
+          <ol className="mt-10 flex flex-col gap-6">
+            {POINTS.map(({ title, text }, i) => (
+              <li key={title} className="flex gap-4 border-t border-line-strong pt-4">
+                <span className="font-display w-7 shrink-0 text-[1.25rem] leading-none text-brand-ink tabular-nums">{String(i + 1).padStart(2, "0")}</span>
                 <div>
                   <p className="font-medium text-fg">{title}</p>
                   <p className="mt-0.5 text-small text-fg-muted">{text}</p>
                 </div>
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
         <p className="text-caption text-fg-subtle">
           Free for students.{" "}

@@ -58,9 +58,9 @@ export default async function MyProfilePage({ searchParams }: PageProps<"/profil
       {toast && <NoticeToast key={toast} message={toast} />}
 
       {missing.length > 0 && (
-        <section aria-labelledby="completeness-title" className="flex flex-col gap-3 rounded-card border border-line bg-surface p-4 sm:p-5">
+        <section aria-labelledby="completeness-title" className="flex flex-col gap-3 border-b border-line pb-5">
           <div className="flex items-center justify-between gap-3">
-            <h2 id="completeness-title" className="text-small font-semibold text-fg">
+            <h2 id="completeness-title" className="text-label text-fg-muted">
               Profile {completeness.percent}% complete
             </h2>
             <span className="text-caption text-fg-subtle">

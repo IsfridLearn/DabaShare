@@ -25,6 +25,13 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 
 ## Log
 
+### 2026-12-02 — Design v3 "The Commons", on branch `design-v3`
+
+- A full redesign after a study of the product and the four references (Linear, Are.na, Notion, an academic editorial site), with two subagent reviews of the rendered UI. The decisions and the result are in DESIGN_V3.md.
+- No database, API or Server Action changes. No new dependencies: Instrument Sans is loaded through `next/font`.
+- Tested: `npm run check` (103 unit tests), `npm run build`, E2E 158 passed and 0 failed, and an accessibility and overflow sweep (146 screenshots, 0 issues). RLS: UNTESTED this round, since no database changes were made. Demo data seeded for screenshots was always deleted afterwards (0 test users left).
+- Not deployed. Waiting for the owner's go-ahead.
+
 ### 2026-12-01 — Design refresh, Phase 6 (final QA), on branch `design-refresh`
 
 - **Security review** of the social layer by `qa-security-reviewer` (Sonnet): 0 critical, 0 high, 1 medium, 6 low. Fixed the medium and 3 low ones in migration `20261201090000_social_feed_hardening.sql`, plus stricter feed cursor validation; the rest are documented in SECURITY.md. The 5 new RLS checks failed before the migration and pass after it.

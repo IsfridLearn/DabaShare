@@ -47,3 +47,27 @@ export function previewText(body: string | null, max = 60): string {
   const flat = body.replace(/\s+/g, " ").trim();
   return flat.length > max ? `${flat.slice(0, max - 1)}…` : flat;
 }
+
+// Consecutive messages from the same person within 5 minutes (and on the same
+// day) form one group: they sit close together and show the time once.
+const GROUP_GAP_MS = 5 * 60 * 1000;
+type Groupable = { sender_id: string; created_at: string };
+
+function sameGroup(a: Groupable, b: Groupable): boolean {
+  const gap = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  return (
+    a.sender_id === b.sender_id &&
+    gap >= 0 &&
+    gap < GROUP_GAP_MS &&
+    dayKey(new Date(a.created_at)) === dayKey(new Date(b.created_at))
+  );
+}
+
+export function groupPosition(messages: Groupable[], i: number): { start: boolean; end: boolean } {
+  const prev = messages[i - 1];
+  const next = messages[i + 1];
+  return {
+    start: !prev || !sameGroup(prev, messages[i]),
+    end: !next || !sameGroup(messages[i], next),
+  };
+}

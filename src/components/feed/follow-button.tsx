@@ -16,19 +16,22 @@ export function FollowButton({
   name,
   size = "sm",
   fullWidth = false,
+  quiet = false,
 }: {
   profileId: string;
   following: boolean;
   name: string;
   size?: Size;
   fullWidth?: boolean;
+  /** In lists: an outlined "Follow" instead of a filled one. */
+  quiet?: boolean;
 }) {
   const [state, action] = useActionState(toggleFollow, { following });
   return (
     <form action={action} className={fullWidth ? "w-full" : undefined}>
       <input type="hidden" name="profileId" value={profileId} />
       <input type="hidden" name="follow" value={state.following ? "0" : "1"} />
-      <FollowSubmit following={state.following} name={name} size={size} fullWidth={fullWidth} />
+      <FollowSubmit following={state.following} name={name} size={size} fullWidth={fullWidth} quiet={quiet} />
       {state.error && (
         <p role="alert" className="mt-1 text-caption text-danger-ink">
           {state.error}
@@ -38,7 +41,19 @@ export function FollowButton({
   );
 }
 
-function FollowSubmit({ following, name, size, fullWidth }: { following: boolean; name: string; size: Size; fullWidth: boolean }) {
+function FollowSubmit({
+  following,
+  name,
+  size,
+  fullWidth,
+  quiet,
+}: {
+  following: boolean;
+  name: string;
+  size: Size;
+  fullWidth: boolean;
+  quiet: boolean;
+}) {
   const { pending } = useFormStatus();
   const shown = pending ? !following : following;
   const Icon = shown ? UserCheck : UserPlus;
@@ -47,7 +62,7 @@ function FollowSubmit({ following, name, size, fullWidth }: { following: boolean
       type="submit"
       aria-pressed={shown}
       aria-label={shown ? `Following ${name}. Unfollow` : `Follow ${name}`}
-      className={buttonClasses({ variant: shown ? "secondary" : "primary", size, fullWidth })}
+      className={buttonClasses({ variant: shown ? (quiet ? "ghost" : "secondary") : quiet ? "secondary" : "primary", size, fullWidth })}
     >
       <Icon className="size-4" aria-hidden="true" />
       {shown ? "Following" : "Follow"}

@@ -1,7 +1,7 @@
 import { BookOpen, Plus, SearchX } from "lucide-react";
 import Link from "next/link";
-import { CourseCard } from "@/components/courses/course-card";
-import { CourseFiltersBar } from "@/components/courses/course-filters";
+import { CourseEntry } from "@/components/courses/course-card";
+import { CourseSearch } from "@/components/courses/course-filters";
 import { buttonClasses } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader, Pagination } from "@/components/ui/primitives";
@@ -15,6 +15,7 @@ export const instant = false;
 
 export const metadata = { title: "Browse courses" };
 
+// The catalogue: search, the departments, then a ruled list of courses.
 export default async function CoursesPage({ searchParams }: PageProps<"/courses">) {
   await requireOnboardedProfile();
   const filters = parseCourseFilters(await searchParams);
@@ -24,15 +25,15 @@ export default async function CoursesPage({ searchParams }: PageProps<"/courses"
     getCategories(),
   ]);
   const filtered = Boolean(filters.q || filters.uni || filters.cat || filters.level || filters.price);
+  const category = categories.find((c) => c.id === filters.cat);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
       <PageHeader
         title="Courses"
-        description="Skills taught by students across Davao City universities."
         actions={
           <>
-            <Link href="/courses/mine" className={buttonClasses({ variant: "secondary" })}>
+            <Link href="/courses/mine" className={`${buttonClasses({ variant: "ghost" })} max-sm:hidden`}>
               My courses
             </Link>
             <Link href="/courses/new" className={buttonClasses()}>
@@ -43,39 +44,52 @@ export default async function CoursesPage({ searchParams }: PageProps<"/courses"
         }
       />
 
-      <CourseFiltersBar filters={filters} universities={universities} categories={categories} total={total} />
+      <CourseSearch filters={filters} universities={universities} categories={categories} />
 
-      {courses.length ? (
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {courses.map((course) => (
-            <li key={course.id} className="flex">
-              <CourseCard course={course} />
-            </li>
-          ))}
-        </ul>
-      ) : filtered ? (
-        <EmptyState
-          icon={<SearchX className="size-5" />}
-          title="No courses match"
-          description="Try a different search term or remove some filters."
-          action={
-            <Link href="/courses" className={buttonClasses({ variant: "secondary" })}>
-              Clear filters
-            </Link>
-          }
-        />
-      ) : (
-        <EmptyState
-          icon={<BookOpen className="size-5" />}
-          title="No courses yet"
-          description="Be the first to share what you know with students across Davao."
-          action={
-            <Link href="/courses/new" className={buttonClasses()}>
-              Post a course
-            </Link>
-          }
-        />
-      )}
+      <section aria-labelledby="results-title">
+        <h2 id="results-title" className="flex items-baseline justify-between border-b border-line pb-2 text-label text-fg-muted" aria-live="polite">
+          <span>{category ? category.name : filters.q ? `Results for “${filters.q}”` : "All courses"}</span>
+          <span className="tabular-nums text-fg-subtle">
+            {total === 1 ? "1 course" : `${total} courses`}
+          </span>
+        </h2>
+
+        {courses.length ? (
+          <ul className="divide-y divide-line border-b border-line">
+            {courses.map((course) => (
+              <li key={course.id}>
+                <CourseEntry course={course} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="pt-6">
+            {filtered ? (
+              <EmptyState
+                icon={<SearchX className="size-5" />}
+                title="No courses match"
+                description="Try a different search term, another category, or fewer filters."
+                action={
+                  <Link href="/courses" className={buttonClasses({ variant: "secondary" })}>
+                    Clear filters
+                  </Link>
+                }
+              />
+            ) : (
+              <EmptyState
+                icon={<BookOpen className="size-5" />}
+                title="No courses yet"
+                description="Be the first to share what you know with students across Davao."
+                action={
+                  <Link href="/courses/new" className={buttonClasses()}>
+                    Post a course
+                  </Link>
+                }
+              />
+            )}
+          </div>
+        )}
+      </section>
 
       <Pagination page={filters.page} pages={Math.ceil(total / PAGE_SIZE)} hrefFor={(page) => coursesHref({ ...filters, page })} />
     </div>

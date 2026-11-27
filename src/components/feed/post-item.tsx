@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, CalendarDays, Ellipsis } from "lucide-react";
+import { ArrowUpRight, Ellipsis } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
@@ -22,20 +22,20 @@ export function PostItem({ post, meId }: { post: FeedPost; meId: string }) {
 
   if (deleted.deleted) {
     return (
-      <p role="status" className="px-4 py-4 text-small text-fg-subtle sm:px-5">
+      <p role="status" className="py-5 text-small text-fg-subtle">
         Post deleted.
       </p>
     );
   }
 
   return (
-    <article aria-labelledby={`post-${post.id}-author`} className="flex gap-3 px-4 py-4 sm:px-5">
+    <article aria-labelledby={`post-${post.id}-author`} className="flex gap-3 py-5">
       {profileHref ? (
         <Link href={profileHref} className="shrink-0 self-start rounded-full" tabIndex={-1} aria-hidden="true">
-          <Avatar name={post.author_name} path={post.author_avatar} size={40} />
+          <Avatar name={post.author_name} path={post.author_avatar} size={36} />
         </Link>
       ) : (
-        <Avatar name={post.author_name} path={post.author_avatar} size={40} />
+        <Avatar name={post.author_name} path={post.author_avatar} size={36} />
       )}
       <div className="min-w-0 flex-1">
         <header className="flex items-start gap-2">
@@ -65,31 +65,16 @@ export function PostItem({ post, meId }: { post: FeedPost; meId: string }) {
 
         <p className="mt-2 break-words whitespace-pre-line text-fg">{post.body}</p>
 
+        {/* Attachments read like a catalogue reference, not a box in a box. */}
         {post.session_id && (
-          <Link
+          <Attachment
             href={`/sessions/${post.session_id}`}
-            className="mt-3 flex items-center gap-3 rounded-control border border-line px-3 py-2.5 transition-colors duration-150 hover:bg-subtle"
-          >
-            <CalendarDays className="size-5 shrink-0 text-brand-ink" aria-hidden="true" />
-            <span className="min-w-0">
-              <span className="block truncate font-medium text-fg">{post.session_title}</span>
-              <span className="block text-small text-fg-muted">
-                {typeLabel(post.session_type)} · {formatWhen(post.session_starts_at)}
-              </span>
-            </span>
-          </Link>
+            label={`${typeLabel(post.session_type)} · ${formatWhen(post.session_starts_at)}`}
+            title={post.session_title}
+          />
         )}
         {post.course_id && (
-          <Link
-            href={`/courses/${post.course_id}`}
-            className="mt-3 flex items-center gap-3 rounded-control border border-line px-3 py-2.5 transition-colors duration-150 hover:bg-subtle"
-          >
-            <BookOpen className="size-5 shrink-0 text-brand-ink" aria-hidden="true" />
-            <span className="min-w-0">
-              <span className="block truncate font-medium text-fg">{post.course_title}</span>
-              <span className="block text-small text-fg-muted">Course · {formatPrice(post.course_price)}</span>
-            </span>
-          </Link>
+          <Attachment href={`/courses/${post.course_id}`} label={`Course · ${formatPrice(post.course_price)}`} title={post.course_title} />
         )}
 
         <div className="-ml-2 mt-2 flex items-center">
@@ -97,6 +82,21 @@ export function PostItem({ post, meId }: { post: FeedPost; meId: string }) {
         </div>
       </div>
     </article>
+  );
+}
+
+function Attachment({ href, label, title }: { href: string; label: string; title: string | null }) {
+  return (
+    <Link
+      href={href}
+      className="group mt-3 flex items-start gap-3 border-l-2 border-brand py-0.5 pl-3 transition-colors duration-150"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-label text-brand-ink">{label}</span>
+        <span className="mt-1 block truncate font-medium text-fg decoration-line-strong underline-offset-4 group-hover:underline">{title}</span>
+      </span>
+      <ArrowUpRight className="mt-1 size-4 shrink-0 text-fg-subtle transition-colors group-hover:text-fg" aria-hidden="true" />
+    </Link>
   );
 }
 
@@ -167,7 +167,7 @@ function DeleteSubmit() {
     <button
       type="submit"
       disabled={pending}
-      className="mt-2 w-full rounded-control bg-danger px-3 py-1.5 font-medium text-white hover:bg-red-700 disabled:opacity-55"
+      className="mt-2 w-full rounded-control bg-danger px-3 py-1.5 font-medium text-white hover:bg-danger-dark disabled:opacity-55"
     >
       {pending ? "Deleting…" : "Yes, delete"}
     </button>

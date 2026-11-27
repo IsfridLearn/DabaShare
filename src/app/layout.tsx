@@ -1,19 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Newsreader } from "next/font/google";
+import { Instrument_Sans } from "next/font/google";
 import "./globals.css";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 
-// UI text: Inter (variable). Page titles: Newsreader, an editorial serif.
-const inter = Inter({
-  variable: "--font-inter",
+// One family, two widths: Instrument Sans at normal width for reading, and
+// its condensed width (the wdth axis) for titles and labels.
+const instrument = Instrument_Sans({
+  variable: "--font-instrument",
   subsets: ["latin"],
-});
-
-const newsreader = Newsreader({
-  variable: "--font-newsreader",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
+  axes: ["wdth"],
 });
 
 export const metadata: Metadata = {
@@ -32,8 +27,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   interactiveWidget: "resizes-content",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfbfa" },
-    { media: "(prefers-color-scheme: dark)", color: "#0e0f11" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f3ec" },
+    { media: "(prefers-color-scheme: dark)", color: "#121311" },
   ],
 };
 
@@ -41,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     // suppressHydrationWarning: the theme script may add the "dark" class
     // before React hydrates, which is intended.
-    <html lang="en" className={`${inter.variable} ${newsreader.variable} h-full`} suppressHydrationWarning>
+    <html lang="en" className={`${instrument.variable} h-full`} suppressHydrationWarning>
       <head>
         {/* Static, trusted script (no user input): applies the saved theme before first paint. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />

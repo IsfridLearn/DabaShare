@@ -9,6 +9,7 @@ import { createPost } from "@/lib/feed/actions";
 import type { AttachOption } from "@/lib/feed/queries";
 import { POST_MAX } from "@/lib/feed/validation";
 import { initialFormState } from "@/lib/forms";
+import { cn } from "@/lib/cn";
 
 // Post box at the top of Home. Text plus, optionally, one of your own
 // upcoming sessions or published courses.
@@ -17,11 +18,14 @@ export function Composer({
   avatarPath,
   sessions,
   courses,
+  autoFocus = false,
 }: {
   name: string;
   avatarPath: string | null;
   sessions: AttachOption[];
   courses: AttachOption[];
+  /** Set by the sidebar's "New post" link (/home?compose=1). */
+  autoFocus?: boolean;
 }) {
   const [state, action, pending] = useActionState(createPost, initialFormState);
   // Typed length, tied to the action result it was typed after. React resets
@@ -35,11 +39,18 @@ export function Composer({
   const attachError = fieldError(state, "attachment");
   const error = bodyError ?? attachError ?? (state.status === "error" ? state.message : undefined);
   const near = length > POST_MAX - 200;
+  // The tools stay open while there's something to act on.
+  const open = autoFocus || length > 0 || Boolean(error);
 
+  // One quiet line until you start writing; the tools open on focus (pure
+  // CSS, so it also works before JavaScript loads).
   return (
-    <form action={action} className="rounded-card border border-line bg-surface p-4 sm:p-5">
-      <div className="flex gap-3">
-        <Avatar name={name} path={avatarPath} size={40} />
+    <form
+      action={action}
+      className="group/composer rounded-card border border-line bg-surface px-3 py-2.5 transition-colors duration-150 focus-within:border-line-strong sm:px-4"
+    >
+      <div className="flex items-start gap-3">
+        <Avatar name={name} path={avatarPath} size={32} />
         <div className="min-w-0 flex-1">
           <label htmlFor="post-body" className="sr-only">
             Write a post
@@ -47,19 +58,26 @@ export function Composer({
           <textarea
             id="post-body"
             name="body"
-            rows={2}
+            rows={1}
             maxLength={POST_MAX}
             required
+            autoFocus={autoFocus}
             defaultValue={state.values?.body ?? ""}
             onInput={(e) => setTyped({ state, length: e.currentTarget.value.length })}
             placeholder="Share a study tip, an event, or what you're learning…"
             aria-invalid={Boolean(bodyError) || undefined}
             aria-describedby={error ? "post-message" : undefined}
-            className="field-sizing-content block max-h-80 min-h-12 w-full resize-none bg-transparent py-2 text-fg placeholder:text-fg-subtle focus:outline-none"
+            className="field-sizing-content block max-h-80 min-h-8 w-full resize-none bg-transparent py-1 text-fg placeholder:text-fg-subtle focus:outline-none"
           />
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3 sm:pl-[52px]">
+      <div
+        className={cn(
+          "mt-2.5 hidden flex-wrap items-center gap-2 border-t border-line pt-2.5 sm:pl-11",
+          "group-focus-within/composer:flex",
+          open && "flex",
+        )}
+      >
         {canAttach && (
           <label className="flex min-w-0 flex-1 items-center gap-2 text-small text-fg-muted">
             <Paperclip className="size-4 shrink-0" aria-hidden="true" />
@@ -103,7 +121,7 @@ export function Composer({
           </Button>
         </div>
       </div>
-      <p id="post-message" role={error ? "alert" : "status"} className={error ? "mt-2 text-small text-danger-ink sm:pl-[52px]" : "sr-only"}>
+      <p id="post-message" role={error ? "alert" : "status"} className={error ? "mt-2 text-small text-danger-ink sm:pl-11" : "sr-only"}>
         {error ?? (state.status === "success" ? state.message : "")}
       </p>
     </form>

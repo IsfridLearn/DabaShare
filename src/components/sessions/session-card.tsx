@@ -31,14 +31,12 @@ export function SessionRow({ session, meId }: { session: SessionListItem; meId: 
   return (
     <Link
       href={`/sessions/${session.id}`}
-      className="group flex gap-4 px-4 py-4 transition-colors duration-150 hover:bg-subtle sm:px-5"
+      className="group -mx-3 flex gap-5 rounded-card px-3 py-5 transition-colors duration-150 hover:bg-subtle/60"
     >
-      <span
-        aria-hidden="true"
-        className="flex w-12 shrink-0 flex-col items-center self-start rounded-control border border-line bg-canvas py-1.5 leading-none"
-      >
-        <span className="text-[0.625rem] font-semibold tracking-wide text-fg-subtle uppercase">{day.month}</span>
-        <span className="mt-1 font-serif text-[1.375rem] font-medium text-fg">{day.day}</span>
+      {/* Timetable column: the date in condensed type, no box. */}
+      <span aria-hidden="true" className="w-11 shrink-0 pt-0.5 text-center leading-none">
+        <span className="block text-label text-fg-subtle">{day.month}</span>
+        <span className="mt-1 block font-display text-[1.75rem] text-fg">{day.day}</span>
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-1.5">
@@ -50,11 +48,11 @@ export function SessionRow({ session, meId }: { session: SessionListItem; meId: 
           )}
           {phase === "cancelled" && <Badge>Cancelled</Badge>}
           {phase === "ended" && <Badge>Ended</Badge>}
-          {mine && <Badge tone="brand">You&apos;re hosting</Badge>}
-          {!mine && myStatus && <Badge tone="success">{myStatus}</Badge>}
-          {!mine && !myStatus && full && phase !== "cancelled" && <Badge>Full</Badge>}
+          {mine && <span className="text-label text-brand-ink">You&apos;re hosting</span>}
+          {!mine && myStatus && <span className="text-label text-brand-ink">{myStatus}</span>}
+          {!mine && !myStatus && full && phase !== "cancelled" && <span className="text-label text-fg-subtle">Full</span>}
         </span>
-        <span className="mt-1 block font-medium text-fg decoration-line-strong underline-offset-4 group-hover:underline">{session.title}</span>
+        <span className="mt-1 block font-display text-[1.3125rem] leading-tight text-fg decoration-line-strong decoration-1 underline-offset-4 group-hover:underline">{session.title}</span>
         <span className="mt-0.5 block text-small text-fg-muted">
           {typeLabel(session.type)} · {day.weekday} {clockRange(session.starts_at, session.ends_at)}
         </span>

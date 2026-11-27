@@ -10,36 +10,44 @@ const badgeTones: Record<BadgeTone, string> = {
   neutral: "bg-subtle text-fg-muted",
   brand: "bg-brand-soft text-brand-ink",
   success: "bg-success-soft text-success-ink",
-  warning: "bg-amber-100 text-amber-800",
+  warning: "bg-warning-soft text-warning-ink",
   danger: "bg-danger-soft text-danger-ink",
 };
 
 export function Badge({ tone = "neutral", children, className }: { tone?: BadgeTone; children: ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-[4px] px-1.5 py-0.5 text-caption font-medium whitespace-nowrap", badgeTones[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1 rounded-[3px] px-1.5 py-0.5 text-caption font-medium whitespace-nowrap", badgeTones[tone], className)}>
       {children}
     </span>
   );
 }
 
-// ── PageHeader: one consistent top of every page ──────────────────────────
+// ── PageHeader: a compact page bar ─────────────────────────────────────────
+// The title names the place (the sidebar already does too), so it stays
+// small and the content starts near the top. A description is for the rare
+// page that needs one sentence of context.
 export function PageHeader({
   title,
   description,
   actions,
   eyebrow,
+  count,
 }: {
   title: string;
   description?: ReactNode;
   actions?: ReactNode;
   eyebrow?: string;
+  count?: number;
 }) {
   return (
-    <header className="flex flex-col gap-4 border-b border-line pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-line pb-4">
       <div className="min-w-0">
-        {eyebrow && <p className="mb-1.5 text-caption font-medium tracking-wide text-fg-subtle uppercase">{eyebrow}</p>}
-        <h1 className="text-title">{title}</h1>
-        {description && <p className="mt-2 max-w-2xl text-fg-muted">{description}</p>}
+        {eyebrow && <p className="mb-1.5 text-label text-fg-subtle">{eyebrow}</p>}
+        <h1 className="flex items-baseline gap-2.5 text-[1.75rem] leading-none">
+          {title}
+          {count !== undefined && <span className="text-small font-normal tabular-nums [font-stretch:100%] text-fg-subtle">{count}</span>}
+        </h1>
+        {description && <p className="mt-2 max-w-2xl text-small text-fg-muted">{description}</p>}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}
     </header>
@@ -63,7 +71,7 @@ export function Tabs({
           aria-current={item.active ? "page" : undefined}
           className={cn(
             "inline-flex shrink-0 items-center gap-1.5 border-b-2 py-2.5 text-[0.875rem] font-medium transition-colors duration-150",
-            item.active ? "border-fg text-fg" : "border-transparent text-fg-muted hover:text-fg",
+            item.active ? "border-brand text-fg" : "border-transparent text-fg-muted hover:text-fg",
           )}
         >
           {item.label}
@@ -82,7 +90,7 @@ export function Chip({ href, active, children }: { href: string; active: boolean
       aria-current={active ? "true" : undefined}
       className={cn(
         "inline-flex h-8 items-center gap-1.5 rounded-control border px-3 text-small font-medium transition-colors duration-150",
-        active ? "border-fg bg-fg text-canvas" : "border-line-strong bg-surface text-fg-muted hover:bg-subtle hover:text-fg",
+        active ? "border-brand bg-brand-soft text-brand-ink" : "border-line-strong bg-surface text-fg-muted hover:bg-subtle hover:text-fg",
       )}
     >
       {children}
@@ -228,5 +236,42 @@ export function RowList({ label, children, className }: { label?: string; childr
     <ul aria-label={label} className={cn("divide-y divide-line overflow-hidden rounded-card border border-line bg-surface", className)}>
       {children}
     </ul>
+  );
+}
+
+// ── Segmented: mutually exclusive views as links (one is always current) ───
+export function Segmented({
+  label,
+  items,
+}: {
+  label: string;
+  items: { href: string; label: ReactNode; active: boolean }[];
+}) {
+  return (
+    <nav aria-label={label} className="inline-flex max-w-full overflow-x-auto rounded-control border border-line-strong bg-surface p-0.5">
+      {items.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          aria-current={item.active ? "page" : undefined}
+          className={cn(
+            "inline-flex h-7 shrink-0 items-center gap-1.5 rounded-[3px] px-3 text-small font-medium whitespace-nowrap transition-colors duration-150",
+            item.active ? "bg-fg text-canvas" : "text-fg-muted hover:bg-subtle hover:text-fg",
+          )}
+        >
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+// ── GroupHeader: label + count above a group of rows (Linear-style) ────────
+export function GroupHeader({ id, children, count }: { id?: string; children: ReactNode; count?: number }) {
+  return (
+    <h2 id={id} className="flex items-baseline gap-2 text-label text-fg-muted">
+      {children}
+      {count !== undefined && <span className="tabular-nums text-fg-subtle">{count}</span>}
+    </h2>
   );
 }

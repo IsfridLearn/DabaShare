@@ -6,6 +6,7 @@ import {
   Library,
   MessageSquare,
   Settings,
+  SquarePen,
   UserRound,
   UsersRound,
   type LucideIcon,
@@ -43,9 +44,12 @@ const YOU: Item[] = [
 // Phones: the five most used places, thumb-reachable.
 const TABS = MAIN.filter((i) => i.href !== "/notifications");
 
+// Current place: ink text on a quiet fill, a forest icon and a 2px forest
+// rule on the left edge. Everything else stays muted.
 const sideLink =
-  "group flex h-8 items-center gap-2.5 rounded-control px-2.5 text-[0.875rem] font-medium text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg";
-const sideActive = "bg-subtle text-fg";
+  "group relative flex h-8 items-center gap-2.5 rounded-control px-2.5 text-[0.875rem] font-medium text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg " +
+  "before:absolute before:inset-y-1.5 before:-left-3 before:w-0.5 before:rounded-full before:bg-brand before:opacity-0 before:transition-opacity";
+const sideActive = "bg-subtle text-fg before:opacity-100 [&>svg]:text-brand-ink";
 
 // Desktop (lg+): a quiet left sidebar, Linear-style. Smaller screens: a slim
 // top bar (logo, alerts, account) and a bottom tab bar.
@@ -55,10 +59,19 @@ export function AppShell({ children }: { children: ReactNode }) {
       <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col border-r border-line bg-canvas lg:flex">
         <div className="flex h-14 items-center px-4">
           <Link href={SIGNED_IN_HOME} className="flex items-center gap-2 text-brand-ink" aria-label="DabaShare home">
-            <Logo size={26} />
+            <Logo size={24} />
           </Link>
         </div>
-        <nav aria-label="Main" className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-2">
+        <div className="px-3 pb-3">
+          <Link
+            href="/home?compose=1"
+            className="flex h-8 items-center gap-2 rounded-control border border-line-strong bg-surface px-2.5 text-[0.875rem] font-medium text-fg transition-colors duration-150 hover:border-fg-subtle/50 hover:bg-subtle"
+          >
+            <SquarePen className="size-4 text-brand-ink" strokeWidth={1.75} aria-hidden="true" />
+            New post
+          </Link>
+        </div>
+        <nav aria-label="Main" className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-1">
           <ul className="flex flex-col gap-0.5">
             {MAIN.map((item) => (
               <li key={item.href}>
@@ -67,7 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             ))}
           </ul>
           <div>
-            <p className="mb-1 px-2.5 text-caption font-medium text-fg-subtle">You</p>
+            <p className="mb-1.5 px-2.5 text-label text-fg-subtle">You</p>
             <ul className="flex flex-col gap-0.5">
               {YOU.map((item) => (
                 <li key={item.href}>
@@ -87,7 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-20 border-b border-line bg-canvas/95 backdrop-blur lg:hidden">
         <div className="flex h-14 items-center gap-2 px-4">
           <Link href={SIGNED_IN_HOME} className="text-brand-ink" aria-label="DabaShare home">
-            <Logo size={26} />
+            <Logo size={24} />
           </Link>
           <div className="ml-auto flex items-center gap-1">
             <NavLink
@@ -123,8 +136,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                 href={item.href}
                 exclude={item.exclude}
                 exact={item.exact}
-                className="relative flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-[0.6875rem] font-medium text-fg-subtle"
-                activeClassName="text-fg"
+                className="relative flex min-h-14 flex-col items-center justify-center gap-1 px-1 text-[0.6875rem] font-medium text-fg-subtle before:absolute before:inset-x-5 before:top-0 before:h-0.5 before:rounded-full before:bg-brand before:opacity-0"
+                activeClassName="text-brand-ink before:opacity-100"
               >
                 <item.icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
                 <span>{item.label}</span>

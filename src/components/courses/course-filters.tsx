@@ -1,103 +1,149 @@
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Input, Select } from "@/components/ui/field";
-import { Chip } from "@/components/ui/primitives";
 import { coursesHref, LEVELS, type CourseFilters } from "@/lib/courses/validation";
 import type { Category, University } from "@/lib/reference";
 
-// A plain GET form: works without JavaScript, and every result page has a
-// shareable URL.
-export function CourseFiltersBar({
+// Search, then one row: the departments (real categories) and a "Filters"
+// dropdown for university, level and price. The dropdown is a <details>, so
+// it works without JavaScript; active filters show as removable chips.
+// A plain GET form: every result page has a shareable URL.
+export function CourseSearch({
   filters,
   universities,
   categories,
-  total,
 }: {
   filters: CourseFilters;
   universities: University[];
   categories: Category[];
-  total: number;
 }) {
-  const priceOptions = [
-    { value: undefined, label: "Any price" },
-    { value: "free" as const, label: "Free" },
-    { value: "paid" as const, label: "Paid" },
-  ];
-  const active = Boolean(filters.q || filters.uni || filters.cat || filters.level || filters.price);
+  const university = universities.find((u) => u.id === filters.uni);
+  const level = LEVELS.find((l) => l.value === filters.level);
+  const refined = Boolean(university || level || filters.price);
 
   return (
-    <div className="flex flex-col gap-3">
-      <form
-        action="/courses"
-        method="get"
-        role="search"
-        className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))_auto]"
-      >
-        {filters.price && <input type="hidden" name="price" value={filters.price} />}
-        <div className="relative col-span-2 sm:col-span-4 lg:col-span-1">
+    <form action="/courses" method="get" role="search" className="flex flex-col gap-4">
+      {filters.cat && <input type="hidden" name="cat" value={filters.cat} />}
+      <div className="flex gap-2">
+        <div className="relative min-w-0 flex-1">
           <label className="sr-only" htmlFor="q">
             Search courses or tutors
           </label>
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-fg-subtle" aria-hidden="true" />
-          <Input id="q" name="q" type="search" className="pl-9" placeholder="Search courses, skills or tutors" defaultValue={filters.q} />
+          <Input id="q" name="q" type="search" className="h-10 pl-9" placeholder="Course, skill or tutor" defaultValue={filters.q} />
         </div>
-        <label className="sr-only" htmlFor="uni">
-          University
-        </label>
-        <Select id="uni" name="uni" defaultValue={filters.uni ?? ""}>
-          <option value="">All universities</option>
-          {universities.map((u) => (
-            <option key={u.id} value={u.id}>
-              {u.short_name}
-            </option>
-          ))}
-        </Select>
-        <label className="sr-only" htmlFor="cat">
-          Category
-        </label>
-        <Select id="cat" name="cat" defaultValue={filters.cat ?? ""}>
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </Select>
-        <label className="sr-only" htmlFor="level">
-          Level
-        </label>
-        <Select id="level" name="level" defaultValue={filters.level ?? ""}>
-          <option value="">All levels</option>
-          {LEVELS.map((l) => (
-            <option key={l.value} value={l.value}>
-              {l.label}
-            </option>
-          ))}
-        </Select>
-        <Button type="submit" className="h-auto min-h-9">
+        <Button type="submit" className="h-10">
           Search
         </Button>
-      </form>
-      <div className="flex flex-wrap items-center gap-2">
-        {priceOptions.map((option) => (
-          <Chip key={option.label} href={coursesHref({ ...filters, price: option.value, page: 1 })} active={filters.price === option.value}>
-            {option.label}
-          </Chip>
-        ))}
-        <p className="text-small text-fg-subtle sm:ml-auto" aria-live="polite">
-          {total === 1 ? "1 course" : `${total} courses`}
-          {active ? " match your filters" : ""}
-          {active && (
-            <>
-              {" · "}
-              <Link href="/courses" className="font-medium text-fg-muted underline-offset-2 hover:text-fg hover:underline">
-                Clear filters
-              </Link>
-            </>
-          )}
-        </p>
       </div>
+
+      <div className="flex items-center gap-2">
+        <CategoryIndex filters={filters} categories={categories} />
+        <details className="relative shrink-0">
+          <summary className="inline-flex h-8 cursor-pointer list-none items-center gap-2 rounded-control border border-line-strong bg-surface px-2.5 text-small font-medium text-fg transition-colors duration-150 hover:bg-subtle [&::-webkit-details-marker]:hidden">
+            <SlidersHorizontal className="size-4 text-fg-muted" aria-hidden="true" />
+            Filters
+          </summary>
+          <div className="absolute right-0 z-30 mt-2 flex w-[min(20rem,calc(100vw-2rem))] flex-col gap-3 rounded-card border border-line bg-surface p-4 shadow-overlay">
+            <FilterField label="University" htmlFor="uni">
+              <Select id="uni" name="uni" defaultValue={filters.uni ?? ""}>
+                <option value="">Any university</option>
+                {universities.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.short_name}
+                  </option>
+                ))}
+              </Select>
+            </FilterField>
+            <FilterField label="Level" htmlFor="level">
+              <Select id="level" name="level" defaultValue={filters.level ?? ""}>
+                <option value="">Any level</option>
+                {LEVELS.map((l) => (
+                  <option key={l.value} value={l.value}>
+                    {l.label}
+                  </option>
+                ))}
+              </Select>
+            </FilterField>
+            <FilterField label="Price" htmlFor="price">
+              <Select id="price" name="price" defaultValue={filters.price ?? ""}>
+                <option value="">Any price</option>
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+              </Select>
+            </FilterField>
+            <Button type="submit" fullWidth>
+              Show courses
+            </Button>
+          </div>
+        </details>
+      </div>
+
+      {refined && (
+        <ul className="-mt-1 flex flex-wrap items-center gap-2" aria-label="Active filters">
+          {university && <ActiveFilter href={coursesHref({ ...filters, uni: undefined, page: 1 })} label={university.short_name} />}
+          {level && <ActiveFilter href={coursesHref({ ...filters, level: undefined, page: 1 })} label={level.label} />}
+          {filters.price && <ActiveFilter href={coursesHref({ ...filters, price: undefined, page: 1 })} label={filters.price === "free" ? "Free" : "Paid"} />}
+        </ul>
+      )}
+    </form>
+  );
+}
+
+function FilterField({ label, htmlFor, children }: { label: string; htmlFor: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={htmlFor} className="text-label text-fg-subtle">
+        {label}
+      </label>
+      {children}
     </div>
+  );
+}
+
+function ActiveFilter({ href, label }: { href: string; label: string }) {
+  return (
+    <li>
+      <Link
+        href={href}
+        className="inline-flex h-7 items-center gap-1.5 rounded-control border border-line-strong bg-surface pr-1.5 pl-2.5 text-small font-medium text-fg transition-colors duration-150 hover:bg-subtle"
+      >
+        {label}
+        <X className="size-3.5 text-fg-muted" aria-hidden="true" />
+        <span className="sr-only">(remove filter)</span>
+      </Link>
+    </li>
+  );
+}
+
+// The catalogue's departments. Scrolls sideways when it doesn't fit; the
+// right edge fades so it reads as scrollable.
+function CategoryIndex({ filters, categories }: { filters: CourseFilters; categories: Category[] }) {
+  const items = [{ id: undefined as number | undefined, name: "All" }, ...categories];
+  return (
+    <nav
+      aria-label="Categories"
+      className="flex min-w-0 flex-1 gap-1 overflow-x-auto pr-8 [mask-image:linear-gradient(to_right,black_calc(100%-2.5rem),transparent)] [scrollbar-width:none]"
+    >
+      {items.map((c) => {
+        const active = filters.cat === c.id;
+        return (
+          <Link
+            key={c.name}
+            href={coursesHref({ ...filters, cat: c.id, page: 1 })}
+            aria-current={active ? "page" : undefined}
+            className={
+              active
+                ? "shrink-0 rounded-control bg-fg px-2.5 py-1 text-small font-medium whitespace-nowrap text-canvas"
+                : "shrink-0 rounded-control px-2.5 py-1 text-small whitespace-nowrap text-fg-muted transition-colors duration-150 hover:bg-subtle hover:text-fg"
+            }
+          >
+            {c.name}
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

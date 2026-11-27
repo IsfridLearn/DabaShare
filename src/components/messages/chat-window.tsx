@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useActionState, useCallback, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import { loadOlderMessages, markConversationRead, sendMessage, type SendState } from "@/lib/messages/actions";
-import { dayKey, formatClock, formatDayLabel, MESSAGE_MAX } from "@/lib/messages/format";
+import { dayKey, formatClock, formatDayLabel, groupPosition, MESSAGE_MAX } from "@/lib/messages/format";
 import type { ChatMessage } from "@/lib/messages/queries";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/cn";
@@ -156,39 +156,52 @@ export function ChatWindow({
         {!messages.length && (
           <p className="py-10 text-center text-small text-fg-muted">No messages yet. Say hello to {otherName}!</p>
         )}
-        <ol className="flex flex-col gap-1.5">
+        <ol className="flex flex-col">
           {messages.map((m, i) => {
             const mine = m.sender_id === meId;
             const newDay = i === 0 || dayKey(new Date(messages[i - 1].created_at)) !== dayKey(new Date(m.created_at));
+            const { start, end } = groupPosition(messages, i);
             return (
-              <li key={m.id} className="flex flex-col">
+              <li key={m.id} className={cn("flex flex-col", i > 0 && (start ? "mt-4" : "mt-0.5"))}>
                 {newDay && (
                   <span className="my-4 flex items-center gap-3 text-caption font-medium text-fg-subtle before:h-px before:flex-1 before:bg-line after:h-px after:flex-1 after:bg-line">
                     {formatDayLabel(m.created_at)}
                   </span>
                 )}
                 <div className={cn("group flex max-w-[85%] flex-col sm:max-w-[70%]", mine ? "items-end self-end" : "items-start self-start")}>
-                  <p
-                    className={cn(
-                      "rounded-[14px] px-3.5 py-2 text-body leading-relaxed break-words whitespace-pre-wrap",
-                      mine ? "rounded-br-[4px] bg-brand text-white" : "rounded-bl-[4px] bg-subtle text-fg",
-                    )}
-                  >
-                    <span className="sr-only">{mine ? "You" : otherName}: </span>
-                    {m.body}
-                  </p>
-                  <span className="mt-0.5 flex items-center gap-1 px-1 text-caption text-fg-subtle">
-                    <time dateTime={m.created_at}>{formatClock(m.created_at)}</time>
+                  <div className={cn("flex items-center gap-1", mine && "flex-row-reverse")}>
+                    <p
+                      className={cn(
+                        "rounded-[16px] px-3.5 py-2 text-body leading-relaxed break-words whitespace-pre-wrap",
+                        mine ? "bg-brand-soft text-fg" : "bg-subtle text-fg",
+                        // Corners pointing at the sender tighten inside a group.
+                        !start && (mine ? "rounded-tr-[5px]" : "rounded-tl-[5px]"),
+                        !end && (mine ? "rounded-br-[5px]" : "rounded-bl-[5px]"),
+                      )}
+                    >
+                      <span className="sr-only">{mine ? "You" : otherName}: </span>
+                      {m.body}
+                      {!end && (
+                        <span className="sr-only">
+                          , <time dateTime={m.created_at}>{formatClock(m.created_at)}</time>
+                        </span>
+                      )}
+                    </p>
                     {!mine && (
                       <Link
                         href={`/report?type=message&id=${m.id}`}
-                        className="rounded px-1.5 py-1 opacity-0 group-hover:opacity-100 hover:text-danger-ink focus:opacity-100 [@media(hover:none)]:opacity-100"
+                        className="shrink-0 rounded-control px-1.5 py-1 text-caption text-fg-subtle opacity-0 group-hover:opacity-100 hover:text-danger-ink focus:opacity-100 [@media(hover:none)]:opacity-100"
                         aria-label={`Report message from ${otherName}`}
                       >
                         Report
                       </Link>
                     )}
-                  </span>
+                  </div>
+                  {end && (
+                    <time dateTime={m.created_at} className="mt-1 px-1 text-caption text-fg-subtle">
+                      {formatClock(m.created_at)}
+                    </time>
+                  )}
                 </div>
               </li>
             );

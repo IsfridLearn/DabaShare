@@ -57,7 +57,7 @@ export function FeedList({
 
   return (
     <div>
-      <ul aria-label={label} className="divide-y divide-line rounded-card border border-line bg-surface">
+      <ul aria-label={label} className="divide-y divide-line border-y border-line">
         {posts.map((post) => (
           <li key={post.id}>
             <PostItem post={post} meId={meId} />
