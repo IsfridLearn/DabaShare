@@ -27,11 +27,12 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 
 ### 2026-12-01 — Design refresh, Phase 6 (final QA), on branch `design-refresh`
 
-- **Security review** of the social layer by `qa-security-reviewer` (Sonnet): 0 critical, 0 high, 1 medium, 6 low. Fixed the medium and 3 low ones in migration `20261201090000_social_feed_hardening.sql` (applied to **dev only**), plus stricter feed cursor validation; the rest are documented in SECURITY.md. The 5 new RLS checks failed before the migration and pass after it.
+- **Security review** of the social layer by `qa-security-reviewer` (Sonnet): 0 critical, 0 high, 1 medium, 6 low. Fixed the medium and 3 low ones in migration `20261201090000_social_feed_hardening.sql`, plus stricter feed cursor validation; the rest are documented in SECURITY.md. The 5 new RLS checks failed before the migration and pass after it.
 - The dev push went through the HTTPS query API (`supabase db query`) and was recorded in `supabase_migrations.schema_migrations`, because this network blocks the direct database port that `supabase db push` uses.
 - **QA sweep** with an automatic horizontal-overflow check and an accessibility audit (unnamed buttons and links, unlabelled fields, one h1 per page, duplicate ids, images without alt, page title): 17 signed-in pages at 360, 768, 1024 and 1440px in light mode, 11 in dark mode at 360 and 1440px, and 8 signed-out pages in both themes at all four widths. Found and fixed: a duplicate `password` id on Settings, and the course Visibility dropdown truncating its descriptions on phones (now radio cards).
 - Tested: `npm run check` (101 unit tests), `npm run build`, `npm run db:test:rls` **144 passed, 0 failed**, E2E **158 passed, 0 failed** (self-cleaned).
-- **Before production:** apply `20261129090000_social_feed.sql` and `20261201090000_social_feed_hardening.sql` to the production project, then deploy. Not done; waiting for the owner's go-ahead.
+- **Database:** there is only one Supabase project (`zxjerdapfbufuimqhcgp`, see DEPLOYMENT.md), so both social migrations were applied to the live database when they were tested. Both are additive; the old site kept working.
+- **Deployed:** `design-refresh` fast-forwarded into `main` (`f3d4d8e`) and Vercel published it to https://dabashare.vercel.app. Live smoke test: public pages 200, protected pages redirect to sign-in, and a temporary signed-in student saw the Home feed and a profile (deleted afterwards). Vercel preview builds of other branches fail because the Preview environment has no Supabase variables; production is unaffected.
 
 ### 2026-12-01 — Design refresh, Phase 5 (interactions + responsive), on branch `design-refresh`
 
