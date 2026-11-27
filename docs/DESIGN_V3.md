@@ -1,6 +1,6 @@
 # DabaShare design v3: "The Commons"
 
-Status: implemented on branch `design-v3` (phases 1–8). Not deployed yet.
+Status: implemented (phases 1–8) and live at https://dabashare.vercel.app since 2026-11-28 (`main` at `a2cc017`). The accent is DabaShare blue (owner decision).
 
 ## 1. Why the current UI still reads as generic
 

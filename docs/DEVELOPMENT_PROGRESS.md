@@ -30,7 +30,8 @@ Your real account (created 2026-11-23) proves the end-to-end email flow: signup 
 - A full redesign after a study of the product and the four references (Linear, Are.na, Notion, an academic editorial site), with two subagent reviews of the rendered UI. The decisions and the result are in DESIGN_V3.md.
 - No database, API or Server Action changes. No new dependencies: Instrument Sans is loaded through `next/font`.
 - Tested: `npm run check` (103 unit tests), `npm run build`, E2E 158 passed and 0 failed, and an accessibility and overflow sweep (146 screenshots, 0 issues). RLS: UNTESTED this round, since no database changes were made. Demo data seeded for screenshots was always deleted afterwards (0 test users left).
-- Not deployed. Waiting for the owner's go-ahead.
+- The accent was changed to DabaShare blue at the owner's request (`a2cc017`; contrast rechecked, E2E 158/0).
+- **Deployed 2026-11-28:** `design-v3` was fast-forwarded into `main` and published by Vercel. Live smoke test: public pages 200, protected pages redirect to sign-in, and temporary signed-in students saw Home, Courses, People and Messages (deleted afterwards; 0 test users left).
 
 ### 2026-12-01 — Design refresh, Phase 6 (final QA), on branch `design-refresh`
 
